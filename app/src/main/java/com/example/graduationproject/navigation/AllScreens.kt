@@ -6,6 +6,7 @@ enum class AllScreens {
     SplashScreen,
     LoginScreen,
     ReportScreen,
+    ChatDetails,
 
     //client
 
@@ -16,7 +17,6 @@ enum class AllScreens {
     ClientProfileSettingsScreen,
     ClientOrderOfferScreen,
     ClientRateScreen,
-    ClientChatDetails,
 
     //worker
 

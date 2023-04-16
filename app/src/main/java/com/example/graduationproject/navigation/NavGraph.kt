@@ -135,8 +135,13 @@ fun NavGraph() {
             )
         }
         //Chat Details
-        composable(route = AllScreens.ClientChatDetails.name) {
-            ChatDetails(navController = navController)
+
+        composable(route = "${AllScreens.ChatDetails.name}/{id}", arguments = listOf(navArgument(name = "id") {
+            type = NavType.StringType
+        })) { data ->
+            data.arguments?.getString("id").let { id ->
+                ChatDetails(navController = navController, id = id.toString())
+            }
         }
 
         //worker

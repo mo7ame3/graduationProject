@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.SmallPhoto
 import com.example.graduationproject.data.ChatData
+import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.RedColor
 
@@ -28,6 +29,7 @@ fun ChatList(navController: NavController) {
             ChatRow(chatData = it) { job ->
                 //nav to chat
                 Log.d("job", "ChatList: ${job.name}")
+                navController.navigate(route = AllScreens.ChatDetails.name+"/${it.id}")
             }
             Spacer(modifier = Modifier.height(20.dp))
         }
@@ -94,72 +96,85 @@ fun ChatRow(
 
 val chatList = listOf(
     ChatData(
+        id = 1,
         name = "ريشة",
         craft = "كهربائي",
         message = "تمام",
     ),
     ChatData(
+        id = 2,
         name = "رزة",
         craft = "محارة",
         message = "ماشي",
     ),
     ChatData(
+        id = 3,
         name = "أحمد محمد",
         craft = "نجار",
     ),
     ChatData(
+        id = 4,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
     ),
     ChatData(
+        id = 5,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
+        id = 6,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
     ),
     ChatData(
+        id = 7,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
     ),
     ChatData(
+        id = 8,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
+        id = 9,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
     ),
     ChatData(
+        id = 10,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
+        id = 11,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
+        id = 12,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
     ),
     ChatData(
+        id = 13,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
+        id = 14,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
-    )
-)
+    ))
