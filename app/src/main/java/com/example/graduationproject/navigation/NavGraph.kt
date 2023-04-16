@@ -121,14 +121,17 @@ fun NavGraph() {
         }
         //Report Screen
         composable(
-            route = AllScreens.ReportScreen.name + "/{client}",
+            route = AllScreens.ReportScreen.name + "/{client}/{status}",
             arguments = listOf(navArgument(name = "client") {
                 type = NavType.BoolType
-            })
+            } ,navArgument(name = "status") {
+                    type = NavType.StringType
+                })
         ) { data ->
             ReportScreen(
                 navController = navController,
-                client = data.arguments!!.getBoolean("client")
+                client = data.arguments!!.getBoolean("client"),
+                status = data.arguments!!.getString("status").toString()
             )
         }
         //Chat Details

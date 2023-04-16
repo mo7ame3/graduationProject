@@ -157,7 +157,7 @@ fun WorkerProfileScreen(
                 ) {
                     items(picturesList) {
                         if (it != null) {
-                            pickPhotoRow(it)
+                            PickPhotoRow(it)
                             Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
@@ -166,7 +166,7 @@ fun WorkerProfileScreen(
             if (adminOrWorker && ShowReportButton) {
                 DefaultButton(label = "تقديم بلاغ") {
                     // nav to Report
-                    navController.navigate(AllScreens.ReportScreen.name + "/${true}")
+                    navController.navigate(AllScreens.ReportScreen.name + "/${true}/client")
                 }
             } else {
                 if (!completeToggle.value && !adminOrWorker) {
@@ -233,7 +233,7 @@ fun CompleteProjectRow(
 
 
 @Composable
-fun pickPhotoRow(
+fun PickPhotoRow(
     selectedImage: Uri? = null
 ) {
     Surface(

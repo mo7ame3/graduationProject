@@ -127,7 +127,7 @@ fun ClientProfileScreen(
                 }
                 DefaultButton(label = "تقديم بلاغ") {
                     // nav to Report
-                    navController.navigate(AllScreens.ReportScreen.name + "/${false}")
+                    navController.navigate(AllScreens.ReportScreen.name + "/${false}/worker")
                 }
             }
         }

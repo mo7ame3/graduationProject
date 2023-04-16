@@ -22,7 +22,8 @@ import com.example.graduationproject.ui.theme.MainColor
 @Composable
 fun ReportScreen(
     navController: NavHostController,
-    client: Boolean = true
+    client: Boolean = true,
+    status: String =""
 ) {
     Scaffold(topBar = {
         TopAppBar(title = "بلاغ") {
@@ -42,39 +43,42 @@ fun ReportScreen(
             }
             //list
             Column {
+
                 reportList.forEach { element ->
                     var checked by remember {
                         mutableStateOf(false)
                     }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                checked = !checked
-                                if (checked) {
-                                    checkedlist.add(element)
-                                } else {
-                                    checkedlist.remove(element)
-                                }
-                            }) {
-                        Checkbox(
-                            checked = checked,
-                            onCheckedChange = {
-                                checked = it
-                                if (checked) {
-                                    checkedlist.add(element)
-                                } else {
-                                    checkedlist.remove(element)
-                                }
-                            },
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = MainColor,
-                                uncheckedColor = MainColor
+                    if ((status == "client" && element != "وصف غير دقيق للمشكلة")
+                        || (status == "worker" && (element != "عامل غير كفء" && element != "عمل غير متقن")))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    checked = !checked
+                                    if (checked) {
+                                        checkedlist.add(element)
+                                    } else {
+                                        checkedlist.remove(element)
+                                    }
+                                }) {
+                            Checkbox(
+                                checked = checked,
+                                onCheckedChange = {
+                                    checked = it
+                                    if (checked) {
+                                        checkedlist.add(element)
+                                    } else {
+                                        checkedlist.remove(element)
+                                    }
+                                },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = MainColor,
+                                    uncheckedColor = MainColor
+                                )
                             )
-                        )
-                        Text(text = element)
-                    }
+                            Text(text = element)
+                        }
                     Spacer(modifier = Modifier.height(15.dp))
                 }
             }
