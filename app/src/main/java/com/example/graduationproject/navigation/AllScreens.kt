@@ -6,6 +6,8 @@ enum class AllScreens {
     SplashScreen,
     LoginScreen,
     ReportScreen,
+    ForgotPasswordScreen,
+    ChangePasswordScreen,
 
     //client
 

@@ -99,17 +99,17 @@ fun LoginScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val phoneError = remember {
+                    val notPhoneError = remember {
                         mutableStateOf(false)
                     }
                     val eye = remember {
                         mutableStateOf(false)
                     }
                     val keyboardController = LocalSoftwareKeyboardController.current
-                    val passwordError = remember {
+                    val notPasswordError = remember {
                         mutableStateOf(false)
                     }
-                    val valid = (passwordError.value && phoneError.value)
+                    val valid = (notPasswordError.value && notPhoneError.value)
 
 //                  Register Variables
                     val nameError = remember {
@@ -151,7 +151,7 @@ fun LoginScreen(navController: NavController) {
 
                     if (toggledTopButton) {
                         PhoneNumber(phoneNumber = phoneNumber,
-                            isNotError = phoneError,
+                            isNotError = notPhoneError,
                             onAction = KeyboardActions {
                                 keyboardController?.hide()
                             })
@@ -161,7 +161,7 @@ fun LoginScreen(navController: NavController) {
                             eye.value = !eye.value
                         }, onAction = KeyboardActions {
                             keyboardController?.hide()
-                        }, isNotError = passwordError
+                        }, isNotError = notPasswordError
                         )
                         Spacer(modifier = Modifier.height(20.dp))
 
