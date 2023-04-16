@@ -15,7 +15,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.*
 import com.example.graduationproject.navigation.AllScreens
@@ -163,13 +165,19 @@ fun LoginScreen(navController: NavController) {
                             keyboardController?.hide()
                         }, isNotError = passwordError
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        TextButton(onClick = {
+                            navController.navigate(route = AllScreens.ForgotPasswordScreen.name)
+                        }) {
+                            Text(text = "هل نسيت كلمة السر ؟" , color = MainColor , fontSize = 14.sp , fontWeight = FontWeight.SemiBold )
+                        }
+
                         Spacer(modifier = Modifier.height(20.dp))
 
                         LoginButton(
                             isLogin = true, enabled = valid, label = "سجل الدخول"
                         ) {
                             //Getting Login values tp pass to API
-
                             scope.launch {
                                 if (phoneNumber.value == "01030718569" && passwordLogin.value == "1234567890000") {
                                     sharedPreference.saveState("client")

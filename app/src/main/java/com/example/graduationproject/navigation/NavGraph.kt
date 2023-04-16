@@ -23,6 +23,8 @@ import com.example.graduationproject.screens.client.profile.ClientProfileScreen
 import com.example.graduationproject.screens.client.profileSettings.ClientProfileSettingsScreen
 import com.example.graduationproject.screens.client.rate.ClientRateScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatDetails
+import com.example.graduationproject.screens.sharedScreens.login.ChangePasswordScreen
+import com.example.graduationproject.screens.sharedScreens.login.ForgotPasswordScreen
 import com.example.graduationproject.screens.sharedScreens.login.LoginScreen
 import com.example.graduationproject.screens.sharedScreens.report.ReportScreen
 import com.example.graduationproject.screens.sharedScreens.splash.SplashScreen
@@ -78,6 +80,14 @@ fun NavGraph() {
         composable(route = AllScreens.SplashScreen.name) {
             SplashScreen(navController = navController)
         }
+
+        composable(route = AllScreens.ForgotPasswordScreen.name){
+            ForgotPasswordScreen(navController = navController)
+        }
+        composable(route = AllScreens.ChangePasswordScreen.name){
+            ChangePasswordScreen(navController = navController)
+        }
+
         composable(route = AllScreens.ClientProfileSettingsScreen.name) {
             ClientProfileSettingsScreen(navController = navController)
         }

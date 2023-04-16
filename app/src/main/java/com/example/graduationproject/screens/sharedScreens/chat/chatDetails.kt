@@ -33,9 +33,8 @@ import com.example.graduationproject.ui.theme.SecondaryColor
 fun ChatDetails(navController: NavHostController, id: String) {
 
     // we should pass 2 ids one for the Sender and the other for the Receiver
-    val selectedPersonToChatWith = chatList.filter {
-        t-> id.toInt() == t.id
-
+    val selectedPersonToChatWith = chatList.filter { t->
+        id.toInt() == t.id
     }
 
     val context = LocalContext.current

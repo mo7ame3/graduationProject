@@ -1,5 +1,6 @@
 package com.example.graduationproject.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -149,6 +150,38 @@ fun PasswordInput(
                 Icon(imageVector = leadingImageVector, contentDescription = null, tint = MainColor)
             }
         })
+}
+
+@SuppressLint("SuspiciousIndentation")
+@Composable
+fun SMSNumber(
+    modifier: Modifier = Modifier,
+    smsNumber: MutableState<String>,
+    keyboardType: KeyboardType = KeyboardType.Number,
+//    imeAction: ImeAction = ImeAction.Next,
+    onAction: KeyboardActions = KeyboardActions.Default,
+    isSingleLine: Boolean = true,
+) {
+    val maxNumbers = 6
+    OutlinedTextField(
+        modifier = modifier
+            .fillMaxWidth(.4f)
+            .height(55.dp)
+            .padding(start = 25.dp, end = 25.dp),
+        shape = RoundedCornerShape(25.dp),
+        label = { Text(text = "ادخل كود التأكيد", style = TextStyle(color = MainColor)) },
+        value = smsNumber.value,
+        onValueChange = {
+            if(it.length <= maxNumbers)
+                smsNumber.value = it
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardActions = onAction,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            backgroundColor = Color.White,
+        ),
+        singleLine = isSingleLine,
+    )
 }
 
 @Composable
