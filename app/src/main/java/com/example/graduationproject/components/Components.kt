@@ -14,21 +14,28 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.graduationproject.R
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.DrawerData
+import com.example.graduationproject.ui.theme.AdminSecondaryColor
 import com.example.graduationproject.ui.theme.GoldColor
 import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.SecondaryColor
@@ -281,6 +288,74 @@ fun PickPhoto(
         )
     }
 }
+
+
+
+//craft photo
+
+@Composable
+fun InternetCraftPhoto( uri: String){
+    Box {
+
+        // to reload image
+        var refreshImage by remember { mutableStateOf(0) }
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(uri)
+                .setParameter("refresh", refreshImage, memoryCacheKey = null)
+                .build()
+        )
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.size(300.dp, 200.dp),
+        )
+        // condition to reload image
+        when (painter.state) {
+            is AsyncImagePainter.State.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(onClick = { refreshImage++ }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+                }
+            }
+            is AsyncImagePainter.State.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            else -> {}
+        }
+    }
+}
+
+//craft name
+@Composable
+fun InternetCraftName(jobName :String){
+    Surface(
+        color = Color.White,
+        modifier = Modifier
+            .height(90.dp)
+            .width(350.dp),
+        shape = RoundedCornerShape(bottomEnd = 30.dp, bottomStart = 30.dp),
+        elevation = 5.dp
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(text = jobName)
+        }
+    }
+}
+
 
 @Composable
 fun ProblemDescription(

@@ -1,7 +1,6 @@
 package com.example.graduationproject.screens.client.home
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,22 +8,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.graduationproject.R
 import com.example.graduationproject.components.BottomBar
 import com.example.graduationproject.components.DrawerBody
 import com.example.graduationproject.components.DrawerHeader
+import com.example.graduationproject.components.InternetCraftName
+import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopMainBar
-import com.example.graduationproject.data.Job
+import com.example.graduationproject.constant.Constant.adminCraftList
+import com.example.graduationproject.data.GoogleDriveList
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.client.order.ClientOrderScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatList
@@ -118,7 +116,7 @@ fun ClientHomeScreen(navController: NavController, route: String) {
             if (home.value == "home") {
                 Home {
                     //navigate to post
-                    navController.navigate(route = AllScreens.ClientPostScreen.name + "/${it.job}")
+                    navController.navigate(route = AllScreens.ClientPostScreen.name + "/${it.jobName}")
                 }
             }
             if (home.value == "order") {
@@ -133,10 +131,10 @@ fun ClientHomeScreen(navController: NavController, route: String) {
 
 @Composable
 fun Home(
-    onClick: (Job) -> Unit
+    onClick: (GoogleDriveList) -> Unit
 ) {
     LazyColumn {
-        items(jobs) {
+        items(adminCraftList) {
             JobRow(job = it) { job ->
                 onClick.invoke(job)
             }
@@ -148,7 +146,7 @@ fun Home(
 }
 
 @Composable
-fun JobRow(job: Job, onClick: (Job) -> Unit) {
+fun JobRow(job: GoogleDriveList, onClick: (GoogleDriveList) -> Unit) {
     Column(modifier = Modifier
         .clickable {
             onClick.invoke(job)
@@ -162,37 +160,11 @@ fun JobRow(job: Job, onClick: (Job) -> Unit) {
                 modifier = Modifier.size(350.dp, 230.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painter = painterResource(id = job.pic),
-                        contentDescription = null,
-                        modifier = Modifier.size(300.dp, 200.dp)
-                    )
-                    Surface(
-                        color = Color.White,
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(350.dp),
-                        shape = RoundedCornerShape(bottomEnd = 30.dp, bottomStart = 30.dp),
-                        elevation = 5.dp
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(text = job.job)
-                        }
-                    }
+                    InternetCraftPhoto(uri = job.picGoogle)
+                    InternetCraftName(jobName = job.jobName)
                 }
             }
         }
 
     }
 }
-
-val jobs = listOf(
-    Job("نجار", R.drawable.carpenter),
-    Job("سباك", R.drawable.plumber),
-    Job("كهربائي", R.drawable.electrical),
-    Job("عامل نظافة", R.drawable.cleaner),
-    Job("حداد", R.drawable.ironguy),
-    Job("صيانة اجهزة كهربائية", R.drawable.machinesfixer),
-    Job("عامل بناء", R.drawable.builder),
-    Job("نقاش", R.drawable.womanpainter)
-)

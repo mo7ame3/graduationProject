@@ -1,7 +1,6 @@
 package com.example.graduationproject.screens.admin.query.jobs
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,17 +9,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import com.example.graduationproject.components.InternetCraftName
+import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.constant.Constant.adminCraftList
 import com.example.graduationproject.data.GoogleDriveList
@@ -71,72 +66,7 @@ fun JobRow(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box {
-
-                        // to reload image
-                        var refreshImage by remember { mutableStateOf(0) }
-                        val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(googleDriveList.picGoogle)
-                                .setParameter("refresh", refreshImage, memoryCacheKey = null)
-                                .build()
-                        )
-                        Image(
-                            painter = painter,
-                            contentDescription = null,
-                            modifier = Modifier.size(300.dp, 200.dp),
-                        )
-                        // condition to reload image
-                        when (painter.state) {
-                            is AsyncImagePainter.State.Error -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    IconButton(onClick = { refreshImage++ }) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(60.dp)
-                                        )
-                                    }
-                                }
-                            }
-                            is AsyncImagePainter.State.Loading -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
-                            else -> {}
-                        }
-
-//                        SubcomposeAsyncImage(
-//                            model = googleDriveList.picGoogle,
-//                            contentDescription = null,
-//                            modifier = Modifier.size(300.dp, 200.dp),
-//                            loading = {
-//                                Box(
-//                                    modifier = Modifier.fillMaxSize(),
-//                                    contentAlignment = Alignment.Center
-//                                ) {
-//                                    CircularProgressIndicator()
-//                                }
-//                            },
-//                            error = {
-//                                Box(
-//                                    modifier = Modifier.fillMaxSize(),
-//                                    contentAlignment = Alignment.Center
-//                                ) {
-//                                    Icon(
-//                                        imageVector = Icons.Default.Error,
-//                                        contentDescription = null,
-//                                        modifier = Modifier.size(60.dp)
-//                                    )
-//                                }
-//                            }
-//                        )
+                        InternetCraftPhoto(googleDriveList.picGoogle)
                         Row(
                             modifier = Modifier.size(300.dp, 200.dp),
                             horizontalArrangement = Arrangement.End,
@@ -153,18 +83,7 @@ fun JobRow(
                             }
                         }
                     }
-                    Surface(
-                        color = Color.White,
-                        modifier = Modifier
-                            .height(90.dp)
-                            .width(350.dp),
-                        shape = RoundedCornerShape(bottomEnd = 30.dp, bottomStart = 30.dp),
-                        elevation = 5.dp
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text(text = googleDriveList.jobName)
-                        }
-                    }
+                    InternetCraftName(jobName = googleDriveList.jobName)
                 }
             }
         }
