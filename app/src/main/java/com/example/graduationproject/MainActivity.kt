@@ -23,6 +23,7 @@ class MainActivity : ComponentActivity() {
         val context: Context = LanguageConfig.changeLanguage(newBase, languageCode)
         super.attachBaseContext(context)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         super.onCreate(savedInstanceState)
@@ -39,7 +40,8 @@ fun MyApp() {
             modifier = Modifier.fillMaxSize(),
             color = Color.White,
         ) {
-            Column(verticalArrangement = Arrangement.Center,
+            Column(
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 NavGraph()
