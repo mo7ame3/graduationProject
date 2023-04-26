@@ -374,4 +374,13 @@ object Constant {
         "وصف غير دقيق للمشكلة",
         "عامل غير كفء",
     )
+
+
+    //BaseURI
+
+    const val BASE_URI = "https://documenter.getpostman.com/view/21783735/2s93Y6uL1y"
+
+    //EndPoint
+
+    const val REGISTER = "api/v1/users/register"
 }

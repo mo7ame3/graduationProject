@@ -16,7 +16,10 @@ import androidx.compose.ui.graphics.Color
 import com.example.graduationproject.language.LanguageConfig
 import com.example.graduationproject.navigation.NavGraph
 import com.example.graduationproject.ui.theme.GraduationProjectTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context) {
         val languageCode = "ar"

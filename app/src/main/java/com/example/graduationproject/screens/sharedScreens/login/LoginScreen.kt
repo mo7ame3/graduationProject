@@ -27,7 +27,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    authenticationViewModel: AuthenticationViewModel
+) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -169,7 +172,12 @@ fun LoginScreen(navController: NavController) {
                         TextButton(onClick = {
                             navController.navigate(route = AllScreens.ForgotPasswordScreen.name)
                         }) {
-                            Text(text = "هل نسيت كلمة السر ؟" , color = MainColor , fontSize = 14.sp , fontWeight = FontWeight.SemiBold )
+                            Text(
+                                text = "هل نسيت كلمة السر ؟",
+                                color = MainColor,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(20.dp))
@@ -222,12 +230,6 @@ fun LoginScreen(navController: NavController) {
                                     ) {
                                         //Getting Register values tp pass to API
                                         //name
-                                        if (nameBack.value == "Raghad"
-                                            && phoneBack.value == "01030718569" && passwordBack.value == "123456789"
-                                        ) {
-                                            navController.navigate(AllScreens.ClientHomeScreen.name + "/login")
-                                        }
-
 //                                        Log.d("TAG", "nameBack: ${nameBack.value}")
 //                                        //Phone
 //                                        Log.d("TAG", "phoneBack: ${phoneBack.value}")
@@ -243,6 +245,22 @@ fun LoginScreen(navController: NavController) {
 //                                        Log.d("TAG", "passwordRegister: ${passwordBack.value}")
 //                                        //passwordConfirm
 //                                        Log.d("TAG", "passwordConfirm: ${passwordConfirmBack.value}")
+
+                                        scope.launch {
+//                                            val register: WrapperClass<Register, Boolean, Exception> =
+//                                                authenticationViewModel.register(
+//                                                    name = "samy",
+//                                                    email = "samy@hello.io",
+//                                                    address = "fayoum",
+//                                                    role = "worker",
+//                                                    myCraft = "Building",
+//                                                    password = "1234567890000",
+//                                                    passwordConfirm = "1234567890000"
+//                                                )
+//                                            Log.d("TAG", "LoginScreen: ${register.loeading}")
+//                                            Log.d("TAG", "LoginScreen: ${register.data}")
+
+                                        }
                                     }
                                 }
                             } else {

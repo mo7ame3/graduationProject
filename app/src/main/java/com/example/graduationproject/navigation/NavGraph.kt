@@ -1,6 +1,7 @@
 package com.example.graduationproject.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +24,7 @@ import com.example.graduationproject.screens.client.profile.ClientProfileScreen
 import com.example.graduationproject.screens.client.profileSettings.ClientProfileSettingsScreen
 import com.example.graduationproject.screens.client.rate.ClientRateScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatDetails
+import com.example.graduationproject.screens.sharedScreens.login.AuthenticationViewModel
 import com.example.graduationproject.screens.sharedScreens.login.ChangePasswordScreen
 import com.example.graduationproject.screens.sharedScreens.login.ForgotPasswordScreen
 import com.example.graduationproject.screens.sharedScreens.login.LoginScreen
@@ -52,7 +54,11 @@ fun NavGraph() {
             }
         }
         composable(route = AllScreens.LoginScreen.name) {
-            LoginScreen(navController = navController)
+            val authenticationViewModel = hiltViewModel<AuthenticationViewModel>()
+            LoginScreen(
+                navController = navController,
+                authenticationViewModel = authenticationViewModel
+            )
         }
         composable(route = AllScreens.ClientOrderOfferScreen.name + "/{problemTitle}",
             arguments = listOf(
@@ -81,10 +87,10 @@ fun NavGraph() {
             SplashScreen(navController = navController)
         }
 
-        composable(route = AllScreens.ForgotPasswordScreen.name){
+        composable(route = AllScreens.ForgotPasswordScreen.name) {
             ForgotPasswordScreen(navController = navController)
         }
-        composable(route = AllScreens.ChangePasswordScreen.name){
+        composable(route = AllScreens.ChangePasswordScreen.name) {
             ChangePasswordScreen(navController = navController)
         }
 
@@ -134,9 +140,9 @@ fun NavGraph() {
             route = AllScreens.ReportScreen.name + "/{client}/{status}",
             arguments = listOf(navArgument(name = "client") {
                 type = NavType.BoolType
-            } ,navArgument(name = "status") {
-                    type = NavType.StringType
-                })
+            }, navArgument(name = "status") {
+                type = NavType.StringType
+            })
         ) { data ->
             ReportScreen(
                 navController = navController,
@@ -146,9 +152,12 @@ fun NavGraph() {
         }
         //Chat Details
 
-        composable(route = "${AllScreens.ChatDetails.name}/{id}", arguments = listOf(navArgument(name = "id") {
-            type = NavType.StringType
-        })) { data ->
+        composable(
+            route = "${AllScreens.ChatDetails.name}/{id}",
+            arguments = listOf(navArgument(name = "id") {
+                type = NavType.StringType
+            })
+        ) { data ->
             data.arguments?.getString("id").let { id ->
                 ChatDetails(navController = navController, id = id.toString())
             }

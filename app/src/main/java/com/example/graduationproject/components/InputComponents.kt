@@ -26,7 +26,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.core.text.isDigitsOnly
 import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.SecondaryColor
 
@@ -35,7 +34,7 @@ import com.example.graduationproject.ui.theme.SecondaryColor
 fun PhoneNumber(
     modifier: Modifier = Modifier,
     phoneNumber: MutableState<String>,
-    keyboardType: KeyboardType = KeyboardType.Number,
+    keyboardType: KeyboardType = KeyboardType.Email,
 //    imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default,
     isNotError: MutableState<Boolean>,
@@ -43,22 +42,17 @@ fun PhoneNumber(
     leadingImageVector: ImageVector? = null,
     isNotBackground: Boolean = false,
 ) {
-    val maxNumbers = 11
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 25.dp, end = 25.dp),
         shape = RoundedCornerShape(25.dp),
-        label = { Text(text = "رقم الهاتف", style = TextStyle(color = MainColor)) },
+        label = { Text(text = "البريد الالكتروني", style = TextStyle(color = MainColor)) },
         value = phoneNumber.value,
         onValueChange = {
-            if (it.length >= 2) {
-                if (it.toCharArray()[0] == '0' && it.toCharArray()[1] == '1') {
-                    if (it.isDigitsOnly()) if (it.length <= maxNumbers) {
-                        phoneNumber.value = it
-                        isNotError.value = it.length == maxNumbers
-                    }
-                }
+            if (it.trim().isNotBlank()) {
+                phoneNumber.value = it
+                isNotError.value = true
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
@@ -172,7 +166,7 @@ fun SMSNumber(
         label = { Text(text = "ادخل كود التأكيد", style = TextStyle(color = MainColor)) },
         value = smsNumber.value,
         onValueChange = {
-            if(it.length <= maxNumbers)
+            if (it.length <= maxNumbers)
                 smsNumber.value = it
         },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
