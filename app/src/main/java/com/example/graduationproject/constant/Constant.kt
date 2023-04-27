@@ -14,7 +14,7 @@ object Constant {
     val adminCraftList = listOf(
         GoogleDriveList(
             jobName = "نجار",
-            picGoogle = "https://drive.google.com/uc?id=1RWfee5Pf3LTODPqHOxKPOAHy79245zVy",
+            picGoogle = "https://drive.google.com/uc?id=1RWfee5Pf3LTODPqHOxKPOAHy79245zVy/",
             id = 0,
             craftTitle = "خدمة النجارة",
             numberOfWorkers = 0,
@@ -355,7 +355,7 @@ object Constant {
 
     //Admin Block list
     val adminBlockList = listOf(
-        BlockData(name = "أحمد محمد", image = Icons.Default.Lock),
+        BlockData(name = "أحمد محمد", image =0),
         BlockData(name = "أحمد محمد", time = "5hours"),
         BlockData(name = "أحمد محمد", time = "10hours"),
         BlockData(name = "أحمد محمد", time = "1day"),
@@ -378,7 +378,7 @@ object Constant {
 
     //BaseURI
 
-    const val BASE_URI = "https://documenter.getpostman.com/view/21783735/2s93Y6uL1y"
+    const val BASE_URI = "https://documenter.getpostman.com/view/21783735/2s93Y6uL1y/"
 
     //EndPoint
 

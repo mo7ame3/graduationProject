@@ -21,6 +21,7 @@ import com.example.graduationproject.components.DrawerHeader
 import com.example.graduationproject.components.InternetCraftName
 import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopMainBar
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.constant.Constant.adminCraftList
 import com.example.graduationproject.data.GoogleDriveList
 import com.example.graduationproject.navigation.AllScreens
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ClientHomeScreen(navController: NavController, route: String) {
 
-    //Log out Variables
+    //Shared preference variables
     val context = LocalContext.current
     val sharedPreference = SharedPreference(context)
 
@@ -41,7 +42,7 @@ fun ClientHomeScreen(navController: NavController, route: String) {
         mutableStateOf("home")
     }
     val title = remember {
-        mutableStateOf("خدماتي")
+        mutableStateOf(Constant.title)
     }
     // from order offer
     val isFirst = remember {
@@ -146,7 +147,8 @@ fun Home(
 }
 
 @Composable
-fun JobRow(job: GoogleDriveList, onClick: (GoogleDriveList) -> Unit) {
+fun JobRow(job: GoogleDriveList,
+           onClick: (GoogleDriveList) -> Unit) {
     Column(modifier = Modifier
         .clickable {
             onClick.invoke(job)

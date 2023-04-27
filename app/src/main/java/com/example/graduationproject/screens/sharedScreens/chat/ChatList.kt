@@ -96,33 +96,39 @@ fun ChatRow(
 
 val chatList = listOf(
     ChatData(
-        id = 1,
+        id = 0,
         name = "ريشة",
         craft = "كهربائي",
         message = "تمام",
     ),
     ChatData(
-        id = 2,
+        id = 1,
         name = "رزة",
         craft = "محارة",
         message = "ماشي",
     ),
     ChatData(
-        id = 3,
+        id = 2,
         name = "أحمد محمد",
         craft = "نجار",
     ),
     ChatData(
-        id = 4,
+        id = 3,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
     ),
     ChatData(
-        id = 5,
+        id = 4,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
+    ),
+    ChatData(
+        id = 5,
+        name = "جحا",
+        craft = "سباك",
+        message = "ماشي",
     ),
     ChatData(
         id = 6,
@@ -132,49 +138,25 @@ val chatList = listOf(
     ),
     ChatData(
         id = 7,
-        name = "جحا",
-        craft = "سباك",
-        message = "ماشي",
-    ),
-    ChatData(
-        id = 8,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
-        id = 9,
+        id = 8,
         name = "جحا",
         craft = "سباك",
         message = "ماشي",
+    ),
+    ChatData(
+        id = 9,
+        name = "احمد محمد",
+        craft = "عامل بناء",
+        message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
     ),
     ChatData(
         id = 10,
         name = "احمد محمد",
         craft = "عامل بناء",
         message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
-    ),
-    ChatData(
-        id = 11,
-        name = "احمد محمد",
-        craft = "عامل بناء",
-        message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
-    ),
-    ChatData(
-        id = 12,
-        name = "جحا",
-        craft = "سباك",
-        message = "ماشي",
-    ),
-    ChatData(
-        id = 13,
-        name = "احمد محمد",
-        craft = "عامل بناء",
-        message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
-    ),
-    ChatData(
-        id = 14,
-        name = "احمد محمد",
-        craft = "عامل بناء",
-        message = "تمام يافندم هاجي بكرا الساعه 9 الصبح ياريت بكرا تكون الرمله و الاسمنت جاهزين ",
-    ))
+    ),)

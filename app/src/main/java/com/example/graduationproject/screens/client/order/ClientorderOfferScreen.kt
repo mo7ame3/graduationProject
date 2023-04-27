@@ -208,20 +208,19 @@ fun OfferRow(
 }
 
 val offersListForTesting = listOf(
-    OffersList(0, "Magdy", "نجار محترف خبره سنتين", 5),
-    OffersList(1, "Mohamed", "نجار محترف خبره 3 سنين", 4),
-    OffersList(2, "Ibrahim", "نجار محترف خبره 4 سنين", 3),
-    OffersList(3, "Anas", "نجار محترف خبره سنتين", 5),
-    OffersList(4, "Amr", "نجار مبتدأ", 2),
-    OffersList(5, "Raghad", "نجار مبندأ", 1),
-    OffersList(6, "Walid", "نجار", 5),
-    OffersList(7, "Mostafa", "نجار", 5),
-    OffersList(8, "Khaled", "نجار", 5),
-    OffersList(9, "Noor", "نجار", 5),
-    OffersList(10, "Reem ", "نجار", 5),
+    OffersList(0, "ريشة", "نجار محترف خبره سنتين", 5),
+    OffersList(1, "رزة", "نجار محترف خبره 3 سنين", 4),
+    OffersList(2, "أحمد محمد", "نجار محترف خبره 4 سنين", 3),
+    OffersList(3, "جحا", "نجار محترف خبره سنتين", 5),
+    OffersList(4, "احمد محمد", "نجار مبتدأ", 2),
+    OffersList(5, "جحا", "نجار مبندأ", 1),
+    OffersList(6, "جحا", "نجار", 5),
+    OffersList(7, "احمد محمد", "نجار", 5),
+    OffersList(8, "جحا", "نجار", 5),
+    OffersList(9, "احمد محمد", "نجار", 5),
+    OffersList(10, "احمد محمد ", "نجار", 5),
 
     )
-
 
 @Composable
 fun AcceptRow(
@@ -298,7 +297,7 @@ fun AcceptRow(
                 }
             }
             Row {
-                IconButton(onClick = { navController.navigate(route = AllScreens.ClientHomeScreen.name + "/chat") }) {
+                IconButton(onClick = { navController.navigate(route = AllScreens.ChatDetails.name + "/${item.id}") }) {
                     Icon(
                         painter = painterResource(id = R.drawable.chat),
                         contentDescription = null,

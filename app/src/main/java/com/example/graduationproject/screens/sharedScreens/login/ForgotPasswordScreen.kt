@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.graduationproject.components.LoginButton
-import com.example.graduationproject.components.PhoneNumber
+import com.example.graduationproject.components.EmailInput
 import com.example.graduationproject.components.SMSNumber
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.GrayColor
@@ -59,10 +59,10 @@ fun ForgotPasswordScreen(navController: NavHostController) {
             ) {
                 val keyboardController = LocalSoftwareKeyboardController.current
                 //phone
-                val phoneNumber = rememberSaveable {
-                    mutableStateOf("01")
+                val email = rememberSaveable {
+                    mutableStateOf("")
                 }
-                val notPhoneError = remember {
+                val notEmailError = remember {
                     mutableStateOf(false)
                 }
                 // Boolean to action searchButton to send SMS
@@ -86,8 +86,8 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                 }
                 Column( modifier = Modifier.padding(top = 10.dp)) {
                     if (!sendSMS.value) {
-                        PhoneNumber(phoneNumber = phoneNumber,
-                            isNotError = notPhoneError,
+                        EmailInput(email = email,
+                            isNotError = notEmailError,
                             onAction = KeyboardActions {
                                 keyboardController?.hide()
                             })
@@ -97,12 +97,12 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceAround
                         ) {
-                            LoginButton(isLogin = notPhoneError.value, label = "بحث" ) {
+                            LoginButton(isLogin = notEmailError.value, label = "بحث" ) {
                                 // Search in dataBase and return Boolean to send SMS
-                                if(notPhoneError.value)
+                                if(notEmailError.value)
                                     sendSMS.value = true
                             }
-                            LoginButton(isLogin = !notPhoneError.value, label = "الغاء") {
+                            LoginButton(isLogin = !notEmailError.value, label = "الغاء") {
                                 // popBackStack
                                 navController.popBackStack()
                             }
@@ -114,7 +114,7 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                                     append("لقد قمنا بارسال رساله الي هذا الرقم ")
                                 }
                                 withStyle(style = SpanStyle(color = GrayColor,fontSize = 14.sp , fontWeight = FontWeight.Bold)){
-                                    append(phoneNumber.value)
+                                    append(email.value)
                                 }})
                             Spacer(modifier = Modifier.height(30.dp))
                             Row(

@@ -40,7 +40,7 @@ fun Register(
         IsNotError = nameError,
         onAction = KeyboardActions { keyboardControllerRegister?.hide() })
 
-    PhoneNumber(phoneNumber = phoneNumber, isNotError = phoneError, onAction = KeyboardActions {
+    EmailInput(email = phoneNumber, isNotError = phoneError, onAction = KeyboardActions {
         keyboardControllerRegister?.hide()
     })
 

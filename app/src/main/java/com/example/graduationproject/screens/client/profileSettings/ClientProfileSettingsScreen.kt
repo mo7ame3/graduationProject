@@ -3,13 +3,15 @@ package com.example.graduationproject.screens.client.profileSettings
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -107,7 +109,9 @@ fun ClientProfileSettingsScreen(navController: NavController) {
 
 
         Column(
-            modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TextInput(text = nameEdit,
                 leadingImageVector = Icons.Default.Person,
@@ -116,13 +120,13 @@ fun ClientProfileSettingsScreen(navController: NavController) {
                     keyboardController?.hide()
                 })
             Spacer(modifier = Modifier.height(5.dp))
-            PhoneNumber(
-                phoneNumber = phoneEdit,
+            EmailInput(
+                email = phoneEdit,
                 isNotError = phoneEditNotError,
                 onAction = KeyboardActions {
                     keyboardController?.hide()
                 },
-                leadingImageVector = Icons.Default.Phone,
+                leadingImageVector = Icons.Default.Email,
                 isNotBackground = true
             )
             Spacer(modifier = Modifier.height(5.dp))

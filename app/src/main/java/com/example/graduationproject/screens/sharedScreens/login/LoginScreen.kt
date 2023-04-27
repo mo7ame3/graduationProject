@@ -3,8 +3,10 @@ package com.example.graduationproject.screens.sharedScreens.login
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -51,8 +53,8 @@ fun LoginScreen(
         mutableStateOf(false)
     }
     // Login Variables
-    val phoneNumber = rememberSaveable {
-        mutableStateOf("01")
+    val email = rememberSaveable {
+        mutableStateOf("")
     }
     val passwordLogin = rememberSaveable {
         mutableStateOf("")
@@ -65,7 +67,7 @@ fun LoginScreen(
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(topEnd = 250.dp, bottomStart = 250.dp)
+            shape = RoundedCornerShape(topEnd = 200.dp, bottomStart = 200.dp)
         ) {
 
             Column(
@@ -91,7 +93,7 @@ fun LoginScreen(
                             showBackArrow.value = false
                             isNext.value = false
                             passwordLogin.value = ""
-                            phoneNumber.value = ""
+                            email.value = ""
                         }) {
                             Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
                         }
@@ -104,7 +106,7 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val phoneError = remember {
+                    val emailError = remember {
                         mutableStateOf(false)
                     }
                     val eye = remember {
@@ -114,20 +116,20 @@ fun LoginScreen(
                     val passwordError = remember {
                         mutableStateOf(false)
                     }
-                    val valid = (passwordError.value && phoneError.value)
+                    val valid = (passwordError.value && emailError.value)
 
 //                  Register Variables
                     val nameError = remember {
                         mutableStateOf(false)
                     }
-                    val phoneErrorRegister = remember {
+                    val emailErrorRegister = remember {
                         mutableStateOf(false)
                     }
                     val nameBack = rememberSaveable {
                         mutableStateOf("")
                     }
                     val phoneBack = rememberSaveable {
-                        mutableStateOf("01")
+                        mutableStateOf("")
                     }
                     val addressListBack = rememberSaveable {
                         mutableStateOf("")
@@ -155,8 +157,8 @@ fun LoginScreen(
 
 
                     if (toggledTopButton) {
-                        PhoneNumber(phoneNumber = phoneNumber,
-                            isNotError = phoneError,
+                        EmailInput(email = email,
+                            isNotError = emailError,
                             onAction = KeyboardActions {
                                 keyboardController?.hide()
                             })
@@ -187,20 +189,20 @@ fun LoginScreen(
                         ) {
                             //Getting Login values tp pass to API
                             scope.launch {
-                                if (phoneNumber.value == "01030718569" && passwordLogin.value == "1234567890000") {
+                                if (email.value == "01030718569" && passwordLogin.value == "1234567890000") {
                                     sharedPreference.saveState("client")
                                     navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
                                         navController.popBackStack()
                                     }
 
                                 }
-                                if (phoneNumber.value == "01029932345" && passwordLogin.value == "1234567890000") {
+                                if (email.value == "01029932345" && passwordLogin.value == "1234567890000") {
                                     sharedPreference.saveState("worker")
                                     navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
                                         navController.popBackStack()
                                     }
                                 }
-                                if (phoneNumber.value == "01555031763" && passwordLogin.value == "com_sci1234#RAMH") {
+                                if (email.value == "01555031763" && passwordLogin.value == "com_sci1234#RAMH") {
                                     sharedPreference.saveState("admin")
                                     navController.navigate(AllScreens.AdminHomeScreen.name) {
                                         navController.popBackStack()
@@ -209,13 +211,15 @@ fun LoginScreen(
                             }
 
                             //phoneNumber
-                            Log.d("TAG", "phoneNumber: ${phoneNumber.value}")
+                            Log.d("TAG", "phoneNumber: ${email.value}")
                             //passwordLogin
                             Log.d("TAG", "phoneNumber: ${passwordLogin.value}")
                         }
                     } else {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()).padding(bottom = 30.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             if (isNext.value) {
@@ -270,7 +274,7 @@ fun LoginScreen(
                                     isNext = isNext,
                                     phoneNumber = phoneBack,
                                     nameError = nameError,
-                                    phoneError = phoneErrorRegister,
+                                    phoneError = emailErrorRegister,
                                     backArrow = showBackArrow,
                                 )
                             }

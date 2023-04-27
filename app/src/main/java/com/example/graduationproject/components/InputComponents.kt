@@ -31,9 +31,9 @@ import com.example.graduationproject.ui.theme.SecondaryColor
 
 
 @Composable
-fun PhoneNumber(
+fun EmailInput(
     modifier: Modifier = Modifier,
-    phoneNumber: MutableState<String>,
+    email: MutableState<String>,
     keyboardType: KeyboardType = KeyboardType.Email,
 //    imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default,
@@ -48,10 +48,10 @@ fun PhoneNumber(
             .padding(start = 25.dp, end = 25.dp),
         shape = RoundedCornerShape(25.dp),
         label = { Text(text = "البريد الالكتروني", style = TextStyle(color = MainColor)) },
-        value = phoneNumber.value,
+        value = email.value,
         onValueChange = {
+            email.value = it
             if (it.trim().isNotBlank()) {
-                phoneNumber.value = it
                 isNotError.value = true
             }
         },
