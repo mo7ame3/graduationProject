@@ -1,8 +1,8 @@
 package com.example.graduationproject.model
 
-//Edit
 data class Register(
-    val data: Data,
+    val data: Data? = null,
     val status: String,
-    val token: String
+    val token: String? = null,
+    val message: String? = null
 )

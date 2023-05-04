@@ -37,6 +37,7 @@ fun AdminHomeScreen(navController: NavHostController) {
         TopAppBar(title = "") {
             scope.launch {
                 sharedPreference.saveState("")
+                sharedPreference.saveToken("")
                 navController.navigate(route = AllScreens.LoginScreen.name) {
                     navController.popBackStack()
                 }

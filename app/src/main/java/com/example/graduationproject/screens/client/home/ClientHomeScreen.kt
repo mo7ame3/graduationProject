@@ -95,6 +95,7 @@ fun ClientHomeScreen(navController: NavController, route: String) {
                     //Log out and nav to Login
                     scope.launch {
                         sharedPreference.saveState("")
+                        sharedPreference.saveToken("")
                         navController.navigate(route = AllScreens.LoginScreen.name) {
                             navController.popBackStack()
                         }
@@ -147,8 +148,10 @@ fun Home(
 }
 
 @Composable
-fun JobRow(job: GoogleDriveList,
-           onClick: (GoogleDriveList) -> Unit) {
+fun JobRow(
+    job: GoogleDriveList,
+    onClick: (GoogleDriveList) -> Unit
+) {
     Column(modifier = Modifier
         .clickable {
             onClick.invoke(job)

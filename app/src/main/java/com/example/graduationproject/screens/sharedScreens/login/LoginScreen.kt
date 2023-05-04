@@ -1,6 +1,7 @@
 package com.example.graduationproject.screens.sharedScreens.login
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.*
+import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.Register
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
@@ -30,8 +33,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(
-    navController: NavController,
-    authenticationViewModel: AuthenticationViewModel
+    navController: NavController, authenticationViewModel: AuthenticationViewModel
 ) {
 
     val context = LocalContext.current
@@ -128,7 +130,7 @@ fun LoginScreen(
                     val nameBack = rememberSaveable {
                         mutableStateOf("")
                     }
-                    val phoneBack = rememberSaveable {
+                    val emailBack = rememberSaveable {
                         mutableStateOf("")
                     }
                     val addressListBack = rememberSaveable {
@@ -157,7 +159,8 @@ fun LoginScreen(
 
 
                     if (toggledTopButton) {
-                        EmailInput(email = email,
+                        EmailInput(
+                            email = email,
                             isNotError = emailError,
                             onAction = KeyboardActions {
                                 keyboardController?.hide()
@@ -194,7 +197,6 @@ fun LoginScreen(
                                     navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
                                         navController.popBackStack()
                                     }
-
                                 }
                                 if (email.value == "01029932345" && passwordLogin.value == "1234567890000") {
                                     sharedPreference.saveState("worker")
@@ -219,7 +221,8 @@ fun LoginScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .verticalScroll(rememberScrollState()).padding(bottom = 30.dp),
+                                .verticalScroll(rememberScrollState())
+                                .padding(bottom = 30.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             if (isNext.value) {
@@ -232,38 +235,47 @@ fun LoginScreen(
                                         passwordIsNOtError = passwordIsNOtError,
                                         passwordIsNOtErrorConfirm = passwordIsNOtErrorConfirm
                                     ) {
-                                        //Getting Register values tp pass to API
-                                        //name
-//                                        Log.d("TAG", "nameBack: ${nameBack.value}")
-//                                        //Phone
-//                                        Log.d("TAG", "phoneBack: ${phoneBack.value}")
-//                                        //address
-//                                        Log.d("TAG", "listBack: ${addressListBack.value}")
-//                                        //worker or clint
-//                                        Log.d(
-//                                            "TAG", "workerOrClintBack: ${workerOrClintBack.value}"
-//                                        )
-//                                        //craft
-//                                        Log.d("TAG", "craftListBack: ${craftListBack.value}")
-//                                        //password
-//                                        Log.d("TAG", "passwordRegister: ${passwordBack.value}")
-//                                        //passwordConfirm
-//                                        Log.d("TAG", "passwordConfirm: ${passwordConfirmBack.value}")
-
                                         scope.launch {
-//                                            val register: WrapperClass<Register, Boolean, Exception> =
-//                                                authenticationViewModel.register(
-//                                                    name = "samy",
-//                                                    email = "samy@hello.io",
-//                                                    address = "fayoum",
-//                                                    role = "worker",
-//                                                    myCraft = "Building",
-//                                                    password = "1234567890000",
-//                                                    passwordConfirm = "1234567890000"
-//                                                )
-//                                            Log.d("TAG", "LoginScreen: ${register.loeading}")
-//                                            Log.d("TAG", "LoginScreen: ${register.data}")
-
+                                            val register: WrapperClass<Register, Boolean, Exception> =
+                                                authenticationViewModel.register(
+                                                    name = nameBack.value,
+                                                    email = emailBack.value,
+                                                    address = addressListBack.value,
+                                                    role = if (workerOrClintBack.value == "عميل") "client" else "worker",
+                                                    myCraft = if (workerOrClintBack.value == "عميل") "عميل" else craftListBack.value,
+                                                    password = passwordBack.value,
+                                                    passwordConfirm = passwordConfirmBack.value
+                                                )
+                                            Log.d("TAG", "LoginScreen:${register.data?.status} ")
+                                            if (register.data?.status == "success") {
+                                                if (workerOrClintBack.value == "عميل") {
+                                                    sharedPreference.saveState("client")
+                                                    Log.d(
+                                                        "TAG",
+                                                        "LoginScreen: ${register.data!!.token.toString()}"
+                                                    )
+                                                    sharedPreference.saveToken(register.data!!.token.toString())
+                                                    navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
+                                                        navController.popBackStack()
+                                                    }
+                                                } else {
+                                                    sharedPreference.saveState("worker")
+                                                    sharedPreference.saveToken(register.data!!.token.toString())
+                                                    Log.d(
+                                                        "TAG",
+                                                        "LoginScreen: ${register.data!!.token.toString()}"
+                                                    )
+                                                    navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
+                                                        navController.popBackStack()
+                                                    }
+                                                }
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    register.data?.message,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
                                         }
                                     }
                                 }
@@ -272,7 +284,7 @@ fun LoginScreen(
                                     name = nameBack,
                                     value = addressListBack,
                                     isNext = isNext,
-                                    phoneNumber = phoneBack,
+                                    phoneNumber = emailBack,
                                     nameError = nameError,
                                     phoneError = emailErrorRegister,
                                     backArrow = showBackArrow,

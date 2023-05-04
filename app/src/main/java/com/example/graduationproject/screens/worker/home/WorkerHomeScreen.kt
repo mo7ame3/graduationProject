@@ -91,6 +91,7 @@ fun WorkerHomeScreen(navController: NavHostController, route: String) {
                     //Log out and nav to Login
                     scope.launch {
                         sharedPreference.saveState("")
+                        sharedPreference.saveToken("")
                         navController.navigate(route = AllScreens.LoginScreen.name) {
                             navController.popBackStack()
                         }

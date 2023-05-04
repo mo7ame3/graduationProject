@@ -15,6 +15,7 @@ class SharedPreference(private val context: Context) {
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "UserState")
         val USER_STATE = stringPreferencesKey("user_state")
+        val TOKEN = stringPreferencesKey("token")
     }
 
     //to get the email
@@ -23,11 +24,21 @@ class SharedPreference(private val context: Context) {
             Preferences[USER_STATE] ?: ""
         }
 
+    val getToken: Flow<String?> = context.dataStore.data
+        .map { Preferences ->
+            Preferences[TOKEN] ?: ""
+        }
 
     //to save the email
     suspend fun saveState(name: String) {
         context.dataStore.edit { Preferences ->
             Preferences[USER_STATE] = name
+        }
+    }
+
+    suspend fun saveToken(token: String) {
+        context.dataStore.edit { Preferences ->
+            Preferences[TOKEN] = token
         }
     }
 
