@@ -373,12 +373,11 @@ object Constant {
         "عامل غير كفء",
     )
 
-
     //BaseURI
-
     const val BASE_URI = "https://api-ramh.onrender.com"
 
     //EndPoint
-
     const val REGISTER = "api/v1/users/register"
+    const val LOGIN = "api/v1/users/login"
+    const val GETALLCRAFTS = "api/v1/crafts"
 }

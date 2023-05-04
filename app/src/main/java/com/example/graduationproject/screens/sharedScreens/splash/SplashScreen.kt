@@ -1,5 +1,6 @@
 package com.example.graduationproject.screens.sharedScreens.splash
 
+import android.util.Log
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -33,6 +34,7 @@ fun SplashScreen(navController: NavController) {
     val context = LocalContext.current
     val sharedPreference = SharedPreference(context)
     val getState = sharedPreference.getState.collectAsState(initial = "")
+    val getToken = sharedPreference.getToken.collectAsState(initial = "")
 
     LaunchedEffect(key1 = true, block = {
         scale.animateTo(
@@ -41,30 +43,28 @@ fun SplashScreen(navController: NavController) {
                 durationMillis = 800,
                 easing = { OvershootInterpolator(8f).getInterpolation(it) })
         )
-        delay(1000L)
-
-        when (getState.value) {
-            "client" -> {
-                navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
-                    navController.popBackStack()
+        delay(500L)
+        if (getToken.value.toString().isNotEmpty()){
+            when (getState.value) {
+                "client" -> {
+                    navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
+                        navController.popBackStack()
+                    }
                 }
-            }
-            "worker" -> {
-                navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
-                    navController.popBackStack()
+                "worker" -> {
+                    navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
+                        navController.popBackStack()
+                    }
                 }
-            }
-            "admin" -> {
-                navController.navigate(AllScreens.AdminHomeScreen.name) {
-                    navController.popBackStack()
-                }
-            }
-            else -> {
-                navController.navigate(AllScreens.LoginScreen.name) {
-                    navController.popBackStack()
-                }
-
-            }
+                "admin" -> {
+                    navController.navigate(AllScreens.AdminHomeScreen.name) {
+                        navController.popBackStack()
+                    }
+                } }
+            }  else {
+        navController.navigate(AllScreens.LoginScreen.name) {
+            navController.popBackStack()
+        }
         }
     })
 

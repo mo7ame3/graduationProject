@@ -1,9 +1,8 @@
-package com.example.graduationproject.model
+package com.example.graduationproject.model.login
 
 data class User(
     val __v: Int,
     val _id: String,
-    val active: Boolean,
     val address: String,
     val createdAt: String,
     val email: String,

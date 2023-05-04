@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,6 +39,7 @@ fun WorkerHomeScreen(navController: NavHostController, route: String) {
     //Log out Variables
     val context = LocalContext.current
     val sharedPreference = SharedPreference(context)
+    val name = sharedPreference.getName.collectAsState(initial = "")
 
     val home = remember {
         mutableStateOf("home")
@@ -65,7 +67,7 @@ fun WorkerHomeScreen(navController: NavHostController, route: String) {
         drawerContent = {
             DrawerHeader()
             Spacer(modifier = Modifier.height(50.dp))
-            DrawerBody(isClient = false) {
+            DrawerBody(isClient = false, name = name.value.toString()) {
                 if (it.title == "مشاريعي") {
                     scope.launch {
                         Log.d("TAG", "WorkerHomeScreen: ${it.title}")
@@ -74,7 +76,7 @@ fun WorkerHomeScreen(navController: NavHostController, route: String) {
                     }
                 }
 
-                if (it.title == "أحمد محمد") {
+                if (it.title == name.value.toString()) {
                     //Navigate to Profile
                     scope.launch {
                         navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${false}/${false}/ ")

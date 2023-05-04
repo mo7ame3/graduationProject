@@ -17,6 +17,7 @@ import com.example.graduationproject.screens.admin.query.reports.AdminReportsQue
 import com.example.graduationproject.screens.admin.query.reports.query.AdminReportListQuery
 import com.example.graduationproject.screens.admin.query.workers.AdminAllWorkers
 import com.example.graduationproject.screens.client.home.ClientHomeScreen
+import com.example.graduationproject.screens.client.home.ClientHomeViewModel
 import com.example.graduationproject.screens.client.order.ClientMyCraftOrders
 import com.example.graduationproject.screens.client.order.ClientOrderOfferScreen
 import com.example.graduationproject.screens.client.postScreen.ClientPostScreen
@@ -54,10 +55,10 @@ fun NavGraph() {
             }
         }
         composable(route = AllScreens.LoginScreen.name) {
-            val authenticationViewModel = hiltViewModel<AuthenticationViewModel>()
+            val viewModel = hiltViewModel<AuthenticationViewModel>()
             LoginScreen(
                 navController = navController,
-                authenticationViewModel = authenticationViewModel
+                authenticationViewModel = viewModel
             )
         }
         composable(route = AllScreens.ClientOrderOfferScreen.name + "/{problemTitle}",
@@ -77,9 +78,10 @@ fun NavGraph() {
                 type = NavType.StringType
             })
         ) { data ->
+            val viewModel = hiltViewModel<ClientHomeViewModel>()
             data.arguments!!.getString("route")?.let {
                 ClientHomeScreen(
-                    navController = navController, route = it
+                    navController = navController, route = it,viewModel
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.example.graduationproject.screens.client.home
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,20 +25,27 @@ import com.example.graduationproject.components.TopMainBar
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.constant.Constant.adminCraftList
 import com.example.graduationproject.data.GoogleDriveList
+import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.client.order.ClientOrderScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatList
 import com.example.graduationproject.sharedpreference.SharedPreference
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ClientHomeScreen(navController: NavController, route: String) {
-
+fun ClientHomeScreen(
+    navController: NavController,
+    route: String,
+    clientHomeViewModel: ClientHomeViewModel
+) {
     //Shared preference variables
     val context = LocalContext.current
     val sharedPreference = SharedPreference(context)
-
+    val name = sharedPreference.getName.collectAsState(initial = "")
+    val token = sharedPreference.getToken.collectAsState(initial = "")
     val home = remember {
         mutableStateOf("home")
     }
@@ -56,14 +64,13 @@ fun ClientHomeScreen(navController: NavController, route: String) {
                 if (route == "home") "خدماتي" else if (route == "chat") "المحادثات" else "طلباتي"
         }
     }
-
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     Scaffold(
         drawerContent = {
             DrawerHeader()
             Spacer(modifier = Modifier.height(50.dp))
-            DrawerBody(isClient = true) {
+            DrawerBody(isClient = true, name = name.value.toString()) {
                 if (it.title == "طلباتي") {
                     scope.launch {
                         home.value = "order"
@@ -71,11 +78,18 @@ fun ClientHomeScreen(navController: NavController, route: String) {
                     }
                 }
 
-                if (it.title == "أحمد محمد") {
+                if (it.title == name.value.toString()) {
                     //Navigate to Profile
                     scope.launch {
                         navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${false}/${false}/${false}/ ")
                         scaffoldState.drawerState.close()
+
+                        // expired 60s
+//                        if (token.value.toString().isNotEmpty()){
+//                        val getAllCrafts: WrapperClass<GetAllCrafts, Boolean, Exception> =
+//                            clientHomeViewModel.getAllCrafts(token =  "Bearer ${token.value.toString()}")
+//                        Log.d("TAG", "ClientHomeScreen: ${getAllCrafts.data}")
+//                    }
                     }
                 }
                 if (it.title == "إعدادات حسابي") {

@@ -184,17 +184,18 @@ fun DrawerHeader() {
 @Composable
 fun DrawerBody(
     isClient: Boolean,
+    name:String,
     onClick: (DrawerData) -> Unit
 ) {
     val drawerListClient = if (isClient) listOf(
-        DrawerData(title = "أحمد محمد", pic = R.drawable.person),
+        DrawerData(title = name, pic = R.drawable.person),
         DrawerData(title = "إعدادات حسابي", pic = R.drawable.settings),
         DrawerData(title = "طلباتي", pic = R.drawable.my_orders),
         DrawerData(title = "مكتملة", pic = R.drawable.completed_orders),
         DrawerData(title = "تسجيل الخروج", pic = R.drawable.logout),
     )
     else listOf(
-        DrawerData(title = "أحمد محمد", pic = R.drawable.person),
+        DrawerData(title = name, pic = R.drawable.person),
         DrawerData(title = "إعدادات حسابي", pic = R.drawable.settings),
         DrawerData(title = "مشاريعي", pic = R.drawable.my_orders),
         DrawerData(title = "تسجيل الخروج", pic = R.drawable.logout),
