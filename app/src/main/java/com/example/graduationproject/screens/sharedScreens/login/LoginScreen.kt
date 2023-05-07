@@ -1,6 +1,5 @@
 package com.example.graduationproject.screens.sharedScreens.login
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -26,6 +25,7 @@ import com.example.graduationproject.components.*
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
+import com.example.graduationproject.model.register.myCraft.MyCraft
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
@@ -112,7 +112,7 @@ fun LoginScreen(
         mutableStateOf(false)
     }
     // loading variable
-    val loading = remember{
+    val loading = remember {
         mutableStateOf(false)
     }
     // box design
@@ -125,7 +125,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(topEnd = 200.dp, bottomStart = 200.dp)
         ) {
-            if(!loading.value){
+            if (!loading.value) {
                 Column(
                     modifier = Modifier.padding(top = 150.dp), horizontalAlignment = Alignment.End
                 ) {
@@ -151,7 +151,10 @@ fun LoginScreen(
                                 passwordLogin.value = ""
                                 email.value = ""
                             }) {
-                                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBack,
+                                    contentDescription = null
+                                )
                             }
                         }
                     }
@@ -197,8 +200,11 @@ fun LoginScreen(
                                 //Getting Login values tp pass to API
                                 scope.launch {
                                     loading.value = true
-                                    val login:WrapperClass<Login,Boolean,Exception> =
-                                    authenticationViewModel.login(email = email.value, password = passwordLogin.value)
+                                    val login: WrapperClass<Login, Boolean, Exception> =
+                                        authenticationViewModel.login(
+                                            email = email.value,
+                                            password = passwordLogin.value
+                                        )
                                     if (login.data?.status == "success") {
                                         sharedPreference.saveName(login.data!!.data?.user!!.name)
                                         when (login.data!!.data?.user?.role) {
@@ -209,6 +215,7 @@ fun LoginScreen(
                                                     navController.popBackStack()
                                                 }
                                             }
+
                                             "worker" -> {
                                                 sharedPreference.saveState("worker")
                                                 sharedPreference.saveToken(login.data!!.token.toString())
@@ -216,10 +223,11 @@ fun LoginScreen(
                                                     navController.popBackStack()
                                                 }
                                             }
+
                                             else -> {
                                                 sharedPreference.saveState("admin")
                                                 sharedPreference.saveToken(login.data!!.token.toString())
-                                                navController.navigate(AllScreens.AdminHomeScreen.name + "/login") {
+                                                navController.navigate(AllScreens.AdminHomeScreen.name) {
                                                     navController.popBackStack()
                                                 }
                                             }
@@ -234,8 +242,7 @@ fun LoginScreen(
                                     }
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -261,11 +268,9 @@ fun LoginScreen(
                                                         email = emailBack.value,
                                                         address = addressListBack.value,
                                                         role = if (workerOrClintBack.value == "عميل") "client" else "worker",
-                                                        myCraft = if (workerOrClintBack.value == "عميل") "عميل" else craftListBack.value,
                                                         password = passwordBack.value,
                                                         passwordConfirm = passwordConfirmBack.value
                                                     )
-                                                Log.d("TAG", "LoginScreen:${register.data?.status} ")
                                                 if (register.data?.status == "success") {
                                                     sharedPreference.saveName(register.data!!.data?.user!!.name)
                                                     if (workerOrClintBack.value == "عميل") {
@@ -277,8 +282,25 @@ fun LoginScreen(
                                                     } else {
                                                         sharedPreference.saveState("worker")
                                                         sharedPreference.saveToken(register.data!!.token.toString())
-                                                        navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
-                                                            navController.popBackStack()
+
+
+                                                        val myCraft: WrapperClass<MyCraft, Boolean, Exception> =
+                                                            authenticationViewModel.workerChooseCraft(
+                                                                token = "Bearer " + register.data!!.token.toString(),
+                                                                myCraft = craftListBack.value,
+                                                                workerId = register.data!!.data?.user!!.id
+                                                            )
+                                                        if (myCraft.data?.status == "success") {
+                                                            navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
+                                                                navController.popBackStack()
+                                                            }
+                                                        } else {
+                                                            loading.value = false
+                                                            Toast.makeText(
+                                                                context,
+                                                                register.data?.message,
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
                                                         }
                                                     }
                                                 } else {
@@ -308,8 +330,7 @@ fun LoginScreen(
                     }
 
                 }
-            }
-            else{
+            } else {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -321,3 +342,4 @@ fun LoginScreen(
         }
     }
 }
+

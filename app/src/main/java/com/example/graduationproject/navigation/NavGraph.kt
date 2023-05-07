@@ -11,7 +11,10 @@ import com.example.graduationproject.screens.admin.home.AdminHomeScreen
 import com.example.graduationproject.screens.admin.query.blocks.AdminBlockedUsers
 import com.example.graduationproject.screens.admin.query.clients.AdminAllClients
 import com.example.graduationproject.screens.admin.query.jobs.AdminJobsScreen
+import com.example.graduationproject.screens.admin.query.jobs.JobViewModel
 import com.example.graduationproject.screens.admin.query.jobs.allWorkers.AdminAllWorkersInSpecificJob
+import com.example.graduationproject.screens.admin.query.jobs.createCraft.AdminCreateNewCraft
+import com.example.graduationproject.screens.admin.query.jobs.createCraft.CreateNewCraftViewModel
 import com.example.graduationproject.screens.admin.query.jobs.edit.AdminEditJobsScreen
 import com.example.graduationproject.screens.admin.query.reports.AdminReportsQuery
 import com.example.graduationproject.screens.admin.query.reports.query.AdminReportListQuery
@@ -81,7 +84,7 @@ fun NavGraph() {
             val viewModel = hiltViewModel<ClientHomeViewModel>()
             data.arguments!!.getString("route")?.let {
                 ClientHomeScreen(
-                    navController = navController, route = it,viewModel
+                    navController = navController, route = it, viewModel
                 )
             }
         }
@@ -221,25 +224,29 @@ fun NavGraph() {
             AdminHomeScreen(navController = navController)
         }
         composable(route = AllScreens.AdminJobsScreen.name) {
-            AdminJobsScreen(navController = navController)
+            val viewModel = hiltViewModel<JobViewModel>()
+            AdminJobsScreen(navController = navController, viewModel)
         }
         composable(
             route = AllScreens.AdminEditJobsScreen.name + "/{id}",
             arguments = listOf(navArgument(name = "id") {
-                type = NavType.IntType
+                type = NavType.StringType
             })
         ) { data ->
-            AdminEditJobsScreen(navController = navController, id = data.arguments?.getInt("id")!!)
+            AdminEditJobsScreen(
+                navController = navController,
+                id = data.arguments?.getString("id")!!
+            )
         }
         composable(
             route = AllScreens.AdminAllWorkersInSpecificJob.name + "/{id}",
             arguments = listOf(navArgument(name = "id") {
-                type = NavType.IntType
+                type = NavType.StringType
             })
         ) { data ->
             AdminAllWorkersInSpecificJob(
                 navController = navController,
-                id = data.arguments?.getInt("id")!!
+                id = data.arguments?.getString("id")!!
             )
         }
         composable(route = AllScreens.AdminAllWorkers.name) {
@@ -275,6 +282,12 @@ fun NavGraph() {
                 navController,
                 name = data.arguments?.getString("reportUserName").toString()
             )
+        }
+        composable(
+            route = AllScreens.AdminCreateNewCraft.name
+        ) {
+            val viewModel = hiltViewModel<CreateNewCraftViewModel>()
+            AdminCreateNewCraft(navController, viewModel)
         }
     }
 }

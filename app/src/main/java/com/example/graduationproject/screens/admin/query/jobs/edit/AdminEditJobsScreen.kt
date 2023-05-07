@@ -33,9 +33,9 @@ import com.example.graduationproject.ui.theme.AdminSecondaryColor
 @Composable
 fun AdminEditJobsScreen(
     navController: NavHostController,
-    id: Int
+    id: String
 ) {
-    val craftItem = adminCraftList[id]
+    val craftItem = adminCraftList[4]
     Scaffold(topBar = {
         TopAppBar(title = "") {
             navController.popBackStack()
@@ -71,6 +71,7 @@ fun AdminEditJobsScreen(
             Spacer(modifier = Modifier.height(10.dp))
             JobRow(craftItem, navController)
         }
+
     }
 }
 

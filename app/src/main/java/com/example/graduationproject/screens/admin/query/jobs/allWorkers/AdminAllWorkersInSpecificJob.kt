@@ -25,9 +25,9 @@ import com.example.graduationproject.navigation.AllScreens
 @Composable
 fun AdminAllWorkersInSpecificJob(
     navController: NavController,
-    id: Int
+    id: String
 ) {
-    val list = adminCraftList[id]
+    val list = adminCraftList[4]
     val showCard = remember {
         mutableStateOf(false)
     }

@@ -374,10 +374,13 @@ object Constant {
     )
 
     //BaseURI
-    const val BASE_URI = "https://api-ramh.onrender.com"
+    const val BASE_URI = "https://api-ramh.onrender.com/"
 
     //EndPoint
     const val REGISTER = "api/v1/users/register"
+    const val MYCRAFT = "api/v1/users"
     const val LOGIN = "api/v1/users/login"
     const val GETALLCRAFTS = "api/v1/crafts"
+    const val CREATEORDER = "api/v1/orders"
+    const val CREATECRAFT = "api/v1/crafts"
 }

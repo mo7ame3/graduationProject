@@ -38,5 +38,6 @@ enum class AllScreens {
     AdminAllClients,
     AdminBlockedUsers,
     AdminReportsQuery,
-    AdminReportListQuery
+    AdminReportListQuery,
+    AdminCreateNewCraft
 }

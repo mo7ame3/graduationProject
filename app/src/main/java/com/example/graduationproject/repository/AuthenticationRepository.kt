@@ -2,19 +2,19 @@ package com.example.graduationproject.repository
 
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
+import com.example.graduationproject.model.register.myCraft.MyCraft
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
 import javax.inject.Inject
 
-class GraduationRepository @Inject constructor(private val api: GraduationApi) {
+class AuthenticationRepository @Inject constructor(private val api: GraduationApi) {
 
 
     private val addNewUser = WrapperClass<Register, Boolean, Exception>()
     private val addLoggedInUser = WrapperClass<Login, Boolean, Exception>()
-    private val getAllCrafts = WrapperClass<GetAllCrafts, Boolean, Exception>()
+    private val workerChooseCraft = WrapperClass<MyCraft, Boolean, Exception>()
 
     suspend fun addNewUser(register: Map<String, String>)
             : WrapperClass<Register, Boolean, Exception> {
@@ -35,6 +35,25 @@ class GraduationRepository @Inject constructor(private val api: GraduationApi) {
         return addNewUser
     }
 
+    suspend fun workerChooseCraft(workerId: String, myCraft: Map<String, String>, token: String)
+            : WrapperClass<MyCraft, Boolean, Exception> {
+        try {
+            // addNewUser.loading = true
+            workerChooseCraft.data =
+                api.workerChooseCraft(workerId = workerId, myCraft = myCraft, authorization = token)
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            workerChooseCraft.data = MyCraft(status = status)
+        } catch (e: Exception) {
+            //addNewUser.loading = false
+            Log.d("TAG", "workerChooseCraft: $e")
+            workerChooseCraft.e = e
+        }
+        return workerChooseCraft
+    }
+
     suspend fun addLoggedInUser(login: Map<String, String>)
             : WrapperClass<Login, Boolean, Exception> {
         try {
@@ -53,28 +72,6 @@ class GraduationRepository @Inject constructor(private val api: GraduationApi) {
             addLoggedInUser.e = e
         }
         return addLoggedInUser
-    }
-
-    suspend fun getAllCrafts(authorization: String)
-            : WrapperClass<GetAllCrafts, Boolean, Exception> {
-        try {
-            //addNewUser.loading = true
-            getAllCrafts.data = api.getAllCrafts(authorization = authorization)
-        }catch (e: HttpException) {
-            //addNewUser.loading = true
-            val error = e.response()?.errorBody()?.string()
-//            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
-//            val message = error.split("message")[1].split("\":")[1]
-            Log.d("TAG", "getAllCrafts: $error")
-            addLoggedInUser.e = e
-
-        }
-        catch (e: Exception) {
-            //addNewUser.loading = false
-            Log.d("TAG", "getAllCrafts: $e")
-            getAllCrafts.e = e
-        }
-        return getAllCrafts
     }
 
 

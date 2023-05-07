@@ -1,11 +1,24 @@
 package com.example.graduationproject.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.example.graduationproject.R
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.AdminUsersQuery
+import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.RedColor
 
 @Composable
@@ -126,6 +140,24 @@ fun CardReport(
                 LoginButton(isLogin = false, label = "الغاء") {
                     onReject.invoke()
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun FloatingAction(onAction: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = MainColor,
+            modifier = Modifier.size(50.dp)
+        ) {
+            IconButton(onClick = { onAction.invoke() }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = null)
             }
         }
     }

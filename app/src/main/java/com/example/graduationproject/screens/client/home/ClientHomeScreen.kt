@@ -1,12 +1,12 @@
 package com.example.graduationproject.screens.client.home
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.rememberScaffoldState
@@ -23,15 +23,14 @@ import com.example.graduationproject.components.InternetCraftName
 import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopMainBar
 import com.example.graduationproject.constant.Constant
-import com.example.graduationproject.constant.Constant.adminCraftList
-import com.example.graduationproject.data.GoogleDriveList
 import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.getAllCrafts.Craft
 import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.client.order.ClientOrderScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatList
 import com.example.graduationproject.sharedpreference.SharedPreference
-import kotlinx.coroutines.CoroutineScope
+import com.example.graduationproject.ui.theme.MainColor
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -56,6 +55,9 @@ fun ClientHomeScreen(
     val isFirst = remember {
         mutableStateOf(true)
     }
+    val loading = remember {
+        mutableStateOf(true)
+    }
     if (route == "home" || route == "chat" || route == "order") {
         if (isFirst.value) {
             home.value = route
@@ -66,6 +68,21 @@ fun ClientHomeScreen(
     }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    var craftList: List<Craft>? = null
+
+    if (token.value.toString().isNotEmpty()) {
+        val craftData: WrapperClass<GetAllCrafts, Boolean, Exception> =
+            produceState<WrapperClass<GetAllCrafts, Boolean, Exception>>(
+                initialValue = WrapperClass(data = null)
+            ) {
+                value = clientHomeViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
+            }.value
+        if (craftData.data != null) {
+            craftList = craftData.data!!.data?.crafts
+            loading.value = false
+        }
+    }
+
     Scaffold(
         drawerContent = {
             DrawerHeader()
@@ -83,13 +100,6 @@ fun ClientHomeScreen(
                     scope.launch {
                         navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${false}/${false}/${false}/ ")
                         scaffoldState.drawerState.close()
-
-                        // expired 60s
-//                        if (token.value.toString().isNotEmpty()){
-//                        val getAllCrafts: WrapperClass<GetAllCrafts, Boolean, Exception> =
-//                            clientHomeViewModel.getAllCrafts(token =  "Bearer ${token.value.toString()}")
-//                        Log.d("TAG", "ClientHomeScreen: ${getAllCrafts.data}")
-//                    }
                     }
                 }
                 if (it.title == "إعدادات حسابي") {
@@ -128,18 +138,30 @@ fun ClientHomeScreen(
         },
         bottomBar = { BottomBar(selected = home, title = title) },
     ) {
-        Column {
-            if (home.value == "home") {
-                Home {
-                    //navigate to post
-                    navController.navigate(route = AllScreens.ClientPostScreen.name + "/${it.jobName}")
+        if (!loading.value) {
+            Column {
+                if (home.value == "home") {
+                    if (craftList != null) {
+                        Home(craftList) {
+                            //navigate to post
+                            navController.navigate(route = AllScreens.ClientPostScreen.name + "/${it.name}")
+                        }
+                    }
+                }
+                if (home.value == "order") {
+                    ClientOrderScreen(navController)
+                }
+                if (home.value == "chat") {
+                    ChatList(navController)
                 }
             }
-            if (home.value == "order") {
-                ClientOrderScreen(navController)
-            }
-            if (home.value == "chat") {
-                ChatList(navController)
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator(color = MainColor)
             }
         }
     }
@@ -147,10 +169,11 @@ fun ClientHomeScreen(
 
 @Composable
 fun Home(
-    onClick: (GoogleDriveList) -> Unit
+    craftList: List<Craft>,
+    onClick: (Craft) -> Unit,
 ) {
     LazyColumn {
-        items(adminCraftList) {
+        items(craftList) {
             JobRow(job = it) { job ->
                 onClick.invoke(job)
             }
@@ -163,8 +186,8 @@ fun Home(
 
 @Composable
 fun JobRow(
-    job: GoogleDriveList,
-    onClick: (GoogleDriveList) -> Unit
+    job: Craft,
+    onClick: (Craft) -> Unit
 ) {
     Column(modifier = Modifier
         .clickable {
@@ -179,8 +202,8 @@ fun JobRow(
                 modifier = Modifier.size(350.dp, 230.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    InternetCraftPhoto(uri = job.picGoogle)
-                    InternetCraftName(jobName = job.jobName)
+                    InternetCraftPhoto(uri = job.avatar)
+                    InternetCraftName(jobName = job.name)
                 }
             }
         }
