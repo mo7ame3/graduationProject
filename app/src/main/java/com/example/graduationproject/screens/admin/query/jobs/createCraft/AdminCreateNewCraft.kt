@@ -2,7 +2,6 @@ package com.example.graduationproject.screens.admin.query.jobs.createCraft
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -54,8 +55,7 @@ import java.io.File
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "Recycle")
 @Composable
 fun AdminCreateNewCraft(
-    navController: NavController,
-    createNewCraftViewModel: CreateNewCraftViewModel
+    navController: NavController, createNewCraftViewModel: CreateNewCraftViewModel
 ) {
     Scaffold(topBar = {
         TopAppBar(title = "") {
@@ -65,115 +65,113 @@ fun AdminCreateNewCraft(
         val jobTitle = remember {
             mutableStateOf("")
         }
+        val loading = remember {
+            mutableStateOf(false)
+        }
         var selectedImage by remember {
             mutableStateOf<Uri?>(null)
         }
-        val valid = (jobTitle.value.trim().isNotBlank()
-                && selectedImage != null
-                )
+        val valid = (jobTitle.value.trim().isNotBlank() && selectedImage != null)
         val context = LocalContext.current
         val sharedPreference = SharedPreference(context)
         val token = sharedPreference.getToken.collectAsState(initial = "")
         val scope = rememberCoroutineScope()
         val keyboardController = LocalSoftwareKeyboardController.current
-
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(5.dp))
-            TextInput(isNotBackground = true,
-                text = jobTitle,
-                label = "اسم المهنة",
-                onAction = KeyboardActions {
-                    keyboardController?.hide()
-                })
-            Spacer(modifier = Modifier.height(5.dp))
-
-            //Add photo
-            Spacer(modifier = Modifier.height(5.dp))
-
-            val launcher =
-                rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
-                    selectedImage = uri
-                }
-            Text(
-                text = "اضف صوره",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 30.dp),
-                color = MainColor
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp)
-                    .padding(start = 25.dp, end = 25.dp)
-                    .clickable {
-                        launcher.launch("image/*")
-                    },
-                shape = RoundedCornerShape(25.dp),
-                border = BorderStroke(width = 1.dp, color = MainColor)
+        if (!loading.value) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                //change photo
-                PickPhoto(selectedImage)
-            }
+                Spacer(modifier = Modifier.height(5.dp))
+                TextInput(isNotBackground = true,
+                    text = jobTitle,
+                    label = "اسم المهنة",
+                    onAction = KeyboardActions {
+                        keyboardController?.hide()
+                    })
+                Spacer(modifier = Modifier.height(5.dp))
 
-            Spacer(modifier = Modifier.height(10.dp))
-            DefaultButton(label = "ارسل", enabled = valid) {
-                scope.launch {
-                    val file = selectedImage?.toString()?.let { it1 -> File(it1) }
-                    // test
-                    val fileUri: Uri =
-                        selectedImage!! // get the file URI from the file picker result
-                    val inputStream = context.contentResolver.openInputStream(fileUri)
-                    val file2 = inputStream?.readBytes()
-                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    val filePart =
-                        file2?.let { MultipartBody.Part.createFormData("image", file!!.name, it) }
-                    Log.d("TAG", "AdminCreateNewCraft: $filePart")
-                    val addCraft: WrapperClass<CreateNewCraft, Boolean, Exception> =
-                        createNewCraftViewModel.createNewCraft(
-                            name = jobTitle.value,
-                            image = filePart!!,
-                            token = "Bearer ${token.value.toString()}"
-                        )
+                //Add photo
+                Spacer(modifier = Modifier.height(5.dp))
 
+                val launcher =
+                    rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+                        selectedImage = uri
+                    }
+                Text(
+                    text = "اضف صوره",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 30.dp),
+                    color = MainColor
+                )
+                Spacer(modifier = Modifier.height(5.dp))
 
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .padding(start = 25.dp, end = 25.dp)
+                        .clickable {
+                            launcher.launch("image/*")
+                        },
+                    shape = RoundedCornerShape(25.dp),
+                    border = BorderStroke(width = 1.dp, color = MainColor)
+                ) {
+                    //change photo
+                    PickPhoto(selectedImage)
+                }
 
-                    if (addCraft.data?.status == "success") {
-                        navController.navigate(AllScreens.AdminHomeScreen.name) {
-                            navController.popBackStack()
-                            navController.popBackStack()
-                            navController.popBackStack()
+                Spacer(modifier = Modifier.height(10.dp))
+                DefaultButton(label = "ارسل", enabled = valid) {
+                    loading.value = true
+                    scope.launch {
+                        val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
+                        val fileUri: Uri =
+                            selectedImage!! // get the file URI from the file picker result
+                        val inputStream = context.contentResolver.openInputStream(fileUri)
+                        val file = inputStream?.readBytes()
+                            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        val filePart = file?.let {
+                            MultipartBody.Part.createFormData(
+                                "image", imageName!!.name, it
+                            )
                         }
-                    } else {
-                        //  loading.value = false
-                        Toast.makeText(
-                            context,
-                            addCraft.data?.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        val namePart = jobTitle.value
+                            .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+
+
+                        val addCraft: WrapperClass<CreateNewCraft, Boolean, Exception> =
+                            createNewCraftViewModel.createNewCraft(
+                                name = namePart,
+                                image = filePart!!,
+                                token = "Bearer ${token.value.toString()}"
+                            )
+                        if (addCraft.data?.status == "success") {
+                            navController.navigate(AllScreens.AdminHomeScreen.name) {
+                                navController.popBackStack()
+                                navController.popBackStack()
+                                navController.popBackStack()
+                            }
+                        } else {
+                            //  loading.value = false
+                            Toast.makeText(
+                                context, addCraft.data?.message, Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
+            }
+        } else {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator(color = MainColor)
             }
         }
     }
 }
 
-//@Composable
-//fun getRealPathFromURI(uri: Uri): String {
-//    val projection = arrayOf(MediaStore.Images.Media.DATA)
-//    val cursor: Cursor? =
-//        LocalContext.current.contentResolver.query(uri, projection, null, null, null)
-//    val column_index =
-//        cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-//    cursor!!.moveToFirst()
-//    val filepath = cursor.getString(column_index!!)
-//    cursor.close()
-//    return filepath
-//}

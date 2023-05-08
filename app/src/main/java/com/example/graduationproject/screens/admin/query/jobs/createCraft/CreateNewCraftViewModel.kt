@@ -6,6 +6,7 @@ import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
 import com.example.graduationproject.repository.AdminRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,7 +15,7 @@ class CreateNewCraftViewModel @Inject constructor(private val repository: AdminR
 
     suspend fun createNewCraft(
         token: String,
-        name: String,
+        name: RequestBody,
         image: MultipartBody.Part
     ): WrapperClass<CreateNewCraft, Boolean, Exception> {
         return repository.createNewCraft(

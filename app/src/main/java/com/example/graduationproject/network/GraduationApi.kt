@@ -7,6 +7,7 @@ import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
 import com.example.graduationproject.model.register.myCraft.MyCraft
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -50,16 +51,12 @@ interface GraduationApi {
 
     //Admin create craft
 
-    //    @POST(Constant.CREATECRAFT)
-//    suspend fun adminCreateCraft(
-//        @Header("Authorization") authorization: String,
-//        @Body newCraft: Map<String, String>,
-//        ): CreateNewCraft
     @Multipart
     @POST(Constant.CREATECRAFT)
     suspend fun adminCreateCraft(
         @Header("Authorization") authorization: String,
-        @Part("name") name: String,
+        //  @Part("name") name: String,
+        @Part("name") name: RequestBody,
         @Part image: MultipartBody.Part
     ): CreateNewCraft
 }

@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity() {
             MyApp()
         }
     }
-
 }
 
 
