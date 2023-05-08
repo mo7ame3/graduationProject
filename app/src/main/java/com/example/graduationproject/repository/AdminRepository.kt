@@ -5,6 +5,7 @@ import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
 import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.network.GraduationApi
+import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -37,11 +38,11 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
         return getAllCrafts
     }
 
-    suspend fun createNewCraft(authorization: String, newCraft: Map<String, String>)
+    suspend fun createNewCraft(authorization: String, name: String, image: MultipartBody.Part)
             : WrapperClass<CreateNewCraft, Boolean, Exception> {
         try {
             //addNewUser.loading = true
-            createNewCraft.data = api.adminCreateCraft(authorization, newCraft)
+            createNewCraft.data = api.adminCreateCraft(authorization, name = name, image = image)
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()

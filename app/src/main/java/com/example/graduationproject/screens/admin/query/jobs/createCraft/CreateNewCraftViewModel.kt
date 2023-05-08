@@ -5,6 +5,7 @@ import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
 import com.example.graduationproject.repository.AdminRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,13 +15,12 @@ class CreateNewCraftViewModel @Inject constructor(private val repository: AdminR
     suspend fun createNewCraft(
         token: String,
         name: String,
-        image: String
+        image: MultipartBody.Part
     ): WrapperClass<CreateNewCraft, Boolean, Exception> {
         return repository.createNewCraft(
-            authorization = token, newCraft = mapOf(
-                "name" to name,
-                "image" to image
-            )
+            authorization = token,
+            name = name,
+            image = image
         )
     }
 

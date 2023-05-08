@@ -45,10 +45,13 @@ import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 @OptIn(ExperimentalComposeUiApi::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "Recycle")
 @Composable
 fun AdminCreateNewCraft(
     navController: NavController,
@@ -73,6 +76,8 @@ fun AdminCreateNewCraft(
         val token = sharedPreference.getToken.collectAsState(initial = "")
         val scope = rememberCoroutineScope()
         val keyboardController = LocalSoftwareKeyboardController.current
+
+
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -121,32 +126,54 @@ fun AdminCreateNewCraft(
             Spacer(modifier = Modifier.height(10.dp))
             DefaultButton(label = "ارسل", enabled = valid) {
                 scope.launch {
-                    val file = File(selectedImage?.path!!)
-                    Log.d("TAG", "AdminCreateNewCraft: ${file.name}")
-                    if (token.value.toString().isNotEmpty()) {
-                        val addCraft: WrapperClass<CreateNewCraft, Boolean, Exception> =
-                            createNewCraftViewModel.createNewCraft(
-                                name = jobTitle.value,
-                                image = file.name + ".png",
-                                token = "Bearer ${token.value.toString()}"
-                            )
-                        if (addCraft.data?.status == "success") {
-                            navController.navigate(AllScreens.AdminHomeScreen.name) {
-                                navController.popBackStack()
-                                navController.popBackStack()
-                                navController.popBackStack()
-                            }
-                        } else {
-                            //  loading.value = false
-                            Toast.makeText(
-                                context,
-                                addCraft.data?.message,
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    val file = selectedImage?.toString()?.let { it1 -> File(it1) }
+                    // test
+                    val fileUri: Uri =
+                        selectedImage!! // get the file URI from the file picker result
+                    val inputStream = context.contentResolver.openInputStream(fileUri)
+                    val file2 = inputStream?.readBytes()
+                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                    val filePart =
+                        file2?.let { MultipartBody.Part.createFormData("image", file!!.name, it) }
+                    Log.d("TAG", "AdminCreateNewCraft: $filePart")
+                    val addCraft: WrapperClass<CreateNewCraft, Boolean, Exception> =
+                        createNewCraftViewModel.createNewCraft(
+                            name = jobTitle.value,
+                            image = filePart!!,
+                            token = "Bearer ${token.value.toString()}"
+                        )
+
+
+
+                    if (addCraft.data?.status == "success") {
+                        navController.navigate(AllScreens.AdminHomeScreen.name) {
+                            navController.popBackStack()
+                            navController.popBackStack()
+                            navController.popBackStack()
                         }
+                    } else {
+                        //  loading.value = false
+                        Toast.makeText(
+                            context,
+                            addCraft.data?.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
         }
     }
 }
+
+//@Composable
+//fun getRealPathFromURI(uri: Uri): String {
+//    val projection = arrayOf(MediaStore.Images.Media.DATA)
+//    val cursor: Cursor? =
+//        LocalContext.current.contentResolver.query(uri, projection, null, null, null)
+//    val column_index =
+//        cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+//    cursor!!.moveToFirst()
+//    val filepath = cursor.getString(column_index!!)
+//    cursor.close()
+//    return filepath
+//}

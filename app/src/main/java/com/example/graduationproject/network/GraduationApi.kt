@@ -6,11 +6,14 @@ import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
 import com.example.graduationproject.model.register.myCraft.MyCraft
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import javax.inject.Singleton
 
@@ -46,9 +49,17 @@ interface GraduationApi {
     ): GetAllCrafts
 
     //Admin create craft
+
+    //    @POST(Constant.CREATECRAFT)
+//    suspend fun adminCreateCraft(
+//        @Header("Authorization") authorization: String,
+//        @Body newCraft: Map<String, String>,
+//        ): CreateNewCraft
+    @Multipart
     @POST(Constant.CREATECRAFT)
     suspend fun adminCreateCraft(
         @Header("Authorization") authorization: String,
-        @Body newCraft: Map<String, String>
+        @Part("name") name: String,
+        @Part image: MultipartBody.Part
     ): CreateNewCraft
 }
