@@ -63,4 +63,6 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
         return getOneCrafts
     }
 
+
+
 }

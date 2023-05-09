@@ -64,7 +64,9 @@ fun AdminCreateNewCraft(
         val jobTitle = remember {
             mutableStateOf("")
         }
-        var loading = false
+        var loading by remember {
+            mutableStateOf(false)
+        }
         var selectedImage by remember {
             mutableStateOf<Uri?>(null)
         }

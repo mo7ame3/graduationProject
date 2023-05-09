@@ -387,15 +387,10 @@ object Constant {
     //Login
     const val LOGIN = "api/v1/users/login"
 
-    //GetAllCrafts
-    const val GETALLCRAFTS = "api/v1/crafts"
+    //GetAllCrafts && CreateCraft && GetOneCraft && UpdateCraft
+    const val CRAFT = "api/v1/crafts"
 
     //CreateOrder
     const val CREATEORDER = "api/v1/orders"
 
-    //CreateCraft
-    const val CREATECRAFT = "api/v1/crafts"
-
-    //GetOneCraft
-    const val GETONECRAFT = "api/v1/crafts"
 }

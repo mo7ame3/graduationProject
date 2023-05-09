@@ -46,7 +46,7 @@ interface GraduationApi {
 
 
     //GET All CRAFT ("Admin and client")
-    @GET(Constant.GETALLCRAFTS)
+    @GET(Constant.CRAFT)
     suspend fun getAllCrafts(
         @Header("Authorization") authorization: String,
     ): GetAllCrafts
@@ -54,7 +54,7 @@ interface GraduationApi {
     //Admin create craft
 
     @Multipart
-    @POST(Constant.CREATECRAFT)
+    @POST(Constant.CRAFT)
     suspend fun adminCreateCraft(
         @Header("Authorization") authorization: String,
         //  @Part("name") name: String,
@@ -63,7 +63,7 @@ interface GraduationApi {
     ): CreateNewCraft
     //Get Craft
 
-    @GET(Constant.GETONECRAFT + "/{craftId}")
+    @GET(Constant.CRAFT + "/{craftId}")
     suspend fun getCraft(
         @Path("craftId") craftId: String,
         @Header("Authorization") authorization: String

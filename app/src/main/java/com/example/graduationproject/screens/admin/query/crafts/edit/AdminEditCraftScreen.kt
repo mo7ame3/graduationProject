@@ -2,6 +2,8 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -11,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -25,9 +28,14 @@ import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.getAllCrafts.Craft
 import com.example.graduationproject.model.getCraft.GetCraft
-import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.AdminMainColor
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
+
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -36,10 +44,11 @@ fun AdminEditCraftScreen(
     craftId: String,
     adminEditCraftViewModel: AdminEditCraftViewModel
 ) {
+    val loading = remember {
+        mutableStateOf(true)
+    }
 
     var craftData: Craft? = null
-    var loading = true
-    val scope = rememberCoroutineScope()
     if (Constant.token.isNotEmpty()) {
         val response: WrapperClass<GetCraft, Boolean, Exception> =
             produceState<WrapperClass<GetCraft, Boolean, Exception>>(
@@ -52,7 +61,7 @@ fun AdminEditCraftScreen(
             }.value
 
         if (response.data?.status == "success") {
-            loading = false
+            loading.value = false
             craftData = response.data!!.data?.craft
         }
     }
@@ -61,7 +70,7 @@ fun AdminEditCraftScreen(
             navController.popBackStack()
         }
     }) {
-        if (!loading) {
+        if (!loading.value) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -90,7 +99,7 @@ fun AdminEditCraftScreen(
 //                }
 //            }
                 Spacer(modifier = Modifier.height(10.dp))
-                JobRow(craftData!!, navController)
+                JobRow(craftData!!, navController, adminEditCraftViewModel, loading)
             }
         } else {
             CircleProgress()
@@ -98,10 +107,13 @@ fun AdminEditCraftScreen(
     }
 }
 
+@SuppressLint("Recycle")
 @Composable
 fun JobRow(
     craft: Craft,
-    navController: NavHostController
+    navController: NavHostController,
+    adminEditCraftViewModel: AdminEditCraftViewModel,
+    loading: MutableState<Boolean>
 ) {
     val jobName = remember {
         mutableStateOf(craft.name)
@@ -114,7 +126,8 @@ fun JobRow(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             selectedImage = uri
         }
-
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -190,12 +203,61 @@ fun JobRow(
                 }
             }
         }
-        LoginButton(isLogin = true, label = "save") {
+        LoginButton(isLogin = true, label = "ارسل") {
             // Update and nav to Home
-            navController.navigate(route = AllScreens.AdminHomeScreen.name) {
-                navController.popBackStack()
-                navController.popBackStack()
-                navController.popBackStack()
+            loading.value = true
+            val namePart = jobName.value
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+            scope.launch {
+                if (selectedImage != null) {
+                    val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
+                    val fileUri: Uri =
+                        selectedImage!! // get the file URI from the file picker result
+                    val inputStream = context.contentResolver.openInputStream(fileUri)
+                    val file = inputStream?.readBytes()
+                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                    val filePart = file?.let {
+                        MultipartBody.Part.createFormData(
+                            "image", imageName!!.name, it
+                        )
+                    }
+
+
+                    if (jobName.value != craft.name) {
+
+//                        val response :WrapperClass<CreateNewCraft, Boolean , Exception>
+//                                = adminEditCraftViewModel.updateCraftName(
+//                            name= namePart,
+//                            craftId = craft.id,
+//                            authorization = Constant.token,
+//                            image = filePart!!
+//                        )
+//                        Log.d("TAG", "JobRow: ${response.data} ")
+//                        if(response.data?.status =="success"){
+//                            navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+//                                navController.popBackStack()
+//                                navController.popBackStack()
+//                                navController.popBackStack()
+//                            }
+//                        }else{
+//                            loading.value = false
+//                            Toast.makeText(
+//                                context, response.data!!.message, Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+                    } else {
+                        Log.d("TAG", "JobRow photo only")
+                    }
+                } else {
+                    if (jobName.value != craft.name) {
+
+                    } else {
+                        loading.value = false
+                        Toast.makeText(
+                            context, "No Change", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         }
     }
