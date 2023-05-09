@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.FloatingAction
 import com.example.graduationproject.components.InternetCraftName
 import com.example.graduationproject.components.InternetCraftPhoto
@@ -37,9 +38,7 @@ fun AdminCraftsScreen(
     val sharedPreference = SharedPreference(context)
     val token = sharedPreference.getToken.collectAsState(initial = "")
     var craftList: List<Craft>? = null
-    val loading = remember {
-        mutableStateOf(true)
-    }
+    var loading = true
     if (token.value.toString().isNotEmpty()) {
         val craftData: WrapperClass<GetAllCrafts, Boolean, Exception> =
             produceState<WrapperClass<GetAllCrafts, Boolean, Exception>>(
@@ -49,7 +48,7 @@ fun AdminCraftsScreen(
             }.value
         if (craftData.data != null) {
             craftList = craftData.data!!.data?.crafts
-            loading.value = false
+            loading = false
         }
     }
 
@@ -64,7 +63,7 @@ fun AdminCraftsScreen(
             }
         }
     ) {
-        if (!loading.value) {
+        if (!loading) {
             if (craftList != null) {
                 LazyColumn(
                     modifier = Modifier
@@ -81,13 +80,7 @@ fun AdminCraftsScreen(
                 }
             }
         } else {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator(color = MainColor)
-            }
+            CircleProgress()
         }
     }
 }

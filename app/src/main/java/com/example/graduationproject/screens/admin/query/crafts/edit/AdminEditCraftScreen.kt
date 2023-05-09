@@ -2,7 +2,6 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -23,17 +22,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.SubcomposeAsyncImage
 import com.example.graduationproject.R
+import com.example.graduationproject.components.CircleProgress
+import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.constant.Constant.adminCraftList
-import com.example.graduationproject.data.GoogleDriveList
 import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.getAllCrafts.Craft
 import com.example.graduationproject.model.getCraft.GetCraft
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.AdminMainColor
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -48,66 +48,86 @@ fun AdminEditCraftScreen(
     val token = sharedPreference.getToken.collectAsState(initial = "")
     val scope = rememberCoroutineScope()
 
+    var oneCraftData:Craft?=null
+    var loading = true
+    if (token.value.toString().isNotEmpty() ){
+        val response:WrapperClass<GetCraft,Boolean,Exception> =  produceState<WrapperClass<GetCraft,Boolean,Exception>>(
+            initialValue = WrapperClass(data = null) ,
+        ){
+            value = adminEditCraftViewModel.getOneCraft(
+                authorization = "Bearer "+token.value.toString(),
+                craftId = craftId
+            )
+        }.value
+    if (response.data?.status == "success"){
+        loading = false
+        oneCraftData = response.data!!.data!!.craft
+    }
+    }
     val craftItem = adminCraftList[4]
     Scaffold(topBar = {
         TopAppBar(title = "") {
             navController.popBackStack()
         }
     }) {
+        if(!loading && oneCraftData?.name != null){
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 15.dp, start = 10.dp, end = 10.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                //Text(text = "عدد العمال في ${craftItem.craftTitle}" + "   " + craftItem.numberOfWorkers)
-                Row {
-                    if (craftItem.numberOfWorkers == 0)
-                        IconButton(onClick = {
-                            scope.launch {
-                                // Delete craft from data base
-                                Log.d("TAG", "AdminEditCraftScreen")
-                                Log.d("TAG", "AdminEditCraftScreen ${token.value.toString()}")
-                                if (token.value.toString().isNotEmpty() ){
-                                    val response:WrapperClass<GetCraft,Boolean,Exception> =  adminEditCraftViewModel.getOneCraft(
-                                        authorization = token.value.toString(),
-                                        craftId = craftId
-                                    )
-                                    Log.d("TAG", "AdminEditCraftScreen: ${response.data?.data}")
-                                    Log.d("TAG", "AdminEditCraftScreen: ${response.data?.status}")
-                                }
-                            }
-
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.trash),
-                                contentDescription = null,
-                                modifier = Modifier.size(25.dp)
-                            )
-                        }
-
-                }
-            }
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(start = 10.dp, end = 10.dp),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                //Text(text = "عدد العمال في ${craftItem.craftTitle}" + "   " + craftItem.numberOfWorkers)
+//                Row {
+//                    //if (craftItem.numberOfWorkers == 0)
+//                        IconButton(onClick = {
+//                            scope.launch {
+//                                // Delete craft from data base
+//                                Log.d("TAG", "AdminEditCraftScreen")
+//                                Log.d("TAG", "AdminEditCraftScreen ${token.value.toString()}")
+//                                if (token.value.toString().isNotEmpty() ){
+//                                    val response:WrapperClass<GetCraft,Boolean,Exception> =  adminEditCraftViewModel.getOneCraft(
+//                                        authorization = token.value.toString(),
+//                                        craftId = craftId
+//                                    )
+//                                    Log.d("TAG", "AdminEditCraftScreen: ${response.data?.data}")
+//                                    Log.d("TAG", "AdminEditCraftScreen: ${response.data?.status}")
+//                                }
+//                            }
+//
+//                        }) {
+//                            Icon(
+//                                painter = painterResource(id = R.drawable.trash),
+//                                contentDescription = null,
+//                                modifier = Modifier.size(25.dp)
+//                            )
+//                        }
+//
+//                }
+//            }
             Spacer(modifier = Modifier.height(10.dp))
-            JobRow(craftItem, navController)
+            JobRow(craft = oneCraftData, navController)
         }
-
+        }
+        else{
+            CircleProgress()
+        }
     }
 }
 
 @Composable
 fun JobRow(
-    googleDriveList: GoogleDriveList,
+    craft: Craft,
     navController: NavHostController
 ) {
     val jobName = remember {
-        mutableStateOf(googleDriveList.jobName)
+        mutableStateOf(craft.name)
     }
 
     var selectedImage by remember {
@@ -133,33 +153,7 @@ fun JobRow(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box {
-                        SubcomposeAsyncImage(
-                            model = if (selectedImage == null) googleDriveList.picGoogle else selectedImage,
-                            contentDescription = null,
-                            modifier = Modifier.size(300.dp, 200.dp),
-                            loading = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            },
-                            error = {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Error,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(60.dp)
-                                    )
-                                }
-
-                            },
-                            contentScale = ContentScale.Crop
-                        )
+                        InternetCraftPhoto(uri = if(selectedImage == null) craft.avatar else selectedImage.toString())
                         Row(
                             modifier = Modifier.size(300.dp, 200.dp),
                             horizontalArrangement = Arrangement.End,

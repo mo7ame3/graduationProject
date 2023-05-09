@@ -111,7 +111,7 @@ fun AdminCreateNewCraft(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(220.dp)
+                        .height(300.dp)
                         .padding(start = 25.dp, end = 25.dp)
                         .clickable {
                             launcher.launch("image/*")
