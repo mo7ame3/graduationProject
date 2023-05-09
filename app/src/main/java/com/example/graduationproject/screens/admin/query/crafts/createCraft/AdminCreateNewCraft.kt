@@ -1,4 +1,4 @@
-package com.example.graduationproject.screens.admin.query.jobs.createCraft
+package com.example.graduationproject.screens.admin.query.crafts.createCraft
 
 import android.annotation.SuppressLint
 import android.net.Uri

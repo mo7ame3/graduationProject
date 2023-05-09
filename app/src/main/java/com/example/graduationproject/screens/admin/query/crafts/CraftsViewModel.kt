@@ -1,18 +1,18 @@
-package com.example.graduationproject.screens.admin.query.jobs
+package com.example.graduationproject.screens.admin.query.crafts
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
-import com.example.graduationproject.repository.AdminRepository
+import com.example.graduationproject.repository.SharedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class JobViewModel @Inject constructor(private val adminRepository: AdminRepository) :
+class CraftsViewModel @Inject constructor(private val sharedRepository: SharedRepository) :
     ViewModel() {
 
     suspend fun getAllCrafts(token: String): WrapperClass<GetAllCrafts, Boolean, Exception> {
-        return adminRepository.getAllCrafts(token)
+        return sharedRepository.getAllCrafts(token)
     }
 
 

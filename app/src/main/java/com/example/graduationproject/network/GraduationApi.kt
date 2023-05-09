@@ -3,6 +3,7 @@ package com.example.graduationproject.network
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
 import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
+import com.example.graduationproject.model.getCraft.GetCraft
 import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
 import com.example.graduationproject.model.register.myCraft.MyCraft
@@ -43,7 +44,8 @@ interface GraduationApi {
         @Body loginInput: Map<String, String>
     ): Login
 
-    //GET CRAFT
+
+    //GET All CRAFT ("Admin and client")
     @GET(Constant.GETALLCRAFTS)
     suspend fun getAllCrafts(
         @Header("Authorization") authorization: String,
@@ -59,4 +61,11 @@ interface GraduationApi {
         @Part("name") name: RequestBody,
         @Part image: MultipartBody.Part
     ): CreateNewCraft
+    //Get Craft
+
+    @GET(Constant.GETONECRAFT+"/{craftId}")
+    suspend fun getCraft(
+        @Path("craftId") craftId:String,
+        @Header("Authorization") authorization: String
+    ):GetCraft
 }

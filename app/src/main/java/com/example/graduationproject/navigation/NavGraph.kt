@@ -10,12 +10,13 @@ import androidx.navigation.navArgument
 import com.example.graduationproject.screens.admin.home.AdminHomeScreen
 import com.example.graduationproject.screens.admin.query.blocks.AdminBlockedUsers
 import com.example.graduationproject.screens.admin.query.clients.AdminAllClients
-import com.example.graduationproject.screens.admin.query.jobs.AdminJobsScreen
-import com.example.graduationproject.screens.admin.query.jobs.JobViewModel
-import com.example.graduationproject.screens.admin.query.jobs.allWorkers.AdminAllWorkersInSpecificJob
-import com.example.graduationproject.screens.admin.query.jobs.createCraft.AdminCreateNewCraft
-import com.example.graduationproject.screens.admin.query.jobs.createCraft.CreateNewCraftViewModel
-import com.example.graduationproject.screens.admin.query.jobs.edit.AdminEditJobsScreen
+import com.example.graduationproject.screens.admin.query.crafts.AdminCraftsScreen
+import com.example.graduationproject.screens.admin.query.crafts.CraftsViewModel
+import com.example.graduationproject.screens.admin.query.crafts.allWorkers.AdminAllWorkersInSpecificJob
+import com.example.graduationproject.screens.admin.query.crafts.createCraft.AdminCreateNewCraft
+import com.example.graduationproject.screens.admin.query.crafts.createCraft.CreateNewCraftViewModel
+import com.example.graduationproject.screens.admin.query.crafts.edit.AdminEditCraftScreen
+import com.example.graduationproject.screens.admin.query.crafts.edit.AdminEditCraftViewModel
 import com.example.graduationproject.screens.admin.query.reports.AdminReportsQuery
 import com.example.graduationproject.screens.admin.query.reports.query.AdminReportListQuery
 import com.example.graduationproject.screens.admin.query.workers.AdminAllWorkers
@@ -39,6 +40,7 @@ import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemD
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
 import com.example.graduationproject.screens.worker.profile.WorkerProfileScreen
 import com.example.graduationproject.screens.worker.profileSettings.WorkerProfileSettingsScreen
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun NavGraph() {
@@ -224,18 +226,20 @@ fun NavGraph() {
             AdminHomeScreen(navController = navController)
         }
         composable(route = AllScreens.AdminJobsScreen.name) {
-            val viewModel = hiltViewModel<JobViewModel>()
-            AdminJobsScreen(navController = navController, viewModel)
+            val viewModel = hiltViewModel<CraftsViewModel>()
+            AdminCraftsScreen(navController = navController, viewModel)
         }
         composable(
-            route = AllScreens.AdminEditJobsScreen.name + "/{id}",
-            arguments = listOf(navArgument(name = "id") {
+            route = AllScreens.AdminEditJobsScreen.name + "/{craftId}",
+            arguments = listOf(navArgument(name = "craftId") {
                 type = NavType.StringType
             })
         ) { data ->
-            AdminEditJobsScreen(
+            val viewModel = hiltViewModel<AdminEditCraftViewModel>()
+            AdminEditCraftScreen(
                 navController = navController,
-                id = data.arguments?.getString("id")!!
+                craftId = data.arguments?.getString("craftId")!!,
+                viewModel
             )
         }
         composable(

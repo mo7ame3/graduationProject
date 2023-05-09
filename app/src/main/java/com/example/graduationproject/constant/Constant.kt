@@ -383,4 +383,5 @@ object Constant {
     const val GETALLCRAFTS = "api/v1/crafts"
     const val CREATEORDER = "api/v1/orders"
     const val CREATECRAFT = "api/v1/crafts"
+    const val GETONECRAFT ="api/v1/crafts"
 }
