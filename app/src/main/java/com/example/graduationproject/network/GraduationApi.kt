@@ -8,12 +8,14 @@ import com.example.graduationproject.model.getCraft.GetCraft
 import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
 import com.example.graduationproject.model.register.myCraft.MyCraft
+import com.example.graduationproject.model.updateCraft.UpdateCraft
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
@@ -80,5 +82,14 @@ interface GraduationApi {
         @Part("orderDifficulty") orderDifficulty: RequestBody,
         @Part("description") description: RequestBody
     ): CreateNewOrder
+
+    @Multipart
+    @PATCH("api/v1/crafts/{craftID}")
+    suspend fun updateCraft(
+        @Path("craftID") craftId: String,
+        @Header("Authorization") authorization: String,
+        @Part image: MultipartBody.Part? = null,
+        @Part("name") name: RequestBody? = null,
+    ): UpdateCraft
 
 }

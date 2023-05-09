@@ -41,7 +41,6 @@ import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemD
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
 import com.example.graduationproject.screens.worker.profile.WorkerProfileScreen
 import com.example.graduationproject.screens.worker.profileSettings.WorkerProfileSettingsScreen
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 @Composable
 fun NavGraph() {

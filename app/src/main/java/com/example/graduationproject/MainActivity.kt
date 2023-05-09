@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity()  {
     override fun attachBaseContext(newBase: Context) {
         val languageCode = "ar"
         val context: Context = LanguageConfig.changeLanguage(newBase, languageCode)

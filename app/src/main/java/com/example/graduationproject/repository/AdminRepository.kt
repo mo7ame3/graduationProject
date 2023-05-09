@@ -3,6 +3,7 @@ package com.example.graduationproject.repository
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
+import com.example.graduationproject.model.updateCraft.UpdateCraft
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 class AdminRepository @Inject constructor(private val api: GraduationApi) {
     private val createNewCraft = WrapperClass<CreateNewCraft, Boolean, Exception>()
+    private val updateCraft = WrapperClass<UpdateCraft, Boolean, Exception>()
 
 
     suspend fun createNewCraft(authorization: String, name: RequestBody, image: MultipartBody.Part)
@@ -36,6 +38,32 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
 
         }
         return createNewCraft
+    }
+    suspend fun updateCraft(authorization: String, name: RequestBody? = null, image: MultipartBody.Part? = null, craftId :String)
+            : WrapperClass<UpdateCraft, Boolean, Exception> {
+        try {
+            //addNewUser.loading = true
+            Log.d("TAG", "try")
+            updateCraft.data = api.updateCraft(authorization = authorization, name = name, image = image , craftId = craftId)
+            Log.d("TAG", "success: ${updateCraft.data}")
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            updateCraft.data = UpdateCraft(status = status, message = message)
+            Log.d("TAG", "error message: ${e.message}")
+
+        } catch (e: Exception) {
+            //addNewUser.loading = false
+            Log.d("TAG", "updateCraft: $e")
+            updateCraft.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "updateCraft: $e")
+            updateCraft.e = e
+
+        }
+        return updateCraft
     }
 
 
