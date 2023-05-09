@@ -7,31 +7,25 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.SubcomposeAsyncImage
 import com.example.graduationproject.R
 import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.TopAppBar
-import com.example.graduationproject.constant.Constant.adminCraftList
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.getAllCrafts.Craft
 import com.example.graduationproject.model.getCraft.GetCraft
 import com.example.graduationproject.navigation.AllScreens
-import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.AdminMainColor
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
 
@@ -43,39 +37,36 @@ fun AdminEditCraftScreen(
     adminEditCraftViewModel: AdminEditCraftViewModel
 ) {
 
-    val context = LocalContext.current
-    val sharedPreference = SharedPreference(context)
-    val token = sharedPreference.getToken.collectAsState(initial = "")
-    val scope = rememberCoroutineScope()
-
-    var oneCraftData:Craft?=null
+    var craftData: Craft? = null
     var loading = true
-    if (token.value.toString().isNotEmpty() ){
-        val response:WrapperClass<GetCraft,Boolean,Exception> =  produceState<WrapperClass<GetCraft,Boolean,Exception>>(
-            initialValue = WrapperClass(data = null) ,
-        ){
-            value = adminEditCraftViewModel.getOneCraft(
-                authorization = "Bearer "+token.value.toString(),
-                craftId = craftId
-            )
-        }.value
-    if (response.data?.status == "success"){
-        loading = false
-        oneCraftData = response.data!!.data!!.craft
+    val scope = rememberCoroutineScope()
+    if (Constant.token.isNotEmpty()) {
+        val response: WrapperClass<GetCraft, Boolean, Exception> =
+            produceState<WrapperClass<GetCraft, Boolean, Exception>>(
+                initialValue = WrapperClass(data = null)
+            ) {
+                value = adminEditCraftViewModel.getOneCraft(
+                    authorization = "Bearer " + Constant.token,
+                    craftId = craftId
+                )
+            }.value
+
+        if (response.data?.status == "success") {
+            loading = false
+            craftData = response.data!!.data?.craft
+        }
     }
-    }
-    val craftItem = adminCraftList[4]
     Scaffold(topBar = {
         TopAppBar(title = "") {
             navController.popBackStack()
         }
     }) {
-        if(!loading && oneCraftData?.name != null){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 15.dp, start = 10.dp, end = 10.dp)
-        ) {
+        if (!loading) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 15.dp, start = 10.dp, end = 10.dp)
+            ) {
 //            Row(
 //                modifier = Modifier
 //                    .fillMaxWidth()
@@ -86,36 +77,22 @@ fun AdminEditCraftScreen(
 //                //Text(text = "عدد العمال في ${craftItem.craftTitle}" + "   " + craftItem.numberOfWorkers)
 //                Row {
 //                    //if (craftItem.numberOfWorkers == 0)
-//                        IconButton(onClick = {
-//                            scope.launch {
-//                                // Delete craft from data base
-//                                Log.d("TAG", "AdminEditCraftScreen")
-//                                Log.d("TAG", "AdminEditCraftScreen ${token.value.toString()}")
-//                                if (token.value.toString().isNotEmpty() ){
-//                                    val response:WrapperClass<GetCraft,Boolean,Exception> =  adminEditCraftViewModel.getOneCraft(
-//                                        authorization = token.value.toString(),
-//                                        craftId = craftId
-//                                    )
-//                                    Log.d("TAG", "AdminEditCraftScreen: ${response.data?.data}")
-//                                    Log.d("TAG", "AdminEditCraftScreen: ${response.data?.status}")
-//                                }
-//                            }
+//                    IconButton(onClick = {
 //
-//                        }) {
-//                            Icon(
-//                                painter = painterResource(id = R.drawable.trash),
-//                                contentDescription = null,
-//                                modifier = Modifier.size(25.dp)
-//                            )
-//                        }
+//                    }) {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.trash),
+//                            contentDescription = null,
+//                            modifier = Modifier.size(25.dp)
+//                        )
+//                    }
 //
 //                }
 //            }
-            Spacer(modifier = Modifier.height(10.dp))
-            JobRow(craft = oneCraftData, navController)
-        }
-        }
-        else{
+                Spacer(modifier = Modifier.height(10.dp))
+                JobRow(craftData!!, navController)
+            }
+        } else {
             CircleProgress()
         }
     }
@@ -153,7 +130,8 @@ fun JobRow(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box {
-                        InternetCraftPhoto(uri = if(selectedImage == null) craft.avatar else selectedImage.toString())
+
+                        InternetCraftPhoto(uri = (if (selectedImage == null) craft.avatar else selectedImage).toString())
                         Row(
                             modifier = Modifier.size(300.dp, 200.dp),
                             horizontalArrangement = Arrangement.End,

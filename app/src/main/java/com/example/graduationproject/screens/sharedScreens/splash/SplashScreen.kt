@@ -1,6 +1,5 @@
 package com.example.graduationproject.screens.sharedScreens.splash
 
-import android.util.Log
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -20,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
@@ -44,27 +44,31 @@ fun SplashScreen(navController: NavController) {
                 easing = { OvershootInterpolator(8f).getInterpolation(it) })
         )
         delay(500L)
-        if (getToken.value.toString().isNotEmpty()){
+        if (getToken.value.toString().isNotEmpty()) {
+            Constant.token = getToken.value.toString()
             when (getState.value) {
                 "client" -> {
                     navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
                         navController.popBackStack()
                     }
                 }
+
                 "worker" -> {
                     navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
                         navController.popBackStack()
                     }
                 }
+
                 "admin" -> {
                     navController.navigate(AllScreens.AdminHomeScreen.name) {
                         navController.popBackStack()
                     }
-                } }
-            }  else {
-        navController.navigate(AllScreens.LoginScreen.name) {
-            navController.popBackStack()
-        }
+                }
+            }
+        } else {
+            navController.navigate(AllScreens.LoginScreen.name) {
+                navController.popBackStack()
+            }
         }
     })
 

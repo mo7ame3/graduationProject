@@ -9,7 +9,7 @@ import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
-class SharedRepository @Inject constructor(private val api: GraduationApi)  {
+class SharedRepository @Inject constructor(private val api: GraduationApi) {
 
     private val getAllCrafts = WrapperClass<GetAllCrafts, Boolean, Exception>()
     private val getOneCrafts = WrapperClass<GetCraft, Boolean, Exception>()
@@ -39,7 +39,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi)  {
     }
 
 
-    suspend fun getOneCraft(authorization: String , craftId:String)
+    suspend fun getOneCraft(authorization: String, craftId: String)
             : WrapperClass<GetCraft, Boolean, Exception> {
         try {
             //addNewUser.loading = true

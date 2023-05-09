@@ -10,7 +10,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -36,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.DefaultButton
 import com.example.graduationproject.components.PickPhoto
 import com.example.graduationproject.components.TextInput
@@ -65,9 +64,7 @@ fun AdminCreateNewCraft(
         val jobTitle = remember {
             mutableStateOf("")
         }
-        val loading = remember {
-            mutableStateOf(false)
-        }
+        var loading = false
         var selectedImage by remember {
             mutableStateOf<Uri?>(null)
         }
@@ -77,7 +74,7 @@ fun AdminCreateNewCraft(
         val token = sharedPreference.getToken.collectAsState(initial = "")
         val scope = rememberCoroutineScope()
         val keyboardController = LocalSoftwareKeyboardController.current
-        if (!loading.value) {
+        if (!loading) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -122,10 +119,9 @@ fun AdminCreateNewCraft(
                     //change photo
                     PickPhoto(selectedImage)
                 }
-
                 Spacer(modifier = Modifier.height(10.dp))
                 DefaultButton(label = "ارسل", enabled = valid) {
-                    loading.value = true
+                    loading = true
                     scope.launch {
                         val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
                         val fileUri: Uri =
@@ -155,7 +151,7 @@ fun AdminCreateNewCraft(
                                 navController.popBackStack()
                             }
                         } else {
-                            //  loading.value = false
+                            loading = false
                             Toast.makeText(
                                 context, addCraft.data?.message, Toast.LENGTH_SHORT
                             ).show()
@@ -164,13 +160,7 @@ fun AdminCreateNewCraft(
                 }
             }
         } else {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                CircularProgressIndicator(color = MainColor)
-            }
+            CircleProgress()
         }
     }
 }

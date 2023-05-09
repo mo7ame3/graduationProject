@@ -25,6 +25,7 @@ import com.example.graduationproject.screens.client.home.ClientHomeViewModel
 import com.example.graduationproject.screens.client.order.ClientMyCraftOrders
 import com.example.graduationproject.screens.client.order.ClientOrderOfferScreen
 import com.example.graduationproject.screens.client.postScreen.ClientPostScreen
+import com.example.graduationproject.screens.client.postScreen.PostViewModel
 import com.example.graduationproject.screens.client.profile.ClientProfileScreen
 import com.example.graduationproject.screens.client.profileSettings.ClientProfileSettingsScreen
 import com.example.graduationproject.screens.client.rate.ClientRateScreen
@@ -51,12 +52,13 @@ fun NavGraph() {
     ) {
         val postScreen = AllScreens.ClientPostScreen.name
         composable(
-            route = "$postScreen/{id}", arguments = listOf(navArgument(name = "id") {
+            route = "$postScreen/{craftId}", arguments = listOf(navArgument(name = "craftId") {
                 type = NavType.StringType
             })
         ) { data ->
-            data.arguments?.getString("id").let { id ->
-                ClientPostScreen(navController = navController, id = id.toString())
+            val viewModel = hiltViewModel<PostViewModel>()
+            data.arguments?.getString("craftId").let { id ->
+                ClientPostScreen(navController = navController, craftId = id.toString(), viewModel)
             }
         }
         composable(route = AllScreens.LoginScreen.name) {

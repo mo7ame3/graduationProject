@@ -373,15 +373,29 @@ object Constant {
         "عامل غير كفء",
     )
 
+    //token
+    var token = ""
+
     //BaseURI
     const val BASE_URI = "https://api-ramh.onrender.com/"
 
     //EndPoint
+    //Register
     const val REGISTER = "api/v1/users/register"
     const val MYCRAFT = "api/v1/users"
+
+    //Login
     const val LOGIN = "api/v1/users/login"
+
+    //GetAllCrafts
     const val GETALLCRAFTS = "api/v1/crafts"
+
+    //CreateOrder
     const val CREATEORDER = "api/v1/orders"
+
+    //CreateCraft
     const val CREATECRAFT = "api/v1/crafts"
-    const val GETONECRAFT ="api/v1/crafts"
+
+    //GetOneCraft
+    const val GETONECRAFT = "api/v1/crafts"
 }

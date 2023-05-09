@@ -2,6 +2,7 @@ package com.example.graduationproject.network
 
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
+import com.example.graduationproject.model.creatOrder.CreateNewOrder
 import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.getCraft.GetCraft
 import com.example.graduationproject.model.login.Login
@@ -35,7 +36,6 @@ interface GraduationApi {
         @Path("workerId") workerId: String,
         @Header("Authorization") authorization: String,
         @Body myCraft: Map<String, String>
-
     ): MyCraft
 
     //Login
@@ -63,9 +63,22 @@ interface GraduationApi {
     ): CreateNewCraft
     //Get Craft
 
-    @GET(Constant.GETONECRAFT+"/{craftId}")
+    @GET(Constant.GETONECRAFT + "/{craftId}")
     suspend fun getCraft(
-        @Path("craftId") craftId:String,
+        @Path("craftId") craftId: String,
         @Header("Authorization") authorization: String
-    ):GetCraft
+    ): GetCraft
+
+    //Create Order
+    @Multipart
+    @POST(Constant.CREATEORDER + "/{craftID}")
+    suspend fun createOrder(
+        @Path("craftID") craftId: String,
+        @Header("Authorization") authorization: String,
+        @Part image: MultipartBody.Part,
+        @Part("title") title: RequestBody,
+        @Part("orderDifficulty") orderDifficulty: RequestBody,
+        @Part("description") description: RequestBody
+    ): CreateNewOrder
+
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.*
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.login.Login
 import com.example.graduationproject.model.register.Register
@@ -207,10 +208,11 @@ fun LoginScreen(
                                         )
                                     if (login.data?.status == "success") {
                                         sharedPreference.saveName(login.data!!.data?.user!!.name)
+                                        sharedPreference.saveToken(login.data!!.token.toString())
+                                        Constant.token = login.data!!.token.toString()
                                         when (login.data!!.data?.user?.role) {
                                             "client" -> {
                                                 sharedPreference.saveState("client")
-                                                sharedPreference.saveToken(login.data!!.token.toString())
                                                 navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
                                                     navController.popBackStack()
                                                 }
@@ -218,7 +220,6 @@ fun LoginScreen(
 
                                             "worker" -> {
                                                 sharedPreference.saveState("worker")
-                                                sharedPreference.saveToken(login.data!!.token.toString())
                                                 navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
                                                     navController.popBackStack()
                                                 }
@@ -226,7 +227,6 @@ fun LoginScreen(
 
                                             else -> {
                                                 sharedPreference.saveState("admin")
-                                                sharedPreference.saveToken(login.data!!.token.toString())
                                                 navController.navigate(AllScreens.AdminHomeScreen.name) {
                                                     navController.popBackStack()
                                                 }
@@ -273,17 +273,16 @@ fun LoginScreen(
                                                     )
                                                 if (register.data?.status == "success") {
                                                     sharedPreference.saveName(register.data!!.data?.user!!.name)
+                                                    sharedPreference.saveToken(register.data!!.token.toString())
+                                                    Constant.token =
+                                                        register.data!!.token.toString()
                                                     if (workerOrClintBack.value == "عميل") {
                                                         sharedPreference.saveState("client")
-                                                        sharedPreference.saveToken(register.data!!.token.toString())
                                                         navController.navigate(AllScreens.ClientHomeScreen.name + "/login") {
                                                             navController.popBackStack()
                                                         }
                                                     } else {
                                                         sharedPreference.saveState("worker")
-                                                        sharedPreference.saveToken(register.data!!.token.toString())
-
-
                                                         val myCraft: WrapperClass<MyCraft, Boolean, Exception> =
                                                             authenticationViewModel.workerChooseCraft(
                                                                 token = "Bearer " + register.data!!.token.toString(),
