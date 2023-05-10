@@ -39,27 +39,33 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
         }
         return createNewCraft
     }
-    suspend fun updateCraft(authorization: String, name: RequestBody? = null, image: MultipartBody.Part? = null, craftId :String)
-            : WrapperClass<UpdateCraft, Boolean, Exception> {
+
+    suspend fun updateCraft(
+        authorization: String,
+        name: RequestBody? = null,
+        image: MultipartBody.Part? = null,
+        craftId: String
+    ): WrapperClass<UpdateCraft, Boolean, Exception> {
         try {
             //addNewUser.loading = true
-            Log.d("TAG", "try")
-            updateCraft.data = api.updateCraft(authorization = authorization, name = name, image = image , craftId = craftId)
-            Log.d("TAG", "success: ${updateCraft.data}")
+            updateCraft.data = api.updateCraft(
+                authorization = authorization,
+                name = name,
+                image = image,
+                craftId = craftId
+            )
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
             updateCraft.data = UpdateCraft(status = status, message = message)
-            Log.d("TAG", "error message: ${e.message}")
-
         } catch (e: Exception) {
             //addNewUser.loading = false
-            Log.d("TAG", "updateCraft: $e")
+            Log.d("TAG", "updateCraftError: $e")
             updateCraft.e = e
         } catch (e: SocketTimeoutException) {
-            Log.d("TAG", "updateCraft: $e")
+            Log.d("TAG", "updateCraftError: $e")
             updateCraft.e = e
 
         }

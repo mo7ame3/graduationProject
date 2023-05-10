@@ -2,7 +2,6 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,9 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -28,6 +29,8 @@ import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.getAllCrafts.Craft
 import com.example.graduationproject.model.getCraft.GetCraft
+import com.example.graduationproject.model.updateCraft.UpdateCraft
+import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.AdminMainColor
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
 import kotlinx.coroutines.launch
@@ -107,6 +110,7 @@ fun AdminEditCraftScreen(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("Recycle")
 @Composable
 fun JobRow(
@@ -128,6 +132,9 @@ fun JobRow(
         }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -164,14 +171,8 @@ fun JobRow(
 
                             IconButton(onClick = {
                                 // delete photo
-                                scope.launch{
-                                    if (craft.id.isNotEmpty()) {
-                                        adminEditCraftViewModel.updateCraft(
-                                            authorization = "Bearer " + Constant.token,
-                                            craftId = craft.id,
-                                            name = " عامل بناء".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                                        )
-                                    }
+                                scope.launch {
+
                                 }
                             }) {
                                 Icon(
@@ -199,14 +200,14 @@ fun JobRow(
                             value = jobName.value,
                             onValueChange = { jobName.value = it },
                             textStyle = TextStyle(
-                            color = AdminMainColor,
-                            textAlign = TextAlign.Center
+                                color = AdminMainColor,
+                                textAlign = TextAlign.Center
                             ),
                             colors = TextFieldDefaults.textFieldColors(
                                 backgroundColor = Color.White,
                                 focusedIndicatorColor = Color.White,
                                 unfocusedIndicatorColor = Color.White
-                            )
+                            ),
                         )
                     }
                 }
@@ -214,90 +215,168 @@ fun JobRow(
         }
 
         LoginButton(isLogin = true, label = "ارسل") {
+            keyboardController?.hide()
+            val namePart = jobName.value
+                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
 
-
-
-            scope.launch{
+            scope.launch {
                 if (craft.id.isNotEmpty()) {
-                    adminEditCraftViewModel.updateCraft(
-                        authorization = "Bearer " + Constant.token,
-                        craftId = craft.id,
-                        name = "بناء".toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    )
+                    if (selectedImage != null) {
+                        val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
+                        val fileUri: Uri =
+                            selectedImage!! // get the file URI from the file picker result
+                        val inputStream = context.contentResolver.openInputStream(fileUri)
+                        val file = inputStream?.readBytes()
+                            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        val filePart = file?.let {
+                            MultipartBody.Part.createFormData(
+                                "image", imageName!!.name, it
+                            )
+                        }
+
+                        if (jobName.value != craft.name) {
+                            val response: WrapperClass<UpdateCraft, Boolean, Exception> =
+                                adminEditCraftViewModel.updateCraft(
+                                    authorization = "Bearer " + Constant.token,
+                                    craftId = craft.id,
+                                    name = namePart,
+                                    image = filePart
+                                )
+                            loading.value = true
+                            if (response.data!!.status == "success") {
+                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                loading.value = false
+                                Toast.makeText(
+                                    context, response.data!!.message, Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            val response: WrapperClass<UpdateCraft, Boolean, Exception> =
+                                adminEditCraftViewModel.updateCraft(
+                                    authorization = "Bearer " + Constant.token,
+                                    craftId = craft.id,
+                                    image = filePart
+                                )
+                            loading.value = true
+                            if (response.data!!.status == "success") {
+                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                loading.value = false
+                                Toast.makeText(
+                                    context, response.data!!.message, Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } else {
+                        if (jobName.value != craft.name) {
+                            val response: WrapperClass<UpdateCraft, Boolean, Exception> =
+                                adminEditCraftViewModel.updateCraft(
+                                    authorization = "Bearer " + Constant.token,
+                                    craftId = craft.id,
+                                    name = namePart,
+                                )
+                            loading.value = true
+                            if (response.data!!.status == "success") {
+                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                loading.value = false
+                                Toast.makeText(
+                                    context, response.data!!.message, Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                context, "No Change", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }
             }
+        }
+    }
+}
 
-            // Update and nav to Home
+
+// Update and nav to Home
 //            loading.value = true
 //            val namePart = jobName.value
 //                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
 //            scope.launch {
 //
-////                if (selectedImage != null) {
-////                    val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
-////                    val fileUri: Uri =
-////                        selectedImage!! // get the file URI from the file picker result
-////                    val inputStream = context.contentResolver.openInputStream(fileUri)
-////                    val file = inputStream?.readBytes()
-////                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-////                    val filePart = file?.let {
-////                        MultipartBody.Part.createFormData(
-////                            "image", imageName!!.name, it
-////                        )
-////                    }
-////
-////
-//////                    if (jobName.value != craft.name) {
-//////
-////////                        val response :WrapperClass<CreateNewCraft, Boolean , Exception>
-////////                                = adminEditCraftViewModel.creatCraft(
-////////                            name= namePart,
-////////                            authorization = Constant.token,
-////////                            image = filePart!!
-////////                        )
-////////                        Log.d("TAG", "JobRow: ${response.data} ")
-////////                        if(response.data?.status =="success"){
-////////                            navController.navigate(route = AllScreens.AdminHomeScreen.name) {
-////////                                navController.popBackStack()
-////////                                navController.popBackStack()
-////////                                navController.popBackStack()
-////////                            }
-////////                        }else{
-////////                            loading.value = false
-////////                            Toast.makeText(
-////////                                context, response.data!!.message, Toast.LENGTH_SHORT
-////////                            ).show()
-////////                        }
-//////
-//////                        if (craft.id.isNotEmpty()) {
-//////                            adminEditCraftViewModel.updateCraft(
-//////                                name = namePart,
-//////                                authorization = "Bearer" + Constant.token,
-//////                                image = filePart!!,
-//////                                craftId = craft.id
-//////                            )
-//////                        }
-//////
-//////
-//////                    } else {
-//////                        Log.d("TAG", "JobRow photo only")
-//////                    }
-//////                } else {
-//////                    if (jobName.value != craft.name) {
-//////
-//////                    } else {
-//////                        loading.value = false
-//////                        Toast.makeText(
-//////                            context, "No Change", Toast.LENGTH_SHORT
-//////                        ).show()
-//////                    }
-//////                }
-////
-////            }
+//                if (selectedImage != null) {
+//                    val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
+//                    val fileUri: Uri =
+//                        selectedImage!! // get the file URI from the file picker result
+//                    val inputStream = context.contentResolver.openInputStream(fileUri)
+//                    val file = inputStream?.readBytes()
+//                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+//                    val filePart = file?.let {
+//                        MultipartBody.Part.createFormData(
+//                            "image", imageName!!.name, it
+//                        )
+//                    }
+//
+//
+//                    if (jobName.value != craft.name) {
+//
+//                        val response :WrapperClass<CreateNewCraft, Boolean , Exception>
+//                                = adminEditCraftViewModel.creatCraft(
+//                            name= namePart,
+//                            authorization = Constant.token,
+//                            image = filePart!!
+//                        )
+//                        Log.d("TAG", "JobRow: ${response.data} ")
+//                        if(response.data?.status =="success"){
+//                            navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+//                                navController.popBackStack()
+//                                navController.popBackStack()
+//                                navController.popBackStack()
+//                            }
+//                        }else{
+//                            loading.value = false
+//                            Toast.makeText(
+//                                context, response.data!!.message, Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//
+//                        if (craft.id.isNotEmpty()) {
+//                            adminEditCraftViewModel.updateCraft(
+//                                name = namePart,
+//                                authorization = "Bearer" + Constant.token,
+//                                image = filePart!!,
+//                                craftId = craft.id
+//                            )
+//                        }
+//
+//
+//                    } else {
+//                        Log.d("TAG", "JobRow photo only")
+//                    }
+//                } else {
+//                    if (jobName.value != craft.name) {
+//
+//                    } else {
+//                        loading.value = false
+//                       Toast.makeText(
+//                            context, "No Change", Toast.LENGTH_SHORT
+//                       ).show()
+//                    }
+//                }
+//
+//            }
 //            }
 
 
-
-        }
-    }
-}
