@@ -102,7 +102,7 @@ fun AdminEditCraftScreen(
 //                }
 //            }
                 Spacer(modifier = Modifier.height(10.dp))
-                JobRow(craftData!!, navController, adminEditCraftViewModel, loading)
+                JobRow(craftData!!, navController, adminEditCraftViewModel)
             }
         } else {
             CircleProgress()
@@ -116,8 +116,7 @@ fun AdminEditCraftScreen(
 fun JobRow(
     craft: Craft,
     navController: NavHostController,
-    adminEditCraftViewModel: AdminEditCraftViewModel,
-    loading: MutableState<Boolean>
+    adminEditCraftViewModel: AdminEditCraftViewModel
 ) {
     val jobName = remember {
         mutableStateOf(craft.name)
@@ -130,183 +129,195 @@ fun JobRow(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             selectedImage = uri
         }
+    var loading2 by remember {
+        mutableStateOf(false)
+    }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    if (!loading2) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box {
+                Surface(
+                    elevation = 10.dp,
+                    shape = RoundedCornerShape(size = 30.dp),
+                    modifier = Modifier.size(350.dp, 250.dp),
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        Box {
-            Surface(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(size = 30.dp),
-                modifier = Modifier.size(350.dp, 250.dp),
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box {
-
-                        InternetCraftPhoto(uri = (if (selectedImage == null) craft.avatar else selectedImage).toString())
-                        Row(
-                            modifier = Modifier.size(300.dp, 200.dp),
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.Top
-                        ) {
-                            IconButton(onClick = {
-                                // edit photo
-                                launcher.launch("image/*")
-                            }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.camera),
-                                    contentDescription = null,
-                                    tint = AdminSecondaryColor,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                            }
-
-                            IconButton(onClick = {
-                                // delete photo
-                                scope.launch {
-
+                            InternetCraftPhoto(uri = (if (selectedImage == null) craft.avatar else selectedImage).toString())
+                            Row(
+                                modifier = Modifier.size(300.dp, 200.dp),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                IconButton(onClick = {
+                                    // edit photo
+                                    launcher.launch("image/*")
+                                }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.camera),
+                                        contentDescription = null,
+                                        tint = AdminSecondaryColor,
+                                        modifier = Modifier.size(25.dp)
+                                    )
                                 }
-                            }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.trash),
-                                    contentDescription = null,
-                                    tint = AdminSecondaryColor,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                            }
 
+                                IconButton(onClick = {
+                                    // delete photo
+                                    scope.launch {
+
+                                    }
+                                }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.trash),
+                                        contentDescription = null,
+                                        tint = AdminSecondaryColor,
+                                        modifier = Modifier.size(25.dp)
+                                    )
+                                }
+
+                            }
                         }
-                    }
-                    Surface(
-                        color = Color.White,
-                        modifier = Modifier
-                            .height(50.dp)
-                            .width(350.dp),
-                        shape = RoundedCornerShape(bottomEnd = 30.dp, bottomStart = 30.dp),
-                        elevation = 5.dp
-                    ) {
-                        TextField(
-                            modifier = Modifier.fillMaxSize(),
-                            singleLine = true,
-                            maxLines = 1,
-                            value = jobName.value,
-                            onValueChange = { jobName.value = it },
-                            textStyle = TextStyle(
-                                color = AdminMainColor,
-                                textAlign = TextAlign.Center
-                            ),
-                            colors = TextFieldDefaults.textFieldColors(
-                                backgroundColor = Color.White,
-                                focusedIndicatorColor = Color.White,
-                                unfocusedIndicatorColor = Color.White
-                            ),
-                        )
+                        Surface(
+                            color = Color.White,
+                            modifier = Modifier
+                                .height(50.dp)
+                                .width(350.dp),
+                            shape = RoundedCornerShape(bottomEnd = 30.dp, bottomStart = 30.dp),
+                            elevation = 5.dp
+                        ) {
+                            TextField(
+                                modifier = Modifier.fillMaxSize(),
+                                singleLine = true,
+                                maxLines = 1,
+                                value = jobName.value,
+                                onValueChange = { jobName.value = it },
+                                textStyle = TextStyle(
+                                    color = AdminMainColor,
+                                    textAlign = TextAlign.Center
+                                ),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    backgroundColor = Color.White,
+                                    focusedIndicatorColor = Color.White,
+                                    unfocusedIndicatorColor = Color.White
+                                ),
+                            )
+                        }
                     }
                 }
             }
-        }
+            LoginButton(isLogin = true, label = "ارسل") {
+                keyboardController?.hide()
+                val namePart = jobName.value
+                    .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                scope.launch {
+                    loading2 = true
+                    if (craft.id.isNotEmpty()) {
+                        if (selectedImage != null) {
+                            val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
+                            val fileUri: Uri =
+                                selectedImage!! // get the file URI from the file picker result
+                            val inputStream = context.contentResolver.openInputStream(fileUri)
+                            val file = inputStream?.readBytes()
+                                ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                            val filePart = file?.let {
+                                MultipartBody.Part.createFormData(
+                                    "image", imageName!!.name, it
+                                )
+                            }
 
-        LoginButton(isLogin = true, label = "ارسل") {
-            keyboardController?.hide()
-            val namePart = jobName.value
-                .toRequestBody("multipart/form-data".toMediaTypeOrNull())
-
-            scope.launch {
-                if (craft.id.isNotEmpty()) {
-                    if (selectedImage != null) {
-                        val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
-                        val fileUri: Uri =
-                            selectedImage!! // get the file URI from the file picker result
-                        val inputStream = context.contentResolver.openInputStream(fileUri)
-                        val file = inputStream?.readBytes()
-                            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                        val filePart = file?.let {
-                            MultipartBody.Part.createFormData(
-                                "image", imageName!!.name, it
-                            )
+                            if (jobName.value != craft.name) {
+                                val response: WrapperClass<UpdateCraft, Boolean, Exception> =
+                                    adminEditCraftViewModel.updateCraft(
+                                        authorization = "Bearer " + Constant.token,
+                                        craftId = craft.id,
+                                        name = namePart,
+                                        image = filePart
+                                    )
+                                if (response.data!!.status == "success") {
+                                    navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                    }
+                                } else {
+                                    loading2 = false
+                                    selectedImage = null
+                                    jobName.value = craft.name
+                                    Toast.makeText(
+                                        context, response.data!!.message, Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } else {
+                                val response: WrapperClass<UpdateCraft, Boolean, Exception> =
+                                    adminEditCraftViewModel.updateCraft(
+                                        authorization = "Bearer " + Constant.token,
+                                        craftId = craft.id,
+                                        image = filePart
+                                    )
+                                if (response.data!!.status == "success") {
+                                    navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                    }
+                                } else {
+                                    loading2 = false
+                                    selectedImage = null
+                                    Toast.makeText(
+                                        context, response.data!!.message, Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
                         }
-
-                        if (jobName.value != craft.name) {
-                            val response: WrapperClass<UpdateCraft, Boolean, Exception> =
-                                adminEditCraftViewModel.updateCraft(
-                                    authorization = "Bearer " + Constant.token,
-                                    craftId = craft.id,
-                                    name = namePart,
-                                    image = filePart
-                                )
-                            loading.value = true
-                            if (response.data!!.status == "success") {
-                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                    navController.popBackStack()
+                        else {
+                            if (jobName.value != craft.name) {
+                                val response: WrapperClass<UpdateCraft, Boolean, Exception> =
+                                    adminEditCraftViewModel.updateCraft(
+                                        authorization = "Bearer " + Constant.token,
+                                        craftId = craft.id,
+                                        name = namePart,
+                                    )
+                                if (response.data!!.status == "success") {
+                                    navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                    }
+                                } else {
+                                    loading2 = false
+                                    selectedImage = null
+                                    Toast.makeText(
+                                        context, response.data!!.message, Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             } else {
-                                loading.value = false
+                                loading2 = false
+                                selectedImage = null
+                                jobName.value = craft.name
                                 Toast.makeText(
-                                    context, response.data!!.message, Toast.LENGTH_SHORT
+                                    context, "No Change", Toast.LENGTH_SHORT
                                 ).show()
                             }
-                        } else {
-                            val response: WrapperClass<UpdateCraft, Boolean, Exception> =
-                                adminEditCraftViewModel.updateCraft(
-                                    authorization = "Bearer " + Constant.token,
-                                    craftId = craft.id,
-                                    image = filePart
-                                )
-                            loading.value = true
-                            if (response.data!!.status == "success") {
-                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                }
-                            } else {
-                                loading.value = false
-                                Toast.makeText(
-                                    context, response.data!!.message, Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                    } else {
-                        if (jobName.value != craft.name) {
-                            val response: WrapperClass<UpdateCraft, Boolean, Exception> =
-                                adminEditCraftViewModel.updateCraft(
-                                    authorization = "Bearer " + Constant.token,
-                                    craftId = craft.id,
-                                    name = namePart,
-                                )
-                            loading.value = true
-                            if (response.data!!.status == "success") {
-                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                    navController.popBackStack()
-                                }
-                            } else {
-                                loading.value = false
-                                Toast.makeText(
-                                    context, response.data!!.message, Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        } else {
-                            Toast.makeText(
-                                context, "No Change", Toast.LENGTH_SHORT
-                            ).show()
                         }
                     }
                 }
             }
         }
     }
+    else {
+        CircleProgress()
+    }
+
 }
 
 
