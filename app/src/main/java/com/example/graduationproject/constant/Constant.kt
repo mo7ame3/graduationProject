@@ -1,5 +1,6 @@
 package com.example.graduationproject.constant
 
+import android.annotation.SuppressLint
 import com.example.graduationproject.R
 import com.example.graduationproject.data.AdminUserReport
 import com.example.graduationproject.data.AdminUsersQuery
@@ -8,6 +9,7 @@ import com.example.graduationproject.data.GoogleDriveList
 
 object Constant {
     const val title = "خدماتي"
+    @SuppressLint("NonConstantResourceId")
     const val logo = R.drawable.home
     val adminCraftList = listOf(
         GoogleDriveList(

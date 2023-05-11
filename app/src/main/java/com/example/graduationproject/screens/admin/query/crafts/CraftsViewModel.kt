@@ -15,5 +15,4 @@ class CraftsViewModel @Inject constructor(private val sharedRepository: SharedRe
         return sharedRepository.getAllCrafts(token)
     }
 
-
 }

@@ -84,7 +84,7 @@ interface GraduationApi {
     ): CreateNewOrder
 
     @Multipart
-    @PATCH("api/v1/crafts/{craftID}")
+    @PATCH(Constant.CRAFT + "/{craftID}")
     suspend fun updateCraft(
         @Path("craftID") craftId: String,
         @Header("Authorization") authorization: String,

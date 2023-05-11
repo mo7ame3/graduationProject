@@ -14,6 +14,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     private val getAllCrafts = WrapperClass<GetAllCrafts, Boolean, Exception>()
     private val getOneCrafts = WrapperClass<GetCraft, Boolean, Exception>()
 
+
     suspend fun getAllCrafts(authorization: String)
             : WrapperClass<GetAllCrafts, Boolean, Exception> {
         try {
@@ -62,7 +63,5 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
         }
         return getOneCrafts
     }
-
-
 
 }
