@@ -1,22 +1,42 @@
 package com.example.graduationproject.screens.client.home
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.BottomBar
+import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.DrawerBody
 import com.example.graduationproject.components.DrawerHeader
 import com.example.graduationproject.components.InternetCraftName
@@ -24,13 +44,12 @@ import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopMainBar
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.getAllCrafts.Craft
-import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
+import com.example.graduationproject.model.shared.getAllCrafts.Craft
+import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.client.order.ClientOrderScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatList
 import com.example.graduationproject.sharedpreference.SharedPreference
-import com.example.graduationproject.ui.theme.MainColor
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,10 +87,12 @@ fun ClientHomeScreen(
     }
 
     //check home loading
-    val loading = remember {
+    var loading by remember {
         mutableStateOf(true)
     }
-
+    var exception by remember {
+        mutableStateOf(false)
+    }
     //bottomBar
     if (route == "home" || route == "chat" || route == "order") {
         if (isFirst.value) {
@@ -99,11 +120,21 @@ fun ClientHomeScreen(
             ) {
                 value = clientHomeViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
             }.value
-        if (craftData.data != null) {
-            scope.launch {
-                craftList.emit(craftData.data!!.data?.crafts!!)
-                loading.value = false
+        if (craftData.data?.status == "success") {
+            if (craftData.data != null) {
+                scope.launch {
+                    craftList.emit(craftData.data!!.data?.crafts!!)
+                    loading = false
+                    exception = false
+                }
             }
+        } else if (craftData.data?.status == "fail" || craftData.e != null) {
+            exception = true
+            Toast.makeText(
+                context,
+                "خطأ في الانترنت",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -116,7 +147,7 @@ fun ClientHomeScreen(
     SwipeRefresh(state = swipeRefreshState,
         onRefresh = {
             swipeLoading = true
-            loading.value = false
+            loading = false
             scope.launch {
                 val craftData: WrapperClass<GetAllCrafts, Boolean, Exception> =
                     clientHomeViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
@@ -185,7 +216,7 @@ fun ClientHomeScreen(
             },
             bottomBar = { BottomBar(selected = home, title = title) },
         ) {
-            if (!loading.value) {
+            if (!loading && !exception) {
                 Column {
                     if (home.value == "home") {
                         Home(craftList.value) {
@@ -200,18 +231,48 @@ fun ClientHomeScreen(
                         ChatList(navController)
                     }
                 }
-            } else {
+            } else if (loading && !exception) {
+                CircleProgress()
+            } else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgressIndicator(color = MainColor)
+                    IconButton(onClick = {
+                        exception = false
+                        loading = true
+                        scope.launch {
+                            Log.d("TAG", "fdfdfd: ")
+                            val craftData: WrapperClass<GetAllCrafts, Boolean, Exception> =
+                                clientHomeViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
+                            if (craftData.data?.status == "success") {
+                                if (craftData.data != null) {
+                                    scope.launch {
+                                        craftList.emit(craftData.data!!.data?.crafts!!)
+                                        loading = false
+                                        exception = false
+                                    }
+                                }
+                            } else if (craftData.data?.status == "fail" || craftData.e != null) {
+                                exception = true
+                                Toast.makeText(
+                                    context,
+                                    "خطأ في الانترنت",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh, contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
                 }
             }
         }
     }
-
 }
 
 @Composable

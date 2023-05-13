@@ -1,4 +1,4 @@
-package com.example.graduationproject.model.creatOrder
+package com.example.graduationproject.model.client.creatOrder
 
 data class CreateNewOrder(
     val data: Data? = null,

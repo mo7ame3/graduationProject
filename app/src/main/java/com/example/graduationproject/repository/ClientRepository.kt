@@ -2,7 +2,7 @@ package com.example.graduationproject.repository
 
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

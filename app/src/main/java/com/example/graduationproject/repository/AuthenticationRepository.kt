@@ -2,11 +2,12 @@ package com.example.graduationproject.repository
 
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.login.Login
-import com.example.graduationproject.model.register.Register
-import com.example.graduationproject.model.register.myCraft.MyCraft
+import com.example.graduationproject.model.shared.login.Login
+import com.example.graduationproject.model.shared.register.Register
+import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class AuthenticationRepository @Inject constructor(private val api: GraduationApi) {
@@ -50,6 +51,9 @@ class AuthenticationRepository @Inject constructor(private val api: GraduationAp
             //addNewUser.loading = false
             Log.d("TAG", "workerChooseCraft: $e")
             workerChooseCraft.e = e
+        }catch (e: SocketTimeoutException) {
+            Log.d("TAG", "workerChooseCraft: $e")
+            workerChooseCraft.e = e
         }
         return workerChooseCraft
     }
@@ -68,6 +72,9 @@ class AuthenticationRepository @Inject constructor(private val api: GraduationAp
 
         } catch (e: Exception) {
             //addNewUser.loading = false
+            Log.d("TAG", "addLoggedInUser: $e")
+            addLoggedInUser.e = e
+        }catch (e: SocketTimeoutException) {
             Log.d("TAG", "addLoggedInUser: $e")
             addLoggedInUser.e = e
         }

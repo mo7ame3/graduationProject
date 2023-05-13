@@ -2,7 +2,7 @@ package com.example.graduationproject.screens.client.home
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
+import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.repository.ClientRepository
 import com.example.graduationproject.repository.SharedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

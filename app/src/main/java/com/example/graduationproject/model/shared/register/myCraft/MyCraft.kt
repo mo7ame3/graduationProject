@@ -1,4 +1,4 @@
-package com.example.graduationproject.model.register.myCraft
+package com.example.graduationproject.model.shared.register.myCraft
 
 data class MyCraft(
     val status: String,

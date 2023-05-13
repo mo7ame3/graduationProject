@@ -1,4 +1,4 @@
-package com.example.graduationproject.model.login
+package com.example.graduationproject.model.shared.login
 
 data class Login(
     val data: Data?=null,

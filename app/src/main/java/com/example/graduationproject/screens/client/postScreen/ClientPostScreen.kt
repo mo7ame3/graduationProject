@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.*
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor

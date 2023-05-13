@@ -1,4 +1,4 @@
-package com.example.graduationproject.model.updateCraft
+package com.example.graduationproject.model.admin.updateCraft
 
 data class CraftUpdate(
     val __v: Int,

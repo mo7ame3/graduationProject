@@ -2,13 +2,13 @@ package com.example.graduationproject.network
 
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
-import com.example.graduationproject.model.creatOrder.CreateNewOrder
-import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
-import com.example.graduationproject.model.getCraft.GetCraft
-import com.example.graduationproject.model.login.Login
-import com.example.graduationproject.model.register.Register
-import com.example.graduationproject.model.register.myCraft.MyCraft
-import com.example.graduationproject.model.updateCraft.UpdateCraft
+import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
+import com.example.graduationproject.model.shared.getCraft.GetCraft
+import com.example.graduationproject.model.shared.login.Login
+import com.example.graduationproject.model.shared.register.Register
+import com.example.graduationproject.model.shared.register.myCraft.MyCraft
+import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body

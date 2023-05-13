@@ -1,9 +1,8 @@
-package com.example.graduationproject.model.register
+package com.example.graduationproject.model.shared.register.myCraft
 
 data class User(
     val __v: Int,
     val _id: String,
-    val active: Boolean,
     val address: String,
     val createdAt: String,
     val email: String,
@@ -13,7 +12,6 @@ data class User(
     val name: String,
     val offers: List<Any>,
     val orders: List<Any>,
-    val password: String,
     val reports: List<Any>,
     val role: String,
     val tokens: List<Any>,

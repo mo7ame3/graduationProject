@@ -1,4 +1,4 @@
-package com.example.graduationproject.model.getAllCrafts
+package com.example.graduationproject.model.shared.getAllCrafts
 
 data class Craft(
     val _id: String,

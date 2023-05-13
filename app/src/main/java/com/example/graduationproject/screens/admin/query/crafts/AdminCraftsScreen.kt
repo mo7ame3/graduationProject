@@ -1,6 +1,8 @@
 package com.example.graduationproject.screens.admin.query.crafts
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,8 +40,8 @@ import com.example.graduationproject.components.InternetCraftName
 import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.getAllCrafts.Craft
-import com.example.graduationproject.model.getAllCrafts.GetAllCrafts
+import com.example.graduationproject.model.shared.getAllCrafts.Craft
+import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
@@ -47,9 +50,9 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
-    "StateFlowValueCalledInComposition"
-)
+@SuppressLint(
+    "UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
+    "StateFlowValueCalledInComposition")
 @Composable
 fun AdminCraftsScreen(
     navController: NavHostController,
@@ -64,7 +67,12 @@ fun AdminCraftsScreen(
     val scope = rememberCoroutineScope()
 
     //check home loading
-    var loading  = true
+    var loading by remember {
+        mutableStateOf(true)
+    }
+    var exception by remember {
+        mutableStateOf(false)
+    }
 
     //state flow list
     val craftList = MutableStateFlow<List<Craft>>(emptyList())
@@ -77,11 +85,21 @@ fun AdminCraftsScreen(
             ) {
                 value = craftsViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
             }.value
-        if (craftData.data != null) {
-            scope.launch {
-              craftList.emit(craftData.data!!.data?.crafts!!)
-                loading = false
+        if (craftData.data?.status == "success") {
+            if (craftData.data != null) {
+                scope.launch {
+                    craftList.emit(craftData.data!!.data?.crafts!!)
+                    loading = false
+                    exception = false
+                }
             }
+        } else if (craftData.data?.status == "fail" || craftData.e != null) {
+            exception = true
+            Toast.makeText(
+                context,
+                "خطأ في الانترنت",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -102,7 +120,7 @@ fun AdminCraftsScreen(
                     craftsViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
                 if (craftData.data?.status == "success") {
                     if (craftData.data != null) {
-                          craftList.emit(craftData.data!!.data?.crafts!!)
+                        craftList.emit(craftData.data!!.data?.crafts!!)
                         swipeLoading = false
                     }
                 } else {
@@ -121,7 +139,7 @@ fun AdminCraftsScreen(
                 }
             }
         ) {
-            if (!loading) {
+            if (!loading && !exception) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -135,8 +153,46 @@ fun AdminCraftsScreen(
                         }
                     }
                 }
-            } else {
+            }
+            else if (loading && !exception) {
                 CircleProgress()
+            }
+            else if (exception) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(onClick = {
+                        exception = false
+                        loading = true
+                        scope.launch {
+                            val craftData: WrapperClass<GetAllCrafts, Boolean, Exception> =
+                                craftsViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
+                            if (craftData.data?.status == "success") {
+                                if (craftData.data != null) {
+                                    scope.launch {
+                                        craftList.emit(craftData.data!!.data?.crafts!!)
+                                        loading = false
+                                        exception = false
+                                    }
+                                }
+                            } else if (craftData.data?.status == "fail" || craftData.e != null) {
+                                exception = true
+                                Toast.makeText(
+                                    context,
+                                    "خطأ في الانترنت",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh, contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+                }
             }
         }
     }

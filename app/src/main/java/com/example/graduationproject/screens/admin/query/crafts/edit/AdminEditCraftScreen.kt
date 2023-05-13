@@ -27,9 +27,9 @@ import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.getAllCrafts.Craft
-import com.example.graduationproject.model.getCraft.GetCraft
-import com.example.graduationproject.model.updateCraft.UpdateCraft
+import com.example.graduationproject.model.shared.getAllCrafts.Craft
+import com.example.graduationproject.model.shared.getCraft.GetCraft
+import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.AdminMainColor
 import com.example.graduationproject.ui.theme.AdminSecondaryColor

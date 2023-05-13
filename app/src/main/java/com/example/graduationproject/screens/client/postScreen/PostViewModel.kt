@@ -2,7 +2,7 @@ package com.example.graduationproject.screens.client.postScreen
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
 import com.example.graduationproject.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.MultipartBody

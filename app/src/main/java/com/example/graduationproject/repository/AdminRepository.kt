@@ -3,7 +3,7 @@ package com.example.graduationproject.repository
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
-import com.example.graduationproject.model.updateCraft.UpdateCraft
+import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -67,7 +67,6 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
         } catch (e: SocketTimeoutException) {
             Log.d("TAG", "updateCraftError: $e")
             updateCraft.e = e
-
         }
         return updateCraft
     }

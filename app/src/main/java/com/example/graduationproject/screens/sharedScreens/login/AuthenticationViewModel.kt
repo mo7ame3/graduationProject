@@ -2,9 +2,9 @@ package com.example.graduationproject.screens.sharedScreens.login
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.login.Login
-import com.example.graduationproject.model.register.Register
-import com.example.graduationproject.model.register.myCraft.MyCraft
+import com.example.graduationproject.model.shared.login.Login
+import com.example.graduationproject.model.shared.register.Register
+import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.repository.AuthenticationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

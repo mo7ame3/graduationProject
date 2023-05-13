@@ -24,9 +24,9 @@ import androidx.navigation.NavController
 import com.example.graduationproject.components.*
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.login.Login
-import com.example.graduationproject.model.register.Register
-import com.example.graduationproject.model.register.myCraft.MyCraft
+import com.example.graduationproject.model.shared.login.Login
+import com.example.graduationproject.model.shared.register.Register
+import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor

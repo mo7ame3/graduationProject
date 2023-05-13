@@ -1,4 +1,4 @@
-package com.example.graduationproject.model.register
+package com.example.graduationproject.model.shared.register
 
 data class Register(
     val data: Data? = null,
