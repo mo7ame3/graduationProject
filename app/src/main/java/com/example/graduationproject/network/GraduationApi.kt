@@ -2,6 +2,7 @@ package com.example.graduationproject.network
 
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
+import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
 import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.shared.getCraft.GetCraft
@@ -12,6 +13,7 @@ import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -83,6 +85,7 @@ interface GraduationApi {
         @Part("description") description: RequestBody
     ): CreateNewOrder
 
+    //updateCraft
     @Multipart
     @PATCH(Constant.CRAFT + "/{craftID}")
     suspend fun updateCraft(
@@ -92,4 +95,10 @@ interface GraduationApi {
         @Part("name") name: RequestBody? = null,
     ): UpdateCraft
 
+    //deleteCraft
+    @DELETE(Constant.DELETECRAFT + "/{craftID}")
+    suspend fun deleteCraft(
+        @Path("craftID") craftId: String,
+        @Header("Authorization") authorization: String,
+    ): DeleteCraft
 }

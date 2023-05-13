@@ -129,14 +129,14 @@ fun JobRow(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             selectedImage = uri
         }
-    var loading2 by remember {
+    var loadingInJobRow by remember {
         mutableStateOf(false)
     }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    if (!loading2) {
+    if (!loadingInJobRow) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -173,7 +173,33 @@ fun JobRow(
 
                                 IconButton(onClick = {
                                     // delete photo
+                                    loadingInJobRow = true
                                     scope.launch {
+                                        val deleteCraft = adminEditCraftViewModel.deleteCraft(
+                                            authorization = "Bearer " + Constant.token,
+                                            craftId = craft.id,
+                                        )
+                                        when (deleteCraft.data?.status) {
+                                            "success" -> {
+                                                navController.navigate(route = AllScreens.AdminHomeScreen.name) {
+                                                    navController.popBackStack()
+                                                    navController.popBackStack()
+                                                    navController.popBackStack()
+                                                }
+                                            }
+                                            "fail" -> {
+                                                loadingInJobRow = false
+                                                Toast.makeText(
+                                                    context, deleteCraft.data!!.message, Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                            else -> {
+                                                loadingInJobRow = false
+                                                Toast.makeText(
+                                                    context, "خطأ في الانترنت", Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
 
                                     }
                                 }) {
@@ -220,7 +246,7 @@ fun JobRow(
                 val namePart = jobName.value
                     .toRequestBody("multipart/form-data".toMediaTypeOrNull())
                 scope.launch {
-                    loading2 = true
+                    loadingInJobRow = true
                     if (craft.id.isNotEmpty()) {
                         if (selectedImage != null) {
                             val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
@@ -250,7 +276,7 @@ fun JobRow(
                                         navController.popBackStack()
                                     }
                                 } else {
-                                    loading2 = false
+                                    loadingInJobRow = false
                                     selectedImage = null
                                     jobName.value = craft.name
                                     Toast.makeText(
@@ -271,15 +297,14 @@ fun JobRow(
                                         navController.popBackStack()
                                     }
                                 } else {
-                                    loading2 = false
+                                    loadingInJobRow = false
                                     selectedImage = null
                                     Toast.makeText(
                                         context, response.data!!.message, Toast.LENGTH_SHORT
                                     ).show()
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             if (jobName.value != craft.name) {
                                 val response: WrapperClass<UpdateCraft, Boolean, Exception> =
                                     adminEditCraftViewModel.updateCraft(
@@ -294,14 +319,14 @@ fun JobRow(
                                         navController.popBackStack()
                                     }
                                 } else {
-                                    loading2 = false
+                                    loadingInJobRow = false
                                     selectedImage = null
                                     Toast.makeText(
                                         context, response.data!!.message, Toast.LENGTH_SHORT
                                     ).show()
                                 }
                             } else {
-                                loading2 = false
+                                loadingInJobRow = false
                                 selectedImage = null
                                 jobName.value = craft.name
                                 Toast.makeText(
@@ -313,8 +338,7 @@ fun JobRow(
                 }
             }
         }
-    }
-    else {
+    } else {
         CircleProgress()
     }
 

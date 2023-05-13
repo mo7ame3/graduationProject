@@ -3,17 +3,20 @@ package com.example.graduationproject.repository
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
+import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.HttpException
+import java.lang.NullPointerException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 class AdminRepository @Inject constructor(private val api: GraduationApi) {
     private val createNewCraft = WrapperClass<CreateNewCraft, Boolean, Exception>()
     private val updateCraft = WrapperClass<UpdateCraft, Boolean, Exception>()
+    private val deleteCraft = WrapperClass<DeleteCraft, Boolean, Exception>()
 
 
     suspend fun createNewCraft(authorization: String, name: RequestBody, image: MultipartBody.Part)
@@ -69,6 +72,37 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
             updateCraft.e = e
         }
         return updateCraft
+    }
+
+    suspend fun deleteCraft(
+        authorization: String,
+        craftId: String
+    ): WrapperClass<DeleteCraft, Boolean, Exception> {
+        try {
+            //addNewUser.loading = true
+            deleteCraft.data = api.deleteCraft(
+                craftId = craftId,
+                authorization = authorization
+            )
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            deleteCraft.data = DeleteCraft(status = status, message = message)
+        }
+        catch (e : NullPointerException){
+            deleteCraft.data = DeleteCraft(status = "success")
+        }
+        catch (e: Exception) {
+            //addNewUser.loading = false
+            Log.d("TAG", "deleteCraft: $e")
+            deleteCraft.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "deleteCraft: $e")
+            deleteCraft.e = e
+        }
+        return deleteCraft
     }
 
 
