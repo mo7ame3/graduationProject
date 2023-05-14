@@ -1,7 +1,6 @@
 package com.example.graduationproject.screens.admin.query.crafts
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,8 +39,8 @@ import com.example.graduationproject.components.InternetCraftName
 import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.shared.getAllCrafts.Craft
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
+import com.example.graduationproject.model.shared.craft.Craft
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
@@ -75,7 +74,7 @@ fun AdminCraftsScreen(
     }
 
     //state flow list
-    val craftList = MutableStateFlow<List<Craft>>(emptyList())
+    val craftFromGetAllCraftList = MutableStateFlow<List<Craft>>(emptyList())
 
     //response
     if (token.value.toString().isNotEmpty()) {
@@ -88,7 +87,7 @@ fun AdminCraftsScreen(
         if (craftData.data?.status == "success") {
             if (craftData.data != null) {
                 scope.launch {
-                    craftList.emit(craftData.data!!.data?.crafts!!)
+                    craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
                     loading = false
                     exception = false
                 }
@@ -120,7 +119,7 @@ fun AdminCraftsScreen(
                     craftsViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
                 if (craftData.data?.status == "success") {
                     if (craftData.data != null) {
-                        craftList.emit(craftData.data!!.data?.crafts!!)
+                        craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
                         swipeLoading = false
                     }
                 } else {
@@ -144,8 +143,8 @@ fun AdminCraftsScreen(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    items(items = craftList.value) {
-                        JobRow(craft = it, onEditAction = { edit ->
+                    items(items = craftFromGetAllCraftList.value) {
+                        JobRow(craftFromGetAllCraft = it, onEditAction = { edit ->
                             navController.navigate(AllScreens.AdminEditJobsScreen.name + "/${edit}")
                         })
                         { craftQuery ->
@@ -172,7 +171,7 @@ fun AdminCraftsScreen(
                             if (craftData.data?.status == "success") {
                                 if (craftData.data != null) {
                                     scope.launch {
-                                        craftList.emit(craftData.data!!.data?.crafts!!)
+                                        craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
                                         loading = false
                                         exception = false
                                     }
@@ -200,13 +199,13 @@ fun AdminCraftsScreen(
 
 @Composable
 fun JobRow(
-    craft: Craft,
+    craftFromGetAllCraft: Craft,
     onEditAction: (String) -> Unit,
     onClick: (Craft) -> Unit
 ) {
     Column(modifier = Modifier
         .clickable {
-            onClick.invoke(craft)
+            onClick.invoke(craftFromGetAllCraft)
         }
         .fillMaxSize()
         .padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -218,7 +217,7 @@ fun JobRow(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box {
-                        InternetCraftPhoto(craft.avatar)
+                        InternetCraftPhoto(craftFromGetAllCraft.avatar)
                         Row(
                             modifier = Modifier.size(300.dp, 200.dp),
                             horizontalArrangement = Arrangement.End,
@@ -226,7 +225,7 @@ fun JobRow(
                         ) {
                             IconButton(onClick = {
                                 // nav to edit
-                                onEditAction.invoke(craft.id)
+                                onEditAction.invoke(craftFromGetAllCraft.id)
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Edit, contentDescription = null,
@@ -235,7 +234,7 @@ fun JobRow(
                             }
                         }
                     }
-                    InternetCraftName(jobName = craft.name)
+                    InternetCraftName(jobName = craftFromGetAllCraft.name)
                 }
             }
         }

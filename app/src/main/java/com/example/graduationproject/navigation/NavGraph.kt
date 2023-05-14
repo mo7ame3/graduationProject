@@ -51,14 +51,18 @@ fun NavGraph() {
     ) {
         val postScreen = AllScreens.ClientPostScreen.name
         composable(
-            route = "$postScreen/{craftId}", arguments = listOf(navArgument(name = "craftId") {
+            route = "$postScreen/{craftId}/{craftName}", arguments = listOf(navArgument(name = "craftId")  {
                 type = NavType.StringType
-            })
+            } , navArgument(name = "craftName") {
+                type = NavType.StringType
+            },)
         ) { data ->
             val viewModel = hiltViewModel<PostViewModel>()
-            data.arguments?.getString("craftId").let { id ->
-                ClientPostScreen(navController = navController, craftId = id.toString(), viewModel)
-            }
+            ClientPostScreen(navController = navController,
+                craftId = data.arguments!!.getString("craftId").toString(),
+                craftName = data.arguments!!.getString("craftName").toString(),
+                viewModel)
+
         }
         composable(route = AllScreens.LoginScreen.name) {
             val viewModel = hiltViewModel<AuthenticationViewModel>()

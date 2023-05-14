@@ -2,7 +2,7 @@ package com.example.graduationproject.repository
 
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -12,15 +12,15 @@ import javax.inject.Inject
 
 class ClientRepository @Inject constructor(private val api: GraduationApi) {
 
-    private val createNewOrder: WrapperClass<CreateNewOrder, Boolean, Exception> = WrapperClass()
-    suspend fun CreateOrder(
+    private val createNewOrder: WrapperClass<CreateOrder, Boolean, Exception> = WrapperClass()
+    suspend fun createOrder(
         image: MultipartBody.Part,
         title: RequestBody,
         description: RequestBody,
         orderDifficulty: RequestBody,
         token: String,
         craftId: String
-    ): WrapperClass<CreateNewOrder, Boolean, Exception> {
+    ): WrapperClass<CreateOrder, Boolean, Exception> {
         try {
             //addNewUser.loading = true
             createNewOrder.data = api.createOrder(
@@ -37,7 +37,7 @@ class ClientRepository @Inject constructor(private val api: GraduationApi) {
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
             Log.d("TAG", "CreateOrder: $message")
-            createNewOrder.data = CreateNewOrder(status = status, message = message)
+            createNewOrder.data = CreateOrder(status = status, message = message)
 
         } catch (e: Exception) {
             //addNewUser.loading = false

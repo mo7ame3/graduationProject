@@ -2,6 +2,7 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,9 +28,9 @@ import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.shared.getAllCrafts.Craft
-import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
+import com.example.graduationproject.model.shared.craft.Craft
+import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.AdminMainColor
 import com.example.graduationproject.ui.theme.AdminSecondaryColor
@@ -65,7 +66,14 @@ fun AdminEditCraftScreen(
 
         if (response.data?.status == "success") {
             loading.value = false
-            craftData = response.data!!.data?.craft
+            craftData = Craft(
+                id = response.data?.data?.craft!!.id,
+                _id = response.data?.data?.craft!!._id,
+                name = response.data?.data?.craft!!.name,
+                avatar = response.data?.data?.craft!!.avatar
+            )
+            Log.d("TAG", "AdminEditCraftScreen: ${response.data}")
+            Log.d("TAG", "AdminEditCraftScreen: $craftData")
         }
     }
     Scaffold(topBar = {
@@ -114,12 +122,12 @@ fun AdminEditCraftScreen(
 @SuppressLint("Recycle")
 @Composable
 fun JobRow(
-    craft: Craft,
+    craftFromGetAllCraft: Craft,
     navController: NavHostController,
     adminEditCraftViewModel: AdminEditCraftViewModel
 ) {
     val jobName = remember {
-        mutableStateOf(craft.name)
+        mutableStateOf(craftFromGetAllCraft.name)
     }
 
     var selectedImage by remember {
@@ -153,7 +161,7 @@ fun JobRow(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Box {
 
-                            InternetCraftPhoto(uri = (if (selectedImage == null) craft.avatar else selectedImage).toString())
+                            InternetCraftPhoto(uri = (if (selectedImage == null) craftFromGetAllCraft.avatar else selectedImage).toString())
                             Row(
                                 modifier = Modifier.size(300.dp, 200.dp),
                                 horizontalArrangement = Arrangement.End,
@@ -177,7 +185,7 @@ fun JobRow(
                                     scope.launch {
                                         val deleteCraft = adminEditCraftViewModel.deleteCraft(
                                             authorization = "Bearer " + Constant.token,
-                                            craftId = craft.id,
+                                            craftId = craftFromGetAllCraft.id,
                                         )
                                         when (deleteCraft.data?.status) {
                                             "success" -> {
@@ -187,12 +195,16 @@ fun JobRow(
                                                     navController.popBackStack()
                                                 }
                                             }
+
                                             "fail" -> {
                                                 loadingInJobRow = false
                                                 Toast.makeText(
-                                                    context, deleteCraft.data!!.message, Toast.LENGTH_SHORT
+                                                    context,
+                                                    deleteCraft.data!!.message,
+                                                    Toast.LENGTH_SHORT
                                                 ).show()
                                             }
+
                                             else -> {
                                                 loadingInJobRow = false
                                                 Toast.makeText(
@@ -247,7 +259,7 @@ fun JobRow(
                     .toRequestBody("multipart/form-data".toMediaTypeOrNull())
                 scope.launch {
                     loadingInJobRow = true
-                    if (craft.id.isNotEmpty()) {
+                    if (craftFromGetAllCraft.id.isNotEmpty()) {
                         if (selectedImage != null) {
                             val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
                             val fileUri: Uri =
@@ -261,11 +273,11 @@ fun JobRow(
                                 )
                             }
 
-                            if (jobName.value != craft.name) {
+                            if (jobName.value != craftFromGetAllCraft.name) {
                                 val response: WrapperClass<UpdateCraft, Boolean, Exception> =
                                     adminEditCraftViewModel.updateCraft(
                                         authorization = "Bearer " + Constant.token,
-                                        craftId = craft.id,
+                                        craftId = craftFromGetAllCraft.id,
                                         name = namePart,
                                         image = filePart
                                     )
@@ -278,7 +290,7 @@ fun JobRow(
                                 } else {
                                     loadingInJobRow = false
                                     selectedImage = null
-                                    jobName.value = craft.name
+                                    jobName.value = craftFromGetAllCraft.name
                                     Toast.makeText(
                                         context, response.data!!.message, Toast.LENGTH_SHORT
                                     ).show()
@@ -287,7 +299,7 @@ fun JobRow(
                                 val response: WrapperClass<UpdateCraft, Boolean, Exception> =
                                     adminEditCraftViewModel.updateCraft(
                                         authorization = "Bearer " + Constant.token,
-                                        craftId = craft.id,
+                                        craftId = craftFromGetAllCraft.id,
                                         image = filePart
                                     )
                                 if (response.data!!.status == "success") {
@@ -305,11 +317,11 @@ fun JobRow(
                                 }
                             }
                         } else {
-                            if (jobName.value != craft.name) {
+                            if (jobName.value != craftFromGetAllCraft.name) {
                                 val response: WrapperClass<UpdateCraft, Boolean, Exception> =
                                     adminEditCraftViewModel.updateCraft(
                                         authorization = "Bearer " + Constant.token,
-                                        craftId = craft.id,
+                                        craftId = craftFromGetAllCraft.id,
                                         name = namePart,
                                     )
                                 if (response.data!!.status == "success") {
@@ -328,7 +340,7 @@ fun JobRow(
                             } else {
                                 loadingInJobRow = false
                                 selectedImage = null
-                                jobName.value = craft.name
+                                jobName.value = craftFromGetAllCraft.name
                                 Toast.makeText(
                                     context, "No Change", Toast.LENGTH_SHORT
                                 ).show()

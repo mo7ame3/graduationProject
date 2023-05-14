@@ -2,7 +2,6 @@ package com.example.graduationproject.screens.client.postScreen
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.transition.CircularPropagation
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.*
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
@@ -37,7 +36,12 @@ import java.io.File
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "Recycle")
 @Composable
-fun ClientPostScreen(navController: NavController, craftId: String, postViewModel: PostViewModel) {
+fun ClientPostScreen(
+    navController: NavController,
+    craftId: String,
+    craftName: String,
+    postViewModel: PostViewModel
+) {
 
     BackPressHandler {
         navController.navigate(AllScreens.ClientHomeScreen.name + "/home") {
@@ -47,7 +51,7 @@ fun ClientPostScreen(navController: NavController, craftId: String, postViewMode
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = "البحث عن $craftId") {
+        TopAppBar(title = "البحث عن $craftName") {
             navController.navigate(AllScreens.ClientHomeScreen.name + "/home") {
                 navController.popBackStack()
                 navController.popBackStack()
@@ -70,13 +74,21 @@ fun ClientPostScreen(navController: NavController, craftId: String, postViewMode
         val expanded = remember {
             mutableStateOf(false)
         }
-        var loading = false
+        var selectedImage by remember {
+            mutableStateOf<Uri?>(null)
+        }
+        var loading by remember {
+            mutableStateOf(false)
+        }
         val problemTypeList = listOf("صيانة بسيطة", "صيانة متوسطة", "صيانة معقدة")
         val keyboardController = LocalSoftwareKeyboardController.current
         // valid
         val valid = (problemTitle.value.trim().isNotBlank()
                 && problemDescription.value.trim().isNotBlank()
-                && problemType.value.trim().isNotBlank())
+                && problemType.value.trim().isNotBlank()
+                && selectedImage.toString().isNotEmpty())
+
+
         if (!loading) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -140,9 +152,6 @@ fun ClientPostScreen(navController: NavController, craftId: String, postViewMode
 
                 //Add photo
                 Spacer(modifier = Modifier.height(5.dp))
-                var selectedImage by remember {
-                    mutableStateOf<Uri?>(null)
-                }
                 val launcher =
                     rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
                         selectedImage = uri
@@ -173,7 +182,6 @@ fun ClientPostScreen(navController: NavController, craftId: String, postViewMode
                 //Ellipse
 
                 DefaultButton(label = "ارسل", enabled = valid) {
-                    loading = true
                     val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
                     val fileUri: Uri =
                         selectedImage!! // get the file URI from the file picker result
@@ -192,8 +200,9 @@ fun ClientPostScreen(navController: NavController, craftId: String, postViewMode
                     val problemDescriptionPart = problemDescription.value
                         .toRequestBody("multipart/form-data".toMediaTypeOrNull())
                     scope.launch {
+                        loading = true
                         if (token.value.toString().isNotEmpty()) {
-                            val response: WrapperClass<CreateNewOrder, Boolean, Exception> =
+                            val response: WrapperClass<CreateOrder, Boolean, Exception> =
                                 postViewModel.createOrder(
                                     token = "Bearer " + token.value.toString(),
                                     craftId = craftId,
@@ -202,28 +211,38 @@ fun ClientPostScreen(navController: NavController, craftId: String, postViewMode
                                     title = problemTitlePart,
                                     orderDifficulty = problemTypePart
                                 )
-                            if (response.data?.status == "success") {
-                                navController.navigate(AllScreens.ClientHomeScreen.name + "/home") {
-                                    navController.popBackStack()
-                                    navController.popBackStack()
+                            when (response.data?.status) {
+                                "success" -> {
+                                    navController.navigate(AllScreens.ClientHomeScreen.name + "/home") {
+                                        navController.popBackStack()
+                                        navController.popBackStack()
+                                    }
                                 }
 
-                            } else {
-                                loading = false
-                                Toast.makeText(
-                                    context,
-                                    "${response.data?.message}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                "error" -> {
+                                    loading = false
+                                    Toast.makeText(
+                                        context,
+                                        "${response.data?.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                else -> {
+                                    loading = false
+                                    Toast.makeText(
+                                        context,
+                                        "خطأ في الانترنت",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         }
-
                     }
-
                 }
             }
         } else {
-            CircularPropagation()
+            CircleProgress()
         }
     }
 

@@ -3,13 +3,13 @@ package com.example.graduationproject.network
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
 import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
-import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
-import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.login.Login
 import com.example.graduationproject.model.shared.register.Register
 import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
+import com.example.graduationproject.model.client.creatOrder.CreateOrder
+import com.example.graduationproject.model.shared.getCraft.GetCraft
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -65,6 +65,7 @@ interface GraduationApi {
         @Part("name") name: RequestBody,
         @Part image: MultipartBody.Part
     ): CreateNewCraft
+
     //Get Craft
 
     @GET(Constant.CRAFT + "/{craftId}")
@@ -72,18 +73,6 @@ interface GraduationApi {
         @Path("craftId") craftId: String,
         @Header("Authorization") authorization: String
     ): GetCraft
-
-    //Create Order
-    @Multipart
-    @POST(Constant.CREATEORDER + "/{craftID}")
-    suspend fun createOrder(
-        @Path("craftID") craftId: String,
-        @Header("Authorization") authorization: String,
-        @Part image: MultipartBody.Part,
-        @Part("title") title: RequestBody,
-        @Part("orderDifficulty") orderDifficulty: RequestBody,
-        @Part("description") description: RequestBody
-    ): CreateNewOrder
 
     //updateCraft
     @Multipart
@@ -101,4 +90,16 @@ interface GraduationApi {
         @Path("craftID") craftId: String,
         @Header("Authorization") authorization: String,
     ): DeleteCraft
+
+    //Create Order
+    @Multipart
+    @POST("api/v1/crafts/{craftID}/orders")
+    suspend fun createOrder(
+        @Path("craftID") craftId: String,
+        @Header("Authorization") authorization: String,
+        @Part image: MultipartBody.Part,
+        @Part("title") title: RequestBody,
+        @Part("orderDifficulty") orderDifficulty: RequestBody,
+        @Part("description") description: RequestBody
+    ): CreateOrder
 }

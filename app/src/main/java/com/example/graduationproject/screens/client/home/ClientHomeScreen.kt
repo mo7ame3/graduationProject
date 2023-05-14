@@ -44,7 +44,7 @@ import com.example.graduationproject.components.InternetCraftPhoto
 import com.example.graduationproject.components.TopMainBar
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.shared.getAllCrafts.Craft
+import com.example.graduationproject.model.shared.craft.Craft
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.client.order.ClientOrderScreen
@@ -110,7 +110,7 @@ fun ClientHomeScreen(
     val scope = rememberCoroutineScope()
 
     //state flow list
-    val craftList = MutableStateFlow<List<Craft>>(emptyList())
+    val craftFromGetAllCraftList = MutableStateFlow<List<Craft>>(emptyList())
 
     //response
     if (token.value.toString().isNotEmpty()) {
@@ -123,7 +123,7 @@ fun ClientHomeScreen(
         if (craftData.data?.status == "success") {
             if (craftData.data != null) {
                 scope.launch {
-                    craftList.emit(craftData.data!!.data?.crafts!!)
+                    craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
                     loading = false
                     exception = false
                 }
@@ -153,7 +153,7 @@ fun ClientHomeScreen(
                     clientHomeViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
                 if (craftData.data?.status == "success") {
                     if (craftData.data != null) {
-                        craftList.emit(craftData.data!!.data?.crafts!!)
+                        craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
                         swipeLoading = false
                     }
                 } else {
@@ -219,9 +219,9 @@ fun ClientHomeScreen(
             if (!loading && !exception) {
                 Column {
                     if (home.value == "home") {
-                        Home(craftList.value) {
+                        Home(craftFromGetAllCraftList.value) {
                             //navigate to post
-                            navController.navigate(route = AllScreens.ClientPostScreen.name + "/${it.name}")
+                            navController.navigate(route = AllScreens.ClientPostScreen.name + "/${it.id}/${it.name}")
                         }
                     }
                     if (home.value == "order") {
@@ -243,13 +243,12 @@ fun ClientHomeScreen(
                         exception = false
                         loading = true
                         scope.launch {
-                            Log.d("TAG", "fdfdfd: ")
                             val craftData: WrapperClass<GetAllCrafts, Boolean, Exception> =
                                 clientHomeViewModel.getAllCrafts(token = "Bearer ${token.value.toString()}")
                             if (craftData.data?.status == "success") {
                                 if (craftData.data != null) {
                                     scope.launch {
-                                        craftList.emit(craftData.data!!.data?.crafts!!)
+                                        craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
                                         loading = false
                                         exception = false
                                     }
@@ -277,11 +276,11 @@ fun ClientHomeScreen(
 
 @Composable
 fun Home(
-    craftList: List<Craft>,
+    craftFromGetAllCraftList: List<Craft>,
     onClick: (Craft) -> Unit,
 ) {
     LazyColumn {
-        items(craftList) {
+        items(craftFromGetAllCraftList) {
             JobRow(job = it) { job ->
                 onClick.invoke(job)
             }

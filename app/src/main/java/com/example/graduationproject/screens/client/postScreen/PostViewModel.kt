@@ -2,7 +2,7 @@ package com.example.graduationproject.screens.client.postScreen
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.client.creatOrder.CreateNewOrder
+import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.repository.ClientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.MultipartBody
@@ -21,8 +21,8 @@ class PostViewModel @Inject constructor(private val clientRepository: ClientRepo
         orderDifficulty: RequestBody,
         token: String,
         craftId: String
-    ): WrapperClass<CreateNewOrder, Boolean, Exception> {
-        return clientRepository.CreateOrder(
+    ): WrapperClass<CreateOrder, Boolean, Exception> {
+        return clientRepository.createOrder(
             image = image,
             title = title,
             description = description,

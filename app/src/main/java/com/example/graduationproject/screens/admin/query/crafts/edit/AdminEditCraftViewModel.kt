@@ -3,8 +3,8 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
-import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
+import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.repository.AdminRepository
 import com.example.graduationproject.repository.SharedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
