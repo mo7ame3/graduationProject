@@ -2,7 +2,6 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -72,8 +71,6 @@ fun AdminEditCraftScreen(
                 name = response.data?.data?.craft!!.name,
                 avatar = response.data?.data?.craft!!.avatar
             )
-            Log.d("TAG", "AdminEditCraftScreen: ${response.data}")
-            Log.d("TAG", "AdminEditCraftScreen: $craftData")
         }
     }
     Scaffold(topBar = {
