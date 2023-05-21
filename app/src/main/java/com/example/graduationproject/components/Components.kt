@@ -184,7 +184,7 @@ fun DrawerHeader() {
 @Composable
 fun DrawerBody(
     isClient: Boolean,
-    name:String,
+    name: String,
     onClick: (DrawerData) -> Unit
 ) {
     val drawerListClient = if (isClient) listOf(
@@ -287,6 +287,29 @@ fun SmallPhoto(uri: Uri? = null) {
     }
 }
 
+@Composable
+fun GetSmallPhoto(uri: String? = null) {
+    Surface(
+        shape = CircleShape,
+        color = MainColor,
+        modifier = Modifier.size(50.dp)
+    ) {
+        if (uri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(model = uri),
+                contentDescription = null,
+                modifier = Modifier.size(300.dp, 200.dp),
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                tint = Color.White
+            )
+        }
+    }
+}
+
 //post Screen
 @Composable
 fun PickPhoto(
@@ -311,11 +334,10 @@ fun PickPhoto(
 }
 
 
-
 //craft photo
 
 @Composable
-fun InternetCraftPhoto( uri: String){
+fun InternetCraftPhoto(uri: String) {
     Box {
 
         // to reload image
@@ -347,6 +369,7 @@ fun InternetCraftPhoto( uri: String){
                     }
                 }
             }
+
             is AsyncImagePainter.State.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -355,6 +378,7 @@ fun InternetCraftPhoto( uri: String){
                     CircularProgressIndicator()
                 }
             }
+
             else -> {}
         }
     }
@@ -362,7 +386,7 @@ fun InternetCraftPhoto( uri: String){
 
 //craft name
 @Composable
-fun InternetCraftName(jobName :String){
+fun InternetCraftName(jobName: String) {
     Surface(
         color = Color.White,
         modifier = Modifier
@@ -448,7 +472,7 @@ fun StarsNumber(stars: Int) {
 }
 
 @Composable
-fun CircleProgress(){
+fun CircleProgress() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

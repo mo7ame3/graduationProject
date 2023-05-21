@@ -10,6 +10,7 @@ import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.model.shared.getCraft.GetCraft
+import com.example.graduationproject.model.worker.home.WorkerHome
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -102,4 +103,12 @@ interface GraduationApi {
         @Part("orderDifficulty") orderDifficulty: RequestBody,
         @Part("description") description: RequestBody
     ): CreateOrder
+
+    //Get worker Home
+
+    @GET("api/v1/crafts/{craftId}/orders")
+    suspend fun getWorkerHome(
+        @Path("craftId") craftId: String,
+        @Header("Authorization") authorization: String
+    ): WorkerHome
 }

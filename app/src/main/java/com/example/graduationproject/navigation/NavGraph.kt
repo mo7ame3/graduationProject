@@ -36,6 +36,7 @@ import com.example.graduationproject.screens.sharedScreens.login.ForgotPasswordS
 import com.example.graduationproject.screens.sharedScreens.login.LoginScreen
 import com.example.graduationproject.screens.sharedScreens.report.ReportScreen
 import com.example.graduationproject.screens.sharedScreens.splash.SplashScreen
+import com.example.graduationproject.screens.worker.home.WorkerHomeViewModel
 import com.example.graduationproject.screens.worker.home.WorkerHomeScreen
 import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemDetails
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
@@ -51,17 +52,23 @@ fun NavGraph() {
     ) {
         val postScreen = AllScreens.ClientPostScreen.name
         composable(
-            route = "$postScreen/{craftId}/{craftName}", arguments = listOf(navArgument(name = "craftId")  {
-                type = NavType.StringType
-            } , navArgument(name = "craftName") {
-                type = NavType.StringType
-            },)
+            route = "$postScreen/{craftId}/{craftName}",
+            arguments = listOf(
+                navArgument(name = "craftId") {
+                    type = NavType.StringType
+                },
+                navArgument(name = "craftName") {
+                    type = NavType.StringType
+                },
+            )
         ) { data ->
             val viewModel = hiltViewModel<PostViewModel>()
-            ClientPostScreen(navController = navController,
+            ClientPostScreen(
+                navController = navController,
                 craftId = data.arguments!!.getString("craftId").toString(),
                 craftName = data.arguments!!.getString("craftName").toString(),
-                viewModel)
+                viewModel
+            )
 
         }
         composable(route = AllScreens.LoginScreen.name) {
@@ -184,9 +191,10 @@ fun NavGraph() {
                 type = NavType.StringType
             })
         ) { data ->
+            val viewModel = hiltViewModel<WorkerHomeViewModel>()
             data.arguments!!.getString("route")?.let {
                 WorkerHomeScreen(
-                    navController = navController, route = it
+                    navController = navController, route = it, workerHomeViewModel = viewModel
                 )
             }
         }
