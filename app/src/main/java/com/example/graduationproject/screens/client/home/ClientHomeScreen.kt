@@ -1,7 +1,6 @@
 package com.example.graduationproject.screens.client.home
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

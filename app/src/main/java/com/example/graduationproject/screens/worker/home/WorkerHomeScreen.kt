@@ -5,13 +5,27 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,8 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.graduationproject.R
-import com.example.graduationproject.components.*
-import com.example.graduationproject.data.WorkerHomeList
+import com.example.graduationproject.components.BottomBar
+import com.example.graduationproject.components.CircleProgress
+import com.example.graduationproject.components.DrawerBody
+import com.example.graduationproject.components.DrawerHeader
+import com.example.graduationproject.components.GetSmallPhoto
+import com.example.graduationproject.components.TopMainBar
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.worker.home.Order
 import com.example.graduationproject.model.worker.home.WorkerHome
@@ -40,10 +58,15 @@ import com.example.graduationproject.screens.worker.myProjects.MyProjects
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.GrayColor
 import com.example.graduationproject.ui.theme.MainColor
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
+@SuppressLint(
+    "UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
+    "StateFlowValueCalledInComposition"
+)
 @Composable
 fun WorkerHomeScreen(
     navController: NavHostController,
@@ -109,7 +132,7 @@ fun WorkerHomeScreen(
                     exception = false
                 }
             }
-        } else if (homeData.data?.status == "fail" || homeData.e != null) {
+        } else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -119,125 +142,164 @@ fun WorkerHomeScreen(
         }
     }
 
+    // Swipe Refresh
+    var swipeLoading by remember {
+        mutableStateOf(false)
+    }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
 
-    Scaffold(
-        drawerContent = {
-            DrawerHeader()
-            Spacer(modifier = Modifier.height(50.dp))
-            DrawerBody(isClient = false, name = name.value.toString()) {
-                if (it.title == "مشاريعي") {
-                    scope.launch {
-                        Log.d("TAG", "WorkerHomeScreen: ${it.title}")
-                        home.value = "order"
-                        scaffoldState.drawerState.close()
-                    }
+    SwipeRefresh(state = swipeRefreshState, onRefresh = {
+        swipeLoading = true
+        loading = false
+        scope.launch {
+            val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
+                workerHomeViewModel.getHome(
+                    authorization = "Bearer ${token.value.toString()}",
+                    craftId = "6451481ed17c19136a05327b"
+                )
+            if (homeData.data?.status == "success") {
+                if (homeData.data != null) {
+                    homeList.emit(homeData.data!!.data!!.orders)
+                    swipeLoading = false
                 }
+            } else {
+                swipeLoading = false
+            }
+        }
 
-                if (it.title == name.value.toString()) {
-                    //Navigate to Profile
-                    scope.launch {
-                        navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${false}/${false}/ ")
-                        scaffoldState.drawerState.close()
-                    }
-                }
-                if (it.title == "إعدادات حسابي") {
-                    scope.launch {
-                        navController.navigate(route = AllScreens.WorkerProfileSettingsScreen.name)
-                        scaffoldState.drawerState.close()
-                    }
-                }
-                if (it.title == "تسجيل الخروج") {
-                    //Log out and nav to Login
-                    scope.launch {
-                        sharedPreference.saveState("")
-                        sharedPreference.saveToken("")
-                        navController.navigate(route = AllScreens.LoginScreen.name) {
-                            navController.popBackStack()
+    }) {
+        Scaffold(
+            drawerContent = {
+                DrawerHeader()
+                Spacer(modifier = Modifier.height(50.dp))
+                DrawerBody(isClient = false, name = name.value.toString()) {
+                    if (it.title == "مشاريعي") {
+                        scope.launch {
+                            Log.d("TAG", "WorkerHomeScreen: ${it.title}")
+                            home.value = "order"
+                            scaffoldState.drawerState.close()
                         }
                     }
-                }
-            }
-        },
-        scaffoldState = scaffoldState,
-        topBar = {
-            TopMainBar(title = title) {
-                scope.launch {
-                    scaffoldState.drawerState.open()
-                }
-            }
-
-        },
-        bottomBar = { BottomBar(selected = home, title = title, isClient = false) },
-    ) {
-        if (!loading && !exception) {
-            if (home.value == "home") {
-                LazyColumn {
-                    items(homeList.value) {
-                        WorkerHomeRow(item = it) { data ->
-//                        Log.d("TAG", "WorkerHomeScreen: ${data.name}")
-//                        Log.d("TAG", "WorkerHomeScreen: ${data.problemTitle}")
-//                        Log.d("TAG", "WorkerHomeScreen: ${data.problemType}")
-//                        Log.d("TAG", "WorkerHomeScreen: ${data.address}")
-//                        Log.d("TAG", "WorkerHomeScreen: ${data.time}")
-                            navController.navigate(AllScreens.WorkerProblemDetilas.name)
+                    if (it.title == name.value.toString()) {
+                        //Navigate to Profile
+                        scope.launch {
+                            navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${false}/${false}/ ")
+                            scaffoldState.drawerState.close()
                         }
-                        Spacer(modifier = Modifier.height(15.dp))
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(50.dp))
+                    if (it.title == "إعدادات حسابي") {
+                        scope.launch {
+                            navController.navigate(route = AllScreens.WorkerProfileSettingsScreen.name)
+                            scaffoldState.drawerState.close()
+                        }
                     }
-                }
-            }
-            if (home.value == "chat") {
-                ChatList(navController = navController)
-            }
-            //my projects
-            if (home.value == "order") {
-                MyProjects(navController)
-            }
-        } else if (loading && !exception) {
-            CircleProgress()
-        } else if (exception) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                IconButton(onClick = {
-                    exception = false
-                    loading = true
-                    scope.launch {
-                        val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
-                            workerHomeViewModel.getHome(
-                                authorization = "Bearer ${token.value.toString()}",
-                                craftId = "6451481ed17c19136a05327b"
-                            )
-                        if (homeData.data?.status == "success") {
-                            if (homeData.data != null) {
-                                scope.launch {
-                                    homeList.emit(homeData.data!!.data?.orders!!)
-                                    loading = false
-                                    exception = false
-                                }
+                    if (it.title == "تسجيل الخروج") {
+                        //Log out and nav to Login
+                        scope.launch {
+                            sharedPreference.saveState("")
+                            sharedPreference.saveToken("")
+                            navController.navigate(route = AllScreens.LoginScreen.name) {
+                                navController.popBackStack()
                             }
-                        } else if (homeData.data?.status == "fail" || homeData.e != null) {
-                            exception = true
-                            Toast.makeText(
-                                context,
-                                "خطأ في الانترنت",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
                     }
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh, contentDescription = null,
-                        modifier = Modifier.size(60.dp)
-                    )
+                }
+            },
+            scaffoldState = scaffoldState,
+            topBar = {
+                TopMainBar(title = title) {
+                    scope.launch {
+                        scaffoldState.drawerState.open()
+                    }
+                }
+
+            },
+            bottomBar = { BottomBar(selected = home, title = title, isClient = false) },
+        ) {
+            if (!loading && !exception) {
+                if (home.value == "home") {
+                    if (homeList.value.toString().isNotEmpty()) {
+                        LazyColumn {
+                            items(homeList.value) {
+                                WorkerHomeRow(item = it) { data ->
+                                    Log.d("TAG", "WorkerHomeScreen_USERNAME: ${data.user.name}")
+                                    Log.d("TAG", "WorkerHomeScreen_PROBLEMTITLE: ${data.title}")
+                                    Log.d(
+                                        "TAG",
+                                        "WorkerHomeScreen_ORDERDIFFICULTY: ${data.orderDifficulty}"
+                                    )
+                                    Log.d("TAG", "WorkerHomeScreen_ADDRESS: ${data.user.address}")
+                                    Log.d("TAG", "WorkerHomeScreen_TIME: ${data.createdDate}")
+                                    navController.navigate(AllScreens.WorkerProblemDetilas.name)
+                                }
+                                Spacer(modifier = Modifier.height(15.dp))
+                            }
+                            item {
+                                Spacer(modifier = Modifier.height(50.dp))
+                            }
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "لا يوجد طلابات الان")
+                        }
+                    }
+                }
+                if (home.value == "chat") {
+                    ChatList(navController = navController)
+                }
+                //my projects
+                if (home.value == "order") {
+                    MyProjects(navController)
+                }
+            } else if (loading && !exception) {
+                CircleProgress()
+            } else if (exception) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    IconButton(onClick = {
+                        exception = false
+                        loading = true
+                        scope.launch {
+                            val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
+                                workerHomeViewModel.getHome(
+                                    authorization = "Bearer ${token.value.toString()}",
+                                    craftId = "6451481ed17c19136a05327b"
+                                )
+                            if (homeData.data?.status == "success") {
+                                if (homeData.data != null) {
+                                    scope.launch {
+                                        homeList.emit(homeData.data!!.data?.orders!!)
+                                        loading = false
+                                        exception = false
+                                    }
+                                }
+                            } else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
+                                exception = true
+                                Toast.makeText(
+                                    context,
+                                    "خطأ في الانترنت",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh, contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
                 }
             }
         }
     }
+
 }
 
 @Composable

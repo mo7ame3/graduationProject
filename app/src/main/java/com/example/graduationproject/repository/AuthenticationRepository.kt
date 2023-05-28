@@ -32,6 +32,9 @@ class AuthenticationRepository @Inject constructor(private val api: GraduationAp
             //addNewUser.loading = false
             Log.d("TAG", "Register: $e")
             addNewUser.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "Register: $e")
+            addNewUser.e = e
         }
         return addNewUser
     }

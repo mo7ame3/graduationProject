@@ -76,7 +76,7 @@ fun LoginScreen(
     }
     val valid = (passwordError.value && emailError.value)
 
-//                  Register Variables
+    //Register Variables
     val nameError = remember {
         mutableStateOf(false)
     }
@@ -233,7 +233,14 @@ fun LoginScreen(
                                                 }
                                             }
                                         }
-                                    } else {
+                                    } else if (login.e != null) {
+                                        loading.value = false
+                                        Toast.makeText(
+                                            context,
+                                            "خطأ في الانترنت",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (login.data?.status == "fail" || login.data?.status == "error") {
                                         loading.value = false
                                         Toast.makeText(
                                             context,
@@ -303,7 +310,14 @@ fun LoginScreen(
                                                             ).show()
                                                         }
                                                     }
-                                                } else {
+                                                } else if (register.e != null) {
+                                                    loading.value = false
+                                                    Toast.makeText(
+                                                        context,
+                                                        "خطأ في الانترنت",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                } else if (register.data?.status == "fail" || register.data?.status == "error") {
                                                     loading.value = false
                                                     Toast.makeText(
                                                         context,
@@ -342,4 +356,3 @@ fun LoginScreen(
         }
     }
 }
-
