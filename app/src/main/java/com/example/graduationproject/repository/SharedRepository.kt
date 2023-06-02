@@ -2,9 +2,12 @@ package com.example.graduationproject.repository
 
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.network.GraduationApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -13,6 +16,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
 
     private val getAllCrafts = WrapperClass<GetAllCrafts, Boolean, Exception>()
     private val getOneCrafts = WrapperClass<GetCraft, Boolean, Exception>()
+    private val getCraftList = WrapperClass<CraftList, Boolean, Exception>()
 
 
     suspend fun getAllCrafts(authorization: String)
@@ -63,5 +67,30 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
         }
         return getOneCrafts
     }
+
+
+    suspend fun getCraftList(authorization: String)
+            : WrapperClass<CraftList, Boolean, Exception> {
+        try {
+            getCraftList.data = api.getCraftList(authorization)
+        }
+        catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            getCraftList.data = CraftList(status = status, message = message)
+        }
+        catch (e: Exception) {
+            Log.d("TAG", "getCraftList: $e")
+            getCraftList.e = e
+        }
+        catch (e: SocketTimeoutException) {
+            Log.d("TAG", "getCraftList: $e")
+            getCraftList.e = e
+        }
+        return getCraftList
+    }
+
 
 }

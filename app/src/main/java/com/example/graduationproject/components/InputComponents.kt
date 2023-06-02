@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.graduationproject.model.shared.craftList.Craft
 import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.SecondaryColor
 
@@ -257,7 +258,8 @@ fun DropList(
     expanded: MutableState<Boolean>,
     value: MutableState<String>,
     label: String = "العنوان",
-    list: List<String>,
+    list: List<String> ? = null,
+    craftList: List<Craft> ? = null,
     isNotBackground: Boolean = false,
     leadingImageVector: ImageVector? = null
 ) {
@@ -286,6 +288,7 @@ fun DropList(
                 expanded = expanded.value,
                 modifier = modifier,
                 onDismissRequest = { expanded.value = false }) {
+                if(list != null && craftList == null){
                 list.forEach { t ->
                     DropdownMenuItem(
                         onClick = {
@@ -296,6 +299,20 @@ fun DropList(
                         Text(text = t)
                     }
                     Divider(modifier = Modifier.fillMaxWidth())
+                }
+                }
+                else if(craftList != null && list == null){
+                    craftList.forEach { t ->
+                        DropdownMenuItem(
+                            onClick = {
+                                value.value = t.name
+                                expanded.value = false
+                            },
+                        ) {
+                            Text(text = t.name)
+                        }
+                        Divider(modifier = Modifier.fillMaxWidth())
+                    }
                 }
             }
         }

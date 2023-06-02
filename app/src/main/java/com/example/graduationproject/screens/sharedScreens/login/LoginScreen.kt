@@ -1,5 +1,6 @@
 package com.example.graduationproject.screens.sharedScreens.login
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -266,7 +267,8 @@ fun LoginScreen(
                                             passwordConfirmBack = passwordConfirmBack,
                                             craftListBack = craftListBack,
                                             passwordIsNOtError = passwordIsNOtError,
-                                            passwordIsNOtErrorConfirm = passwordIsNOtErrorConfirm
+                                            passwordIsNOtErrorConfirm = passwordIsNOtErrorConfirm,
+                                            craftList = authenticationViewModel.craftList.value.data?.data?.crafts
                                         ) {
                                             scope.launch {
                                                 loading.value = true

@@ -393,10 +393,10 @@ object Constant {
     const val CRAFT = "api/v1/crafts"
 
     //CreateOrder
-    const val CREATEORDER = "api/v1/orders"
-
-    //CreateOrder
     const val DELETECRAFT = "api/v1/crafts"
+
+    //CraftList
+    const val CRAFTLIST = "api/v1/crafts/names"
 
 
 }

@@ -11,6 +11,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
+import com.example.graduationproject.model.shared.craftList.Craft
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -67,6 +68,7 @@ fun RegisterNext(
     craftListBack: MutableState<String>,
     passwordIsNOtError: MutableState<Boolean>,
     passwordIsNOtErrorConfirm: MutableState<Boolean>,
+    craftList: List<Craft> ? = null,
     onClick: () -> Unit,
 ) {
     val workerOrClientList = listOf(
@@ -75,10 +77,6 @@ fun RegisterNext(
     val workerOrClintExpanded = remember {
         mutableStateOf(false)
     }
-
-    val craftList = listOf(
-        "نجار", "سباك", "كهربائي", "نقاش", "عامل نظافة", "حداد", "صيانة اجهزة كهربائية", "عامل بناء"
-    )
     val craftExpanded = remember {
         mutableStateOf(false)
     }
@@ -122,7 +120,7 @@ fun RegisterNext(
         DropList(
             expanded = craftExpanded,
             value = craftListBack,
-            list = craftList,
+            craftList = craftList,
             label = "الوظيفة",
         )
     }

@@ -9,6 +9,7 @@ import com.example.graduationproject.model.shared.register.Register
 import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
+import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.worker.home.WorkerHome
 import okhttp3.MultipartBody
@@ -111,4 +112,11 @@ interface GraduationApi {
         @Path("craftId") craftId: String,
         @Header("Authorization") authorization: String
     ): WorkerHome
+
+    //Get Craft List use in Register and Client Order Home
+
+    @GET(Constant.CRAFTLIST)
+    suspend fun getCraftList(
+        @Header("Authorization") authorization: String
+    ): CraftList
 }
