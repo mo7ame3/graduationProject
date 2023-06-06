@@ -129,7 +129,7 @@ fun ClientHomeScreen(
                     exception = false
                 }
             }
-        } else if (craftData.data?.status == "fail" || craftData.e != null) {
+        } else if (craftData.data?.status == "fail" || craftData.data?.status == "error" || craftData.e != null) {
             exception = true
             Toast.makeText(
                 context,

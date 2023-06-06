@@ -33,8 +33,10 @@ fun ClientMyCraftOrders(
     name: String,
 ) {
     Scaffold(topBar = {
-        TopAppBar(title = id) {
-            navController.popBackStack()
+        TopAppBar(title = name) {
+            navController.navigate(AllScreens.ClientHomeScreen.name + "/order") {
+                navController.popBackStack()
+            }
         }
     }) {
         //
