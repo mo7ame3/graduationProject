@@ -1,5 +1,7 @@
 package com.example.graduationproject.screens.client.order
 
+import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +12,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,16 +23,51 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.R
 import com.example.graduationproject.data.Job
+import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.shared.craftList.CraftList
+import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.MainColor
+import kotlinx.coroutines.launch
 
+@SuppressLint("ProduceStateDoesNotAssignValue", "CoroutineCreationDuringComposition")
 @Composable
-fun ClientOrderScreen(navController: NavController) {
+fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewModel) {
+
+    //coroutineScope
+    val scope = rememberCoroutineScope()
+
+    val response: WrapperClass<CraftList, Boolean, Exception> =
+        produceState<WrapperClass<CraftList, Boolean, Exception>>(
+            initialValue = WrapperClass(data = null)
+        )
+        {
+            value = orderViewModel.getCraftList()
+        }.value
+
+//    if (response.data?.status == "success") {
+//        if (response.data != null) {
+//            scope.launch {
+//                craftFromGetAllCraftList.emit(craftData.data!!.data?.crafts!!)
+//                loading = false
+//                exception = false
+//            }
+//        }
+//    }
+//    else if (response.data?.status == "fail" || response.e != null) {
+//        exception = true
+//        Toast.makeText(
+//            context,
+//            "خطأ في الانترنت",
+//            Toast.LENGTH_SHORT
+//        ).show()
+//    }
+
     LazyColumn {
         items(orders) {
             OrderRow(onClick = {
                 //navigate to my order
-                navController.navigate(route = AllScreens.ClientMyCraftOrders.name + "/${it.job}")
+                navController.navigate(route = AllScreens.ClientMyCraftOrders.name + "/${it.job}/${it.job}")
             }, order = it)
             Spacer(modifier = Modifier.height(10.dp))
         }
@@ -53,17 +92,10 @@ fun OrderRow(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp)
         ) {
-            Icon(
-                painter = painterResource(id = order.pic),
-                contentDescription = null,
-                modifier = Modifier.size(35.dp),
-                tint = MainColor
-            )
-            Spacer(modifier = Modifier.width(10.dp))
             Text(text = order.job, style = TextStyle(color = MainColor, fontSize = 20.sp))
         }
     }

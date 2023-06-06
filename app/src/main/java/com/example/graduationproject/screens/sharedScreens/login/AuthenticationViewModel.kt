@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.shared.craftList.CraftList
+import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
 import com.example.graduationproject.model.shared.login.Login
 import com.example.graduationproject.model.shared.register.Register
 import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.repository.AuthenticationRepository
 import com.example.graduationproject.repository.SharedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,6 +23,7 @@ class AuthenticationViewModel @Inject constructor(
     private val sharedRepository: SharedRepository
 ) :
     ViewModel() {
+
     val craftList: MutableState<WrapperClass<CraftList, Boolean, Exception>> = mutableStateOf(
         WrapperClass()
     )
@@ -80,8 +81,15 @@ class AuthenticationViewModel @Inject constructor(
     private fun getCraftList(){
     viewModelScope.launch {
         craftList.value = sharedRepository
-            .getCraftList(authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0NTc2NGZjMTU4Nzk0MmY0ZDAwMjEyMiIsImlhdCI6MTY4NTcwNTE5OCwiZXhwIjoxNjk0MzQ1MTk4fQ._di6BkkE54XoZCPOjhXsmXZv0P_YvGN1c2lTkak8Nus")
+            .getCraftList()
     }
+    }
+
+
+    suspend fun getCraftOfWorker(
+        craftId : String
+    ) : WrapperClass<GetCraftOfWorker , Boolean , Exception>{
+        return sharedRepository.getCraftOfWorker(craftId = craftId)
     }
 
 }

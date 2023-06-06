@@ -65,7 +65,7 @@ fun RegisterNext(
     workerOrClintBack: MutableState<String>,
     passwordBack: MutableState<String>,
     passwordConfirmBack: MutableState<String>,
-    craftListBack: MutableState<String>,
+    craftIdBack: MutableState<String>,
     passwordIsNOtError: MutableState<Boolean>,
     passwordIsNOtErrorConfirm: MutableState<Boolean>,
     craftList: List<Craft> ? = null,
@@ -94,7 +94,7 @@ fun RegisterNext(
             false
         }
     } else if (workerOrClintBack.value == workerOrClientList[1]) {
-        if (workerOrClintBack.value.isNotEmpty() && craftListBack.value.isNotEmpty()) {
+        if (workerOrClintBack.value.isNotEmpty() && craftIdBack.value.isNotEmpty()) {
             passwordIsNOtError.value && passwordIsNOtErrorConfirm.value
         } else {
             false
@@ -114,12 +114,12 @@ fun RegisterNext(
     //if select Worker
     //index 0 is client and index 1 is worker
     if (workerOrClintBack.value == workerOrClientList[0]) {
-        craftListBack.value = ""
+        craftIdBack.value = ""
     }
     if (workerOrClintBack.value == workerOrClientList[1]) {
         DropList(
             expanded = craftExpanded,
-            value = craftListBack,
+            value = craftIdBack,
             craftList = craftList,
             label = "الوظيفة",
         )

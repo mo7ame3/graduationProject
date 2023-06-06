@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -78,8 +79,9 @@ fun WorkerHomeScreen(
     val sharedPreference = SharedPreference(context)
     val name = sharedPreference.getName.collectAsState(initial = "")
     val token = sharedPreference.getToken.collectAsState(initial = "")
+    val craftId = sharedPreference.getCraftId.collectAsState(initial = "")
 
-    val home = remember {
+    val homeNavBar = remember {
         mutableStateOf("home")
     }
     val title = remember {
@@ -94,7 +96,7 @@ fun WorkerHomeScreen(
     }
     if (route == "home" || route == "chat" || route == "order") {
         if (isFirst.value) {
-            home.value = route
+            homeNavBar.value = route
             isFirst.value = false
             title.value =
                 if (route == "home") "خدماتي" else if (route == "chat") "المحادثات" else "مشاريعي"
@@ -107,6 +109,9 @@ fun WorkerHomeScreen(
     }
     var exception by remember {
         mutableStateOf(false)
+    }
+    var result = remember {
+        mutableStateOf(0)
     }
 
     //state flow list
@@ -121,17 +126,24 @@ fun WorkerHomeScreen(
             ) {
                 value = workerHomeViewModel.getHome(
                     authorization = "Bearer ${token.value.toString()}",
-                    craftId = "6451481ed17c19136a05327b"
+                    craftId = craftId.value.toString()
                 )
             }.value
+
         if (homeData.data?.status == "success") {
-            if (homeData.data != null) {
+
+            if (homeData.data!!.result != 0) {
                 scope.launch {
                     homeList.emit(homeData.data!!.data!!.orders)
                     loading = false
                     exception = false
+                    result.value = homeData.data!!.result
                 }
+            } else {
+                loading = false
+                exception = false
             }
+
         } else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
             exception = true
             Toast.makeText(
@@ -148,6 +160,7 @@ fun WorkerHomeScreen(
     }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
 
+
     SwipeRefresh(state = swipeRefreshState, onRefresh = {
         swipeLoading = true
         loading = false
@@ -155,7 +168,7 @@ fun WorkerHomeScreen(
             val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
                 workerHomeViewModel.getHome(
                     authorization = "Bearer ${token.value.toString()}",
-                    craftId = "6451481ed17c19136a05327b"
+                    craftId = craftId.value.toString()
                 )
             if (homeData.data?.status == "success") {
                 if (homeData.data != null) {
@@ -176,7 +189,7 @@ fun WorkerHomeScreen(
                     if (it.title == "مشاريعي") {
                         scope.launch {
                             Log.d("TAG", "WorkerHomeScreen: ${it.title}")
-                            home.value = "order"
+                            homeNavBar.value = "order"
                             scaffoldState.drawerState.close()
                         }
                     }
@@ -214,11 +227,11 @@ fun WorkerHomeScreen(
                 }
 
             },
-            bottomBar = { BottomBar(selected = home, title = title, isClient = false) },
+            bottomBar = { BottomBar(selected = homeNavBar, title = title, isClient = false) },
         ) {
             if (!loading && !exception) {
-                if (home.value == "home") {
-                    if (homeList.value.toString().isNotEmpty()) {
+                if (homeNavBar.value == "home") {
+                    if (result.value != 0) {
                         LazyColumn {
                             items(homeList.value) {
                                 WorkerHomeRow(item = it) { data ->
@@ -239,20 +252,28 @@ fun WorkerHomeScreen(
                             }
                         }
                     } else {
-                        Column(
+                        LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            Text(text = "لا يوجد طلابات الان")
+                            item {
+                                Text(
+                                    text = "لا يوجد طلبات حاليا", style = TextStyle(
+                                        color = MainColor,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 20.sp
+                                    )
+                                )
+                            }
                         }
                     }
                 }
-                if (home.value == "chat") {
+                if (homeNavBar.value == "chat") {
                     ChatList(navController = navController)
                 }
                 //my projects
-                if (home.value == "order") {
+                if (homeNavBar.value == "order") {
                     MyProjects(navController)
                 }
             } else if (loading && !exception) {
@@ -270,7 +291,7 @@ fun WorkerHomeScreen(
                             val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
                                 workerHomeViewModel.getHome(
                                     authorization = "Bearer ${token.value.toString()}",
-                                    craftId = "6451481ed17c19136a05327b"
+                                    craftId = craftId.value.toString()
                                 )
                             if (homeData.data?.status == "success") {
                                 if (homeData.data != null) {

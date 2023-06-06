@@ -1,6 +1,5 @@
 package com.example.graduationproject.screens.sharedScreens.login
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.graduationproject.components.*
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
 import com.example.graduationproject.model.shared.login.Login
 import com.example.graduationproject.model.shared.register.Register
 import com.example.graduationproject.model.shared.register.myCraft.MyCraft
@@ -95,7 +95,7 @@ fun LoginScreen(
     }
 
     //RegisterNext values
-    val craftListBack = rememberSaveable {
+    val craftIdBack = rememberSaveable {
         mutableStateOf("")
     }
     val workerOrClintBack = rememberSaveable {
@@ -220,11 +220,16 @@ fun LoginScreen(
                                             }
 
                                             "worker" -> {
-                                                sharedPreference.saveState("worker")
-                                                navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
-                                                    navController.popBackStack()
+                                                //get Craft Id
+                                                val response: WrapperClass<GetCraftOfWorker, Boolean, java.lang.Exception> =
+                                                    authenticationViewModel.getCraftOfWorker(login.data!!.data?.user!!.id)
+                                                if (response.data!!.data != null) {
+                                                    sharedPreference.saveState("worker")
+                                                    sharedPreference.saveCraftId(login.data!!.data?.user!!.id)
+                                                    navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
+                                                        navController.popBackStack()
+                                                    }
                                                 }
-                                                //save worker craft id 
                                             }
 
                                             else -> {
@@ -265,7 +270,7 @@ fun LoginScreen(
                                             workerOrClintBack = workerOrClintBack,
                                             passwordBack = passwordBack,
                                             passwordConfirmBack = passwordConfirmBack,
-                                            craftListBack = craftListBack,
+                                            craftIdBack = craftIdBack,
                                             passwordIsNOtError = passwordIsNOtError,
                                             passwordIsNOtErrorConfirm = passwordIsNOtErrorConfirm,
                                             craftList = authenticationViewModel.craftList.value.data?.data?.crafts
@@ -296,10 +301,11 @@ fun LoginScreen(
                                                         val myCraft: WrapperClass<MyCraft, Boolean, Exception> =
                                                             authenticationViewModel.workerChooseCraft(
                                                                 token = "Bearer " + register.data!!.token.toString(),
-                                                                myCraft = craftListBack.value,
+                                                                myCraft = craftIdBack.value,
                                                                 workerId = register.data!!.data?.user!!.id
                                                             )
                                                         if (myCraft.data?.status == "success") {
+                                                            sharedPreference.saveCraftId(craftIdBack.value)
                                                             navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
                                                                 navController.popBackStack()
                                                             }

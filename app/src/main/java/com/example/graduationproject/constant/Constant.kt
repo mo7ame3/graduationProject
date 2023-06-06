@@ -398,5 +398,8 @@ object Constant {
     //CraftList
     const val CRAFTLIST = "api/v1/crafts/names"
 
+    //CraftOfWorker
+    const val CRAFTOFWORKER = "api/v1/users"
+
 
 }

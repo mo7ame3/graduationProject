@@ -24,6 +24,7 @@ import com.example.graduationproject.screens.client.home.ClientHomeScreen
 import com.example.graduationproject.screens.client.home.ClientHomeViewModel
 import com.example.graduationproject.screens.client.order.ClientMyCraftOrders
 import com.example.graduationproject.screens.client.order.ClientOrderOfferScreen
+import com.example.graduationproject.screens.client.order.OrderViewModel
 import com.example.graduationproject.screens.client.postScreen.ClientPostScreen
 import com.example.graduationproject.screens.client.postScreen.PostViewModel
 import com.example.graduationproject.screens.client.profile.ClientProfileScreen
@@ -36,8 +37,8 @@ import com.example.graduationproject.screens.sharedScreens.login.ForgotPasswordS
 import com.example.graduationproject.screens.sharedScreens.login.LoginScreen
 import com.example.graduationproject.screens.sharedScreens.report.ReportScreen
 import com.example.graduationproject.screens.sharedScreens.splash.SplashScreen
-import com.example.graduationproject.screens.worker.home.WorkerHomeViewModel
 import com.example.graduationproject.screens.worker.home.WorkerHomeScreen
+import com.example.graduationproject.screens.worker.home.WorkerHomeViewModel
 import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemDetails
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
 import com.example.graduationproject.screens.worker.profile.WorkerProfileScreen
@@ -96,9 +97,13 @@ fun NavGraph() {
             })
         ) { data ->
             val viewModel = hiltViewModel<ClientHomeViewModel>()
+            val orderViewModel = hiltViewModel<OrderViewModel>()
             data.arguments!!.getString("route")?.let {
                 ClientHomeScreen(
-                    navController = navController, route = it, viewModel
+                    navController = navController,
+                    route = it,
+                    clientHomeViewModel = viewModel,
+                    orderViewModel = orderViewModel
                 )
             }
         }
@@ -118,13 +123,18 @@ fun NavGraph() {
         }
         val myCraftOrders = AllScreens.ClientMyCraftOrders.name
         composable(
-            route = "$myCraftOrders/{id}", arguments = listOf(navArgument(name = "id") {
+            route = "$myCraftOrders/{id}/{craftName}", arguments = listOf(navArgument(name = "id") {
+                type = NavType.StringType
+            }, navArgument(name = "craftName") {
                 type = NavType.StringType
             })
         ) { data ->
-            data.arguments?.getString("id").let { id ->
-                ClientMyCraftOrders(navController = navController, id = id.toString())
-            }
+            ClientMyCraftOrders(
+                navController = navController,
+                id = data.arguments!!.getString("id").toString(),
+                name = data.arguments!!.getString("craftName").toString(),
+            )
+
         }
 
         val profileScreen = AllScreens.ClientProfileScreen.name

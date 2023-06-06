@@ -27,7 +27,11 @@ import com.example.graduationproject.ui.theme.RedColor
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ClientMyCraftOrders(navController: NavController, id: String) {
+fun ClientMyCraftOrders(
+    navController: NavController,
+    id: String,
+    name: String,
+) {
     Scaffold(topBar = {
         TopAppBar(title = id) {
             navController.popBackStack()

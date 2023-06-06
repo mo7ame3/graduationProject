@@ -47,6 +47,7 @@ import com.example.graduationproject.model.shared.craft.Craft
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.client.order.ClientOrderScreen
+import com.example.graduationproject.screens.client.order.OrderViewModel
 import com.example.graduationproject.screens.sharedScreens.chat.ChatList
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -62,7 +63,8 @@ import kotlinx.coroutines.launch
 fun ClientHomeScreen(
     navController: NavController,
     route: String,
-    clientHomeViewModel: ClientHomeViewModel
+    clientHomeViewModel: ClientHomeViewModel,
+    orderViewModel: OrderViewModel
 ) {
     //Shared preference variables
     val context = LocalContext.current
@@ -145,6 +147,7 @@ fun ClientHomeScreen(
 
     SwipeRefresh(state = swipeRefreshState,
         onRefresh = {
+            if (home.value == "home") {
             swipeLoading = true
             loading = false
             scope.launch {
@@ -158,6 +161,7 @@ fun ClientHomeScreen(
                 } else {
                     swipeLoading = false
                 }
+            }
             }
         }) {
         Scaffold(
@@ -224,7 +228,7 @@ fun ClientHomeScreen(
                         }
                     }
                     if (home.value == "order") {
-                        ClientOrderScreen(navController)
+                        ClientOrderScreen(navController , orderViewModel)
                     }
                     if (home.value == "chat") {
                         ChatList(navController)

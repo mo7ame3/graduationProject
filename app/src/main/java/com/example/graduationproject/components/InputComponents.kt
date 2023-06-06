@@ -305,7 +305,7 @@ fun DropList(
                     craftList.forEach { t ->
                         DropdownMenuItem(
                             onClick = {
-                                value.value = t.name
+                                value.value = t.id
                                 expanded.value = false
                             },
                         ) {
