@@ -334,6 +334,22 @@ fun PickPhoto(
 }
 
 
+//order photo
+@Composable
+fun InternetPhoto(
+    selectImage: String,
+) {
+
+        Image(
+            painter = rememberAsyncImagePainter(selectImage),
+            contentDescription = null,
+            modifier = Modifier.clip(
+                RoundedCornerShape(25.dp)
+            ), contentScale = ContentScale.Crop
+        )
+    }
+
+
 //craft photo
 
 @Composable

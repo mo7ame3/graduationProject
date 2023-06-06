@@ -41,6 +41,7 @@ import com.example.graduationproject.screens.worker.home.WorkerHomeScreen
 import com.example.graduationproject.screens.worker.home.WorkerHomeViewModel
 import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemDetails
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
+import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetailsViewModel
 import com.example.graduationproject.screens.worker.profile.WorkerProfileScreen
 import com.example.graduationproject.screens.worker.profileSettings.WorkerProfileSettingsScreen
 
@@ -209,8 +210,17 @@ fun NavGraph() {
             }
         }
 
-        composable(route = AllScreens.WorkerProblemDetilas.name) {
-            WorkerProblemDetails(navController = navController)
+        composable(route = AllScreens.WorkerProblemDetails.name + "/{orderId}", arguments = listOf(
+            navArgument(name = "orderId") {
+                type = NavType.StringType
+            }
+        )) {
+            val viewModel = hiltViewModel<WorkerProblemDetailsViewModel>()
+
+            WorkerProblemDetails(
+                navController = navController, orderID = it.arguments?.getString("orderId")
+                    .toString(), workerProblemDetailsViewModel = viewModel
+            )
         }
 //        composable(route = AllScreens.WorkerProfileScreen.name) {
 //            WorkerProfileScreen(navController = navController)

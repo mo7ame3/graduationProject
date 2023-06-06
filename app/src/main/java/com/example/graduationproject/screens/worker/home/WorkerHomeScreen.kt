@@ -110,7 +110,7 @@ fun WorkerHomeScreen(
     var exception by remember {
         mutableStateOf(false)
     }
-    var result = remember {
+    val result = remember {
         mutableStateOf(0)
     }
 
@@ -143,7 +143,8 @@ fun WorkerHomeScreen(
                 exception = false
             }
 
-        } else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
+        }
+        else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -234,15 +235,7 @@ fun WorkerHomeScreen(
                         LazyColumn {
                             items(homeList.value) {
                                 WorkerHomeRow(item = it) { data ->
-                                    Log.d("TAG", "WorkerHomeScreen_USERNAME: ${data.user.name}")
-                                    Log.d("TAG", "WorkerHomeScreen_PROBLEMTITLE: ${data.title}")
-                                    Log.d(
-                                        "TAG",
-                                        "WorkerHomeScreen_ORDERDIFFICULTY: ${data.orderDifficulty}"
-                                    )
-                                    Log.d("TAG", "WorkerHomeScreen_ADDRESS: ${data.user.address}")
-                                    Log.d("TAG", "WorkerHomeScreen_TIME: ${data.createdDate}")
-                                    navController.navigate(AllScreens.WorkerProblemDetilas.name)
+                                    navController.navigate(AllScreens.WorkerProblemDetails.name + "/${data._id}")
                                 }
                                 Spacer(modifier = Modifier.height(15.dp))
                             }
@@ -275,9 +268,11 @@ fun WorkerHomeScreen(
                 if (homeNavBar.value == "order") {
                     MyProjects(navController)
                 }
-            } else if (loading && !exception) {
+            }
+            else if (loading && !exception) {
                 CircleProgress()
-            } else if (exception) {
+            }
+            else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,

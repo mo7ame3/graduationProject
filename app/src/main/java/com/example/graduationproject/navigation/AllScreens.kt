@@ -23,7 +23,7 @@ enum class AllScreens {
     //worker
 
     WorkerHomeScreen,
-    WorkerProblemDetilas,
+    WorkerProblemDetails,
     WorkerProfileScreen,
     WorkerProfileSettingsScreen,
     MyProjectProblemDetails,

@@ -13,6 +13,7 @@ import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
 import com.example.graduationproject.model.worker.home.WorkerHome
+import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
@@ -125,4 +126,12 @@ interface GraduationApi {
     suspend fun getCraftOfWorker(
         @Path("craftID") craftId: String,
     ): GetCraftOfWorker
+
+    @GET("api/v1/crafts/{craftId}/orders/{orderId}")
+    suspend fun getOrderDetails(
+        @Path("craftId") craftId: String,
+        @Path("orderId") orderId: String,
+        @Header("Authorization") authorization: String
+    ):GetOrderDetails
+
 }
