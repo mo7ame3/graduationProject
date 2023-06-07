@@ -143,7 +143,7 @@ fun WorkerProblemDetails(
                     if (orderDetails.value[0].avatar == null) {
                         PickPhoto()
                     } else {
-                        InternetPhoto(selectImage = orderDetails.value[0].avatar.toString())
+                        InternetPhoto(uri = orderDetails.value[0].avatar.toString())
                     }
                 }
                 Spacer(modifier = Modifier.height(10.dp))

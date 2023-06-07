@@ -124,16 +124,19 @@ fun NavGraph() {
         }
         val myCraftOrders = AllScreens.ClientMyCraftOrders.name
         composable(
-            route = "$myCraftOrders/{craftId}/{craftName}", arguments = listOf(navArgument(name = "craftId") {
+            route = "$myCraftOrders/{craftId}/{craftName}",
+            arguments = listOf(navArgument(name = "craftId") {
                 type = NavType.StringType
             }, navArgument(name = "craftName") {
                 type = NavType.StringType
             })
         ) { data ->
+            val orderViewModel = hiltViewModel<OrderViewModel>()
             ClientMyCraftOrders(
                 navController = navController,
-                id = data.arguments!!.getString("craftId").toString(),
+                craftId = data.arguments!!.getString("craftId").toString(),
                 name = data.arguments!!.getString("craftName").toString(),
+                orderViewModel = orderViewModel
             )
 
         }

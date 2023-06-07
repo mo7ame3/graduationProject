@@ -3,7 +3,7 @@ package com.example.graduationproject.repository
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
-import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
+import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class AdminRepository @Inject constructor(private val api: GraduationApi) {
     private val createNewCraft = WrapperClass<CreateNewCraft, Boolean, Exception>()
     private val updateCraft = WrapperClass<UpdateCraft, Boolean, Exception>()
-    private val deleteCraft = WrapperClass<DeleteCraft, Boolean, Exception>()
+    private val delete = WrapperClass<Delete, Boolean, Exception>()
 
 
     suspend fun createNewCraft(authorization: String, name: RequestBody, image: MultipartBody.Part)
@@ -77,10 +77,10 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
     suspend fun deleteCraft(
         authorization: String,
         craftId: String
-    ): WrapperClass<DeleteCraft, Boolean, Exception> {
+    ): WrapperClass<Delete, Boolean, Exception> {
         try {
             //addNewUser.loading = true
-            deleteCraft.data = api.deleteCraft(
+            delete.data = api.deleteCraft(
                 craftId = craftId,
                 authorization = authorization
             )
@@ -89,20 +89,20 @@ class AdminRepository @Inject constructor(private val api: GraduationApi) {
             val error = e.response()?.errorBody()?.string()
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
-            deleteCraft.data = DeleteCraft(status = status, message = message)
+            delete.data = Delete(status = status, message = message)
         }
         catch (e : NullPointerException){
-            deleteCraft.data = DeleteCraft(status = "success")
+            delete.data = Delete(status = "success")
         }
         catch (e: Exception) {
             //addNewUser.loading = false
             Log.d("TAG", "deleteCraft: $e")
-            deleteCraft.e = e
+            delete.e = e
         } catch (e: SocketTimeoutException) {
             Log.d("TAG", "deleteCraft: $e")
-            deleteCraft.e = e
+            delete.e = e
         }
-        return deleteCraft
+        return delete
     }
 
 

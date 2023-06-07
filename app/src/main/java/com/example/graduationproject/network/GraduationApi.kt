@@ -2,13 +2,14 @@ package com.example.graduationproject.network
 
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
-import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
+import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.shared.login.Login
 import com.example.graduationproject.model.shared.register.Register
 import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
+import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
@@ -93,7 +94,7 @@ interface GraduationApi {
     suspend fun deleteCraft(
         @Path("craftID") craftId: String,
         @Header("Authorization") authorization: String,
-    ): DeleteCraft
+    ): Delete
 
     //Create Order
     @Multipart
@@ -132,6 +133,21 @@ interface GraduationApi {
         @Path("craftId") craftId: String,
         @Path("orderId") orderId: String,
         @Header("Authorization") authorization: String
-    ):GetOrderDetails
+    ): GetOrderDetails
+
+    //Get My Order
+    @GET("api/v1/crafts/{craftId}/orders/myorders")
+    suspend fun getMyOrder(
+        @Path("craftId") craftId: String,
+        @Header("Authorization") authorization: String
+    ): GetMyOrder
+
+    //Delete Order
+    @DELETE("api/v1/crafts/{craftId}/orders/{orderId}")
+    suspend fun deleteOrder(
+        @Path("craftId") craftId: String,
+        @Path("orderId") orderId: String,
+        @Header("Authorization") authorization: String
+    ):Delete
 
 }

@@ -71,7 +71,6 @@ fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewMod
         mutableStateOf(false)
     }
 
-    Log.d("TAG", "INORDERSCREEN")
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
 
     val response: WrapperClass<CraftList, Boolean, Exception> =
@@ -105,7 +104,7 @@ fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewMod
         if (!loading && !exception) {
             LazyColumn {
                 items(craftList.value) {
-                    OrderRow(onClick = {
+                    OrderRow(onClick = { it ->
                         //navigate to my order
                         navController.navigate(route = AllScreens.ClientMyCraftOrders.name + "/${it.id}/${it.name}")
                     }, craft = it)

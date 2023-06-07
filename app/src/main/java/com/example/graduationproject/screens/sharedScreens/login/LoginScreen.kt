@@ -225,7 +225,7 @@ fun LoginScreen(
                                                     authenticationViewModel.getCraftOfWorker(login.data!!.data?.user!!.id)
                                                 if (response.data!!.data != null) {
                                                     sharedPreference.saveState("worker")
-                                                    sharedPreference.saveCraftId(login.data!!.data?.user!!.id)
+                                                    sharedPreference.saveCraftId(response.data!!.data!!.user[0].myCraft)
                                                     navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
                                                         navController.popBackStack()
                                                     }

@@ -74,7 +74,8 @@ fun BottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(55.dp),
-        shape = RoundedCornerShape(topEnd = 20.dp, topStart = 20.dp), color = MainColor
+        shape = RoundedCornerShape(topEnd = 20.dp, topStart = 20.dp),
+        color = MainColor
     ) {
         BottomNavigation {
             BottomNavigationItem(selected = selected.value == "chat", onClick = {
@@ -84,7 +85,8 @@ fun BottomBar(
             }, icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.chat),
-                    contentDescription = null, modifier = Modifier.size(35.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(35.dp)
                 )
             }, selectedContentColor = Color.White, unselectedContentColor = SecondaryColor)
 
@@ -95,7 +97,8 @@ fun BottomBar(
             }, icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.home_icon_white),
-                    contentDescription = null, modifier = Modifier.size(30.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(30.dp)
                 )
             }, selectedContentColor = Color.White, unselectedContentColor = SecondaryColor)
 
@@ -106,7 +109,8 @@ fun BottomBar(
             }, icon = {
                 Icon(
                     painter = painterResource(id = R.drawable.my_orders),
-                    contentDescription = null, modifier = Modifier.size(25.dp)
+                    contentDescription = null,
+                    modifier = Modifier.size(25.dp)
                 )
             }, selectedContentColor = Color.White, unselectedContentColor = SecondaryColor)
         }
@@ -115,8 +119,7 @@ fun BottomBar(
 
 @Composable
 fun TopMainBar(
-    title: MutableState<String>,
-    onClick: () -> Unit
+    title: MutableState<String>, onClick: () -> Unit
 ) {
     Column {
         Row(
@@ -129,21 +132,22 @@ fun TopMainBar(
         ) {
             IconButton(onClick = onClick) {
                 Icon(
-                    imageVector = Icons.Default.Menu, contentDescription = null,
-                    modifier = Modifier.size(30.dp), tint = MainColor
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = null,
+                    modifier = Modifier.size(30.dp),
+                    tint = MainColor
                 )
             }
             Text(
-                text = title.value,
-                style = TextStyle(
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MainColor
+                text = title.value, style = TextStyle(
+                    fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = MainColor
                 )
             )
             Icon(
-                painter = painterResource(id = Constant.logo), contentDescription = null,
-                modifier = Modifier.size(30.dp), tint = MainColor
+                painter = painterResource(id = Constant.logo),
+                contentDescription = null,
+                modifier = Modifier.size(30.dp),
+                tint = MainColor
             )
 
         }
@@ -165,16 +169,15 @@ fun DrawerHeader() {
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(id = Constant.logo), contentDescription = null,
+                painter = painterResource(id = Constant.logo),
+                contentDescription = null,
                 modifier = Modifier.size(50.dp),
                 tint = Color.White
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = Constant.title,
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 16.sp
+                text = Constant.title, style = TextStyle(
+                    color = Color.White, fontSize = 16.sp
                 )
             )
         }
@@ -183,9 +186,7 @@ fun DrawerHeader() {
 
 @Composable
 fun DrawerBody(
-    isClient: Boolean,
-    name: String,
-    onClick: (DrawerData) -> Unit
+    isClient: Boolean, name: String, onClick: (DrawerData) -> Unit
 ) {
     val drawerListClient = if (isClient) listOf(
         DrawerData(title = name, pic = R.drawable.person),
@@ -216,15 +217,13 @@ fun DrawerRow(
     DrawerData: DrawerData,
     onClick: (DrawerData) -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .padding(start = 20.dp, end = 20.dp)
-            .clickable {
-                onClick.invoke(DrawerData)
-            }
-    ) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(50.dp)
+        .padding(start = 20.dp, end = 20.dp)
+        .clickable {
+            onClick.invoke(DrawerData)
+        }) {
         Icon(
             painter = painterResource(id = DrawerData.pic),
             contentDescription = null,
@@ -243,8 +242,7 @@ fun DrawerRow(
 
 @Composable
 fun TopAppBar(
-    title: String,
-    onAction: () -> Unit
+    title: String, onAction: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -266,9 +264,7 @@ fun TopAppBar(
 @Composable
 fun ProfilePhoto(uri: Uri? = null) {
     Surface(
-        shape = CircleShape,
-        color = MainColor,
-        modifier = Modifier.size(120.dp)
+        shape = CircleShape, color = MainColor, modifier = Modifier.size(120.dp)
     ) {
         PickPhoto(uri, isProfile = true)
     }
@@ -279,9 +275,7 @@ fun ProfilePhoto(uri: Uri? = null) {
 @Composable
 fun SmallPhoto(uri: Uri? = null) {
     Surface(
-        shape = CircleShape,
-        color = MainColor,
-        modifier = Modifier.size(50.dp)
+        shape = CircleShape, color = MainColor, modifier = Modifier.size(50.dp)
     ) {
         PickPhoto(isProfile = true, selectImage = uri)
     }
@@ -290,9 +284,7 @@ fun SmallPhoto(uri: Uri? = null) {
 @Composable
 fun GetSmallPhoto(uri: String? = null) {
     Surface(
-        shape = CircleShape,
-        color = MainColor,
-        modifier = Modifier.size(50.dp)
+        shape = CircleShape, color = MainColor, modifier = Modifier.size(50.dp)
     ) {
         if (uri != null) {
             Image(
@@ -302,9 +294,7 @@ fun GetSmallPhoto(uri: String? = null) {
             )
         } else {
             Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = null,
-                tint = Color.White
+                imageVector = Icons.Default.Person, contentDescription = null, tint = Color.White
             )
         }
     }
@@ -313,8 +303,7 @@ fun GetSmallPhoto(uri: String? = null) {
 //post Screen
 @Composable
 fun PickPhoto(
-    selectImage: Uri? = null,
-    isProfile: Boolean = false
+    selectImage: Uri? = null, isProfile: Boolean = false
 ) {
     if (selectImage != null) {
         Image(
@@ -322,7 +311,8 @@ fun PickPhoto(
             contentDescription = null,
             modifier = if (isProfile) Modifier.clip(CircleShape) else Modifier.clip(
                 RoundedCornerShape(25.dp)
-            ), contentScale = ContentScale.Crop
+            ),
+            contentScale = ContentScale.Crop
         )
     } else {
         Icon(
@@ -337,44 +327,28 @@ fun PickPhoto(
 //order photo
 @Composable
 fun InternetPhoto(
-    selectImage: String,
+    uri: String,
 ) {
 
-        Image(
-            painter = rememberAsyncImagePainter(selectImage),
-            contentDescription = null,
-            modifier = Modifier.clip(
-                RoundedCornerShape(25.dp)
-            ), contentScale = ContentScale.Crop
-        )
-    }
-
-
-//craft photo
-
-@Composable
-fun InternetCraftPhoto(uri: String) {
     Box {
-
         // to reload image
         var refreshImage by remember { mutableStateOf(0) }
         val painter = rememberAsyncImagePainter(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(uri)
-                .setParameter("refresh", refreshImage, memoryCacheKey = null)
-                .build()
+            model = ImageRequest.Builder(LocalContext.current).data(uri)
+                .setParameter("refresh", refreshImage, memoryCacheKey = null).build()
         )
         Image(
-            painter = painter,
-            contentDescription = null,
-            modifier = Modifier.size(300.dp, 200.dp),
+            painter = painter, contentDescription = null, modifier = Modifier
+                .fillMaxSize()
+                .clip(
+                    RoundedCornerShape(25.dp)
+                ), contentScale = ContentScale.Crop
         )
         // condition to reload image
         when (painter.state) {
             is AsyncImagePainter.State.Error -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
                     IconButton(onClick = { refreshImage++ }) {
                         Icon(
@@ -388,8 +362,54 @@ fun InternetCraftPhoto(uri: String) {
 
             is AsyncImagePainter.State.Loading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            else -> {}
+        }
+    }
+}
+
+
+//craft photo
+
+@Composable
+fun InternetCraftPhoto(uri: String) {
+    Box {
+
+        // to reload image
+        var refreshImage by remember { mutableStateOf(0) }
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current).data(uri)
+                .setParameter("refresh", refreshImage, memoryCacheKey = null).build()
+        )
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.size(300.dp, 200.dp),
+        )
+        // condition to reload image
+        when (painter.state) {
+            is AsyncImagePainter.State.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                ) {
+                    IconButton(onClick = { refreshImage++ }) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(60.dp)
+                        )
+                    }
+                }
+            }
+
+            is AsyncImagePainter.State.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
@@ -436,8 +456,7 @@ fun ProblemDescription(
         ) {
             item {
                 Text(
-                    text = problemDescription,
-                    style = TextStyle(
+                    text = problemDescription, style = TextStyle(
                         color = MainColor, fontSize = 20.sp
                     )
                 )
@@ -451,37 +470,27 @@ fun StarsNumber(stars: Int) {
     Row {
         if (stars >= 1) {
             Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                tint = GoldColor
+                imageVector = Icons.Default.Star, contentDescription = null, tint = GoldColor
             )
         }
         if (stars >= 2) {
             Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                tint = GoldColor
+                imageVector = Icons.Default.Star, contentDescription = null, tint = GoldColor
             )
         }
         if (stars >= 3) {
             Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                tint = GoldColor
+                imageVector = Icons.Default.Star, contentDescription = null, tint = GoldColor
             )
         }
         if (stars >= 4) {
             Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                tint = GoldColor
+                imageVector = Icons.Default.Star, contentDescription = null, tint = GoldColor
             )
         }
         if (stars == 5) {
             Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = null,
-                tint = GoldColor
+                imageVector = Icons.Default.Star, contentDescription = null, tint = GoldColor
             )
         }
     }

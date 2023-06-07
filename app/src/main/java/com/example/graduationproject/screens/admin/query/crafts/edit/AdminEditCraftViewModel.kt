@@ -2,7 +2,7 @@ package com.example.graduationproject.screens.admin.query.crafts.edit
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.admin.deleteCraft.DeleteCraft
+import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.repository.AdminRepository
@@ -42,7 +42,7 @@ class AdminEditCraftViewModel @Inject constructor(
     suspend fun deleteCraft(
         authorization: String,
         craftId: String
-    ): WrapperClass<DeleteCraft, Boolean, Exception> {
+    ): WrapperClass<Delete, Boolean, Exception> {
         return adminRepository.deleteCraft(
             authorization = authorization,
             craftId = craftId

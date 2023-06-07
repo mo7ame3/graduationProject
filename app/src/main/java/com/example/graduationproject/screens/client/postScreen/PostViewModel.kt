@@ -27,7 +27,7 @@ class PostViewModel @Inject constructor(private val clientRepository: ClientRepo
             title = title,
             description = description,
             orderDifficulty = orderDifficulty,
-            token = token,
+            authorization = token,
             craftId = craftId
         )
     }
