@@ -257,9 +257,10 @@ fun DropList(
     modifier: Modifier = Modifier.height(250.dp),
     expanded: MutableState<Boolean>,
     value: MutableState<String>,
+    craftId: MutableState<String>? = null,
     label: String = "العنوان",
-    list: List<String> ? = null,
-    craftList: List<Craft> ? = null,
+    list: List<String>? = null,
+    craftList: List<Craft>? = null,
     isNotBackground: Boolean = false,
     leadingImageVector: ImageVector? = null
 ) {
@@ -288,24 +289,24 @@ fun DropList(
                 expanded = expanded.value,
                 modifier = modifier,
                 onDismissRequest = { expanded.value = false }) {
-                if(list != null && craftList == null){
-                list.forEach { t ->
-                    DropdownMenuItem(
-                        onClick = {
-                            value.value = t
-                            expanded.value = false
-                        },
-                    ) {
-                        Text(text = t)
+                if (list != null && craftList == null) {
+                    list.forEach { t ->
+                        DropdownMenuItem(
+                            onClick = {
+                                value.value = t
+                                expanded.value = false
+                            },
+                        ) {
+                            Text(text = t)
+                        }
+                        Divider(modifier = Modifier.fillMaxWidth())
                     }
-                    Divider(modifier = Modifier.fillMaxWidth())
-                }
-                }
-                else if(craftList != null && list == null){
+                } else if (craftList != null && list == null) {
                     craftList.forEach { t ->
                         DropdownMenuItem(
                             onClick = {
-                                value.value = t.id
+                                value.value = t.name
+                                craftId?.value = t.id
                                 expanded.value = false
                             },
                         ) {

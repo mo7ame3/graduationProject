@@ -66,9 +66,10 @@ fun RegisterNext(
     passwordBack: MutableState<String>,
     passwordConfirmBack: MutableState<String>,
     craftIdBack: MutableState<String>,
+    craftName: MutableState<String>,
     passwordIsNOtError: MutableState<Boolean>,
     passwordIsNOtErrorConfirm: MutableState<Boolean>,
-    craftList: List<Craft> ? = null,
+    craftList: List<Craft>,
     onClick: () -> Unit,
 ) {
     val workerOrClientList = listOf(
@@ -119,9 +120,10 @@ fun RegisterNext(
     if (workerOrClintBack.value == workerOrClientList[1]) {
         DropList(
             expanded = craftExpanded,
-            value = craftIdBack,
+            value = craftName,
             craftList = craftList,
             label = "الوظيفة",
+            craftId = craftIdBack
         )
     }
     //Register valid

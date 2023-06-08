@@ -98,6 +98,9 @@ fun LoginScreen(
     val craftIdBack = rememberSaveable {
         mutableStateOf("")
     }
+    val craftName = rememberSaveable {
+        mutableStateOf("")
+    }
     val workerOrClintBack = rememberSaveable {
         mutableStateOf("")
     }
@@ -271,9 +274,10 @@ fun LoginScreen(
                                             passwordBack = passwordBack,
                                             passwordConfirmBack = passwordConfirmBack,
                                             craftIdBack = craftIdBack,
+                                            craftName = craftName,
                                             passwordIsNOtError = passwordIsNOtError,
                                             passwordIsNOtErrorConfirm = passwordIsNOtErrorConfirm,
-                                            craftList = authenticationViewModel.craftList.value.data?.data?.crafts
+                                            craftList = authenticationViewModel.craftList.value.data?.data?.crafts!!
                                         ) {
                                             scope.launch {
                                                 loading.value = true
