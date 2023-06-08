@@ -1,10 +1,12 @@
 package com.example.graduationproject.screens.worker.problemDetails
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.components.*
 import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import com.example.graduationproject.model.worker.orderDetails.Order
 import com.example.graduationproject.navigation.AllScreens
@@ -52,6 +55,9 @@ fun WorkerProblemDetails(
     }
     var exception by remember {
         mutableStateOf(false)
+    }
+    val offerDetails = remember {
+        mutableStateOf("")
     }
     val scope = rememberCoroutineScope()
 
@@ -90,71 +96,112 @@ fun WorkerProblemDetails(
         }
     }) {
         if (!loading && !exception) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(start = 25.dp, end = 25.dp),
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            //get Client id from database and nav to client profile
-                            navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${true}/${false}/${false}/ ")
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    GetSmallPhoto(uri = if (orderDetails.value[0].user.avatar != null) orderDetails.value[0].user.avatar.toString() else null)
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Text(
-                        text = orderDetails.value[0].user.name, style = TextStyle(
-                            color = MainColor,
-                            fontSize = 15.sp
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                //get Client id from database and nav to client profile
+                                navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${true}/${false}/${false}/ ")
+                            },
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        GetSmallPhoto(uri = if (orderDetails.value[0].user.avatar != null) orderDetails.value[0].user.avatar.toString() else null)
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = orderDetails.value[0].user.name, style = TextStyle(
+                                color = MainColor,
+                                fontSize = 15.sp
+                            )
                         )
-                    )
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Row(
-                    modifier = Modifier.padding(start = 25.dp),
-                ) {
-                    Text(
-                        text = "${orderDetails.value[0].title}- ${orderDetails.value[0].orderDifficulty}",
-                        style = TextStyle(
-                            color = MainColor,
-                            fontSize = 18.sp
-                        )
-                    )
-                }
-                Spacer(modifier = Modifier.height(15.dp))
-                //ProblemDescription
-                ProblemDescription(
-                    problemDescription = orderDetails.value[0].description
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp),
-                    shape = RoundedCornerShape(25.dp),
-                    border = BorderStroke(width = 1.dp, color = MainColor)
-                ) {
-                    //change photo
-                    if (orderDetails.value[0].avatar == null) {
-                        PickPhoto()
-                    } else {
-                        InternetPhoto(uri = orderDetails.value[0].avatar.toString())
                     }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    DefaultButton(label = "قدم عرض مساعدة", modifier = Modifier.width(150.dp))
-                    {
-                        navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
-                            navController.popBackStack()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.padding(start = 25.dp),
+                    ) {
+                        Text(
+                            text = "${orderDetails.value[0].title}- ${orderDetails.value[0].orderDifficulty}",
+                            style = TextStyle(
+                                color = MainColor,
+                                fontSize = 18.sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                    //ProblemDescription
+                    ProblemDescription(problemDescription = orderDetails.value[0].description)
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        border = BorderStroke(width = 1.dp, color = MainColor)
+                    ) {
+                        //change photo
+                        if (orderDetails.value[0].avatar == null) {
+                            PickPhoto()
+                        } else {
+                            InternetPhoto(uri = orderDetails.value[0].avatar.toString())
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(220.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        border = BorderStroke(width = 1.dp, color = MainColor)
+                    ) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            TextInput(
+                                text = offerDetails,
+                                isBorder = false,
+                                label = if (offerDetails.value.isEmpty()) "اكتب تفاصيل العرض هنا..." else "",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(0.dp),
+                                isSingleLine = false,
+                                isNotBackground = true,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        DefaultButton(label = "قدم عرض مساعدة", modifier = Modifier.width(150.dp))
+                        {
+                            loading = true
+                            scope.launch {
+                                val response: WrapperClass<CreateOffer, Boolean, Exception> =
+                                    workerProblemDetailsViewModel.createOffer(
+                                        authorization = "Bearer " + token.value.toString(),
+                                        orderId = orderID,
+                                        offerDetails = offerDetails.value.ifBlank { null }
+                                    )
+                                if (response.data?.status == "success") {
+                                    Log.d("TAG", "Success ")
+                                    navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
+                                        navController.popBackStack()
+                                    }
+                                }
+                                else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+                                    loading = false
+                                    Toast.makeText(
+                                        context,
+                                        "خطأ في الانترنت",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
                         }
                     }
                 }

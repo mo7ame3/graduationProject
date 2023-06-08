@@ -13,6 +13,7 @@ import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
+import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import okhttp3.MultipartBody
@@ -148,6 +149,13 @@ interface GraduationApi {
         @Path("craftId") craftId: String,
         @Path("orderId") orderId: String,
         @Header("Authorization") authorization: String
-    ):Delete
+    ): Delete
+
+    //Create Offer
+    @POST(Constant.CREATEOFFER)
+    suspend fun createOffer(
+        @Header("Authorization") authorization: String,
+        @Body offerBody: Map<String, String>
+    ): CreateOffer
 
 }

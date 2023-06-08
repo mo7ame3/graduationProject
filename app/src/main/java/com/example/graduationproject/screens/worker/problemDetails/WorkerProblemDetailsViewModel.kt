@@ -2,6 +2,7 @@ package com.example.graduationproject.screens.worker.problemDetails
 
 import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import com.example.graduationproject.repository.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,21 @@ class WorkerProblemDetailsViewModel @Inject constructor(private val workerReposi
             craftId = craftId,
             authorization = authorization,
             orderId = orderId
+        )
+    }
+
+    suspend fun createOffer(
+        authorization: String,
+        offerDetails: String? = null,
+        orderId: String
+    ): WrapperClass<CreateOffer, Boolean, Exception> {
+        return workerRepository.createOffer(
+            authorization = authorization,
+            offerBody = if (offerDetails == null) mapOf("order" to orderId)
+            else mapOf(
+                "text" to offerDetails,
+                "order" to orderId
+            )
         )
     }
 }

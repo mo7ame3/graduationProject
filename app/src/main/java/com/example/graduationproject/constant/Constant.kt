@@ -401,5 +401,7 @@ object Constant {
     //CraftOfWorker
     const val CRAFTOFWORKER = "api/v1/users"
 
+    //Create Offer
+    const val CREATEOFFER = "api/v1/offers"
 
 }
