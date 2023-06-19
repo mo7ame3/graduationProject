@@ -87,9 +87,9 @@ class AuthenticationViewModel @Inject constructor(
 
 
     suspend fun getCraftOfWorker(
-        craftId : String
+        workerId : String
     ) : WrapperClass<GetCraftOfWorker , Boolean , Exception>{
-        return sharedRepository.getCraftOfWorker(craftId = craftId)
+        return sharedRepository.getCraftOfWorker(workerId = workerId)
     }
 
 }

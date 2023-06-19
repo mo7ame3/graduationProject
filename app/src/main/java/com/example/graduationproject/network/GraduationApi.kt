@@ -10,6 +10,7 @@ import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
+import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
@@ -28,6 +29,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 import javax.inject.Singleton
 
 
@@ -124,9 +126,9 @@ interface GraduationApi {
 
     //Get Craft Of Worker
 
-    @GET(Constant.CRAFTOFWORKER + "/{craftID}")
+    @GET(Constant.CRAFTOFWORKER + "/{workerId}")
     suspend fun getCraftOfWorker(
-        @Path("craftID") craftId: String,
+        @Path("workerId") workerId: String,
     ): GetCraftOfWorker
 
     @GET("api/v1/crafts/{craftId}/orders/{orderId}")
@@ -157,5 +159,12 @@ interface GraduationApi {
         @Header("Authorization") authorization: String,
         @Body offerBody: Map<String, String>
     ): CreateOffer
+
+    //Get OrderOfAnCraft
+    @GET(Constant.OFFEROFANORDER)
+    suspend fun getOfferOfAnOrder(
+        @Header("Authorization") authorization: String,
+        @Query("orderId") orderId : String
+        ): GetOfferOfAnOrder
 
 }

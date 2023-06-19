@@ -80,15 +80,25 @@ fun NavGraph() {
                 authenticationViewModel = viewModel
             )
         }
-        composable(route = AllScreens.ClientOrderOfferScreen.name + "/{problemTitle}",
+        composable(route = AllScreens.ClientOrderOfferScreen.name + "/{problemTitle}/{orderDescription}/{orderId}",
             arguments = listOf(
                 navArgument(name = "problemTitle") {
                     type = NavType.StringType
+                },
+                navArgument(name = "orderDescription") {
+                    type = NavType.StringType
+                },
+                navArgument(name = "orderId") {
+                    type = NavType.StringType
                 }
             )) { data ->
+            val orderViewModel = hiltViewModel<OrderViewModel>()
             ClientOrderOfferScreen(
                 navController = navController,
-                title = data.arguments?.getString("problemTitle")!!
+                orderViewModel = orderViewModel,
+                orderTitle = data.arguments?.getString("problemTitle")!!,
+                orderDescription = data.arguments?.getString("orderDescription")!!,
+                orderId = data.arguments?.getString("orderId")!!
             )
         }
         composable(

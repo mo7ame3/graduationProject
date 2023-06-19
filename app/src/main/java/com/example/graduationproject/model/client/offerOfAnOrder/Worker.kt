@@ -1,20 +1,20 @@
-package com.example.graduationproject.model.shared.login
+package com.example.graduationproject.model.client.offerOfAnOrder
 
-data class User(
+data class Worker(
     val __v: Int,
+    val _id: String,
     val rate: Int? = 0,
     val bio: String? = null,
-    val _id: String,
     val address: String,
+    val avatar: String? = null,
     val createdAt: String,
     val email: String,
     val id: String,
     val isAdmin: Boolean,
-    val myCraft: String,
+    val myCraft: Any,
     val name: String,
     val offers: List<Any>,
     val orders: List<Any>,
-    val password: String,
     val reports: List<Any>,
     val role: String,
     val tokens: List<Any>,

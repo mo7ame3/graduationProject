@@ -2,6 +2,8 @@ package com.example.graduationproject.model.shared.register.myCraft
 
 data class User(
     val __v: Int,
+    val rate: Int? = 0,
+    val bio: String? = null,
     val _id: String,
     val address: String,
     val createdAt: String,

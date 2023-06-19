@@ -1,46 +1,121 @@
 package com.example.graduationproject.screens.client.order
 
 import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.graduationproject.R
-import com.example.graduationproject.components.*
-import com.example.graduationproject.data.OffersList
+import com.example.graduationproject.components.BottomBar
+import com.example.graduationproject.components.CircleProgress
+import com.example.graduationproject.components.GetSmallPhoto
+import com.example.graduationproject.components.LoginButton
+import com.example.graduationproject.components.ProblemDescription
+import com.example.graduationproject.components.StarsNumber
+import com.example.graduationproject.components.TopAppBar
+import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.client.offerOfAnOrder.Data
+import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
 import com.example.graduationproject.navigation.AllScreens
-import com.example.graduationproject.ui.theme.GoldColor
+import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.RedColor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun ClientOrderOfferScreen(
     navController: NavController,
-    title: String
+    orderViewModel: OrderViewModel,
+    orderTitle: String,
+    orderDescription: String,
+    orderId: String
 ) {
     //Bottom Bar Variables
     val home = remember {
         mutableStateOf("")
     }
+    val context = LocalContext.current
+    val sharedPreference = SharedPreference(context)
+    val token = sharedPreference.getToken.collectAsState(initial = "")
+    var loading by remember {
+        mutableStateOf(true)
+    }
+    var haveOffer by remember {
+        mutableStateOf(false)
+    }
+    //coroutineScope
+    val scope = rememberCoroutineScope()
+
+    //state flow list
+    val offersList = MutableStateFlow<List<Data>>(emptyList())
+
+    //response
+    if (token.value.toString().isNotEmpty()) {
+        val offerData: WrapperClass<GetOfferOfAnOrder, Boolean, Exception> =
+            produceState<WrapperClass<GetOfferOfAnOrder, Boolean, Exception>>(
+                initialValue = WrapperClass(data = null)
+            ) {
+                value = orderViewModel.getOfferOfAnOrder(
+                    authorization = "Bearer ${token.value.toString()}",
+                    orderId = orderId
+                )
+            }.value
+        if (offerData.data?.status == "success") {
+            if (offerData.data != null) {
+                scope.launch {
+                    offersList.emit(offerData.data!!.data!!)
+                    loading = false
+                    haveOffer = offerData.data!!.length > 0
+                }
+            }
+        } else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
+            Toast.makeText(
+                context,
+                "خطأ في الانترنت",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     Scaffold(topBar = {
-        TopAppBar(title = title) {
+        TopAppBar(title = orderTitle) {
             navController.popBackStack()
         }
     },
@@ -72,76 +147,57 @@ fun ClientOrderOfferScreen(
         ) {
             //ProblemDescription
             ProblemDescription(
-                problemDescription = "لقد قمت بتحتطيم الكرسي الخاص بي و اريد من يقوم بمساعدتي في حل هذه المشكله واللتي ادت اللي عدم استعمالي لهذا الكرسي مره اخري و قمت بتحطيم الدولاب الخاص بي و قد تدني ويكون نجار كويس للتصليح و السعر يكون معقول جداااااا " +
-                        "\"لقد قمت بتحتطيم الكرسي الخاص بي و اريد من يقوم بمساعدتي في حل هذه المشكله واللتي ادت اللي عدم استعمالي لهذا الكرسي مره اخري و قمت بتحطيم الدولاب الخاص بي و قد تدني ويكون نجار كويس للتصليح و السعر يكون معقول جداااااا "
+                problemDescription = orderDescription
             )
 
             Spacer(modifier = Modifier.height(10.dp))
-            // تاكيد و تراجع
-            val id = remember {
-                mutableStateOf(-1)
-            }
-            val acceptState = remember {
-                mutableStateOf(false)
-            }
-            // تأكيد اكتمال المروع و تأكيد الغاء العمل
-            val confirmed = remember {
-                mutableStateOf(false)
-            }
+//            // تاكيد و تراجع
+//            val id = remember {
+//                mutableStateOf(-1)
+//            }
+//            val acceptState = remember {
+//                mutableStateOf(false)
+//            }
+//            // تأكيد اكتمال المروع و تأكيد الغاء العمل
+//            val confirmed = remember {
+//                mutableStateOf(false)
+//            }
             //
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                //هيظهر كلة في حالة قيد الانتظار
-                items(offersListForTesting) { item ->
-                    //Accept
-                    //هيظهر ف حالة قيد التنفيذ
-                    if (id.value != -1 && acceptState.value) {
-                        if (item.id == id.value) {
-                            AcceptRow(
-                                item = item,
-                                navController = navController,
-                                onConfirmAction = {
-                                    confirmed.value = true
-                                },
-                                confirmed = confirmed,
-                                onCancelAction = {
-                                    id.value = -1
-                                },
-                                onCompleteProjectConfirmation = {
-                                    navController.navigate(route = AllScreens.ClientRateScreen.name)
-                                },
-                                onCancelProjectConfirmation = {
-                                    confirmed.value = false
-                                    id.value = -1
-                                }
-                            )
-                        }
-                    }
-                    //Reject
-                    else if (id.value != -1 && !acceptState.value) {
-                        //Delete Offer
-                        if (item.id != id.value) {
-                            OfferRow(item = item, onAcceptAction = { AcceptedWorker ->
-                                id.value = AcceptedWorker.id
-                                acceptState.value = true
-                            }, onRejectAction = { RejectedWorker ->
-                                id.value = RejectedWorker.id
-                                acceptState.value = false
-                            }, navController = navController)
-                        }
-                    }
-                    //Not Accept and Not Reject
-                    else {
+            if (loading && !haveOffer) {
+                CircleProgress()
+            } else if (!loading && haveOffer) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    //هيظهر كلة في حالة قيد الانتظار
+                    items(offersList.value) { item ->
+
+                        //Not Accept and Not Reject
                         OfferRow(item = item, onAcceptAction = { AcceptedWorker ->
-                            id.value = AcceptedWorker.id
-                            acceptState.value = true
+
                         }, onRejectAction = { RejectedWorker ->
-                            id.value = RejectedWorker.id
-                            acceptState.value = false
+
                         }, navController = navController)
+
+                        Spacer(modifier = Modifier.height(25.dp))
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
-                item {
-                    Spacer(modifier = Modifier.height(30.dp))
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    item {
+                        Text(
+                            text = "لا يوجد عروض حاليا", style = TextStyle(
+                                color = MainColor,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 20.sp
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -151,31 +207,33 @@ fun ClientOrderOfferScreen(
 
 @Composable
 fun OfferRow(
-    item: OffersList,
-    onAcceptAction: (OffersList) -> Unit,
-    onRejectAction: (OffersList) -> Unit,
+    item: Data,
+    onAcceptAction: (Data) -> Unit,
+    onRejectAction: (Data) -> Unit,
     navController: NavController
 ) {
     //The Whole Row
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     )
     {
+        var expanded by remember {
+            mutableStateOf(false)
+        }
         //Navigate to Profile Row
         Row(modifier = Modifier
             .width(200.dp)
             .clickable {
-                navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${true}/${false}/${item.name}")
+                navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${true}/${false}/${item.worker.name}")
             }) {
-            SmallPhoto()
+            GetSmallPhoto(uri = if (item.worker.avatar != null) item.worker.avatar.toString() else null)
             Spacer(modifier = Modifier.width(5.dp))
-            Column {
+            Column(modifier = Modifier.padding(end = 5.dp)) {
                 Text(
-                    text = item.name,
+                    text = item.worker.name,
                     style = TextStyle(
                         color = MainColor,
                         fontSize = 17.sp
@@ -183,13 +241,56 @@ fun OfferRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = item.bio,
-                    style = TextStyle(color = RedColor, fontSize = 12.sp),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1
+                if (!expanded) {
+                    if (!item.worker.bio.isNullOrEmpty()) {
+                        Text(
+                            text = item.worker.bio,
+                            style = TextStyle(color = RedColor, fontSize = 12.sp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    if (item.worker.rate != null && item.worker.rate > 0) {
+                        StarsNumber(item.worker.rate)
+                    }
+                    if (!item.text.isNullOrEmpty()) {
+                        Text(
+                            text = item.text,
+                            style = TextStyle(color = MainColor, fontSize = 12.sp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                } else {
+                    AnimatedVisibility(visible = true) {
+                        if (!item.worker.bio.isNullOrEmpty()) {
+                            Text(
+                                text = item.worker.bio,
+                                style = TextStyle(color = RedColor, fontSize = 12.sp),
+                            )
+                        }
+                        if (item.worker.rate != null && item.worker.rate > 0) {
+                            StarsNumber(item.worker.rate)
+                        }
+                        if (!item.text.isNullOrEmpty()) {
+                            Text(
+                                text = item.text,
+                                style = TextStyle(color = MainColor, fontSize = 12.sp),
+                            )
+                        }
+                    }
+                }
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp
+                    else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "Down Arrow",
+                    modifier = Modifier
+                        .size(25.dp)
+                        .clickable {
+                            expanded = !expanded
+                        },
+                    tint = Color.DarkGray
                 )
-                StarsNumber(item.stars)
             }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
@@ -204,140 +305,181 @@ fun OfferRow(
             }
         }
     }
-
 }
 
-val offersListForTesting = listOf(
-    OffersList(0, "ريشة", "نجار محترف خبره سنتين", 5),
-    OffersList(1, "رزة", "نجار محترف خبره 3 سنين", 4),
-    OffersList(2, "أحمد محمد", "نجار محترف خبره 4 سنين", 3),
-    OffersList(3, "جحا", "نجار محترف خبره سنتين", 5),
-    OffersList(4, "احمد محمد", "نجار مبتدأ", 2),
-    OffersList(5, "جحا", "نجار مبندأ", 1),
-    OffersList(6, "جحا", "نجار", 5),
-    OffersList(7, "احمد محمد", "نجار", 5),
-    OffersList(8, "جحا", "نجار", 5),
-    OffersList(9, "احمد محمد", "نجار", 5),
-    OffersList(10, "احمد محمد ", "نجار", 5),
 
-    )
+//val offersListForTesting = listOf(
+//    OffersList(0, "ريشة", "نجار محترف خبره سنتين", 5),
+//    OffersList(1, "رزة", "نجار محترف خبره 3 سنين", 4),
+//    OffersList(2, "أحمد محمد", "نجار محترف خبره 4 سنين", 3),
+//    OffersList(3, "جحا", "نجار محترف خبره سنتين", 5),
+//    OffersList(4, "احمد محمد", "نجار مبتدأ", 2),
+//    OffersList(5, "جحا", "نجار مبندأ", 1),
+//    OffersList(6, "جحا", "نجار", 5),
+//    OffersList(7, "احمد محمد", "نجار", 5),
+//    OffersList(8, "جحا", "نجار", 5),
+//    OffersList(9, "احمد محمد", "نجار", 5),
+//    OffersList(10, "احمد محمد ", "نجار", 5),
+//
+//    )
+//
+//@Composable
+//fun AcceptRow(
+//    item: OffersList,
+//    confirmed: MutableState<Boolean>,
+//    onConfirmAction: () -> Unit,
+//    onCancelAction: () -> Unit,
+//    navController: NavController,
+//    onCompleteProjectConfirmation: () -> Unit,
+//    onCancelProjectConfirmation: () -> Unit,
+//) {
+//    Column {
+//        //The Whole Row
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(100.dp),
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.SpaceBetween
+//        )
+//        {
+//            //Navigate to Profile Row
+//            Row(modifier = Modifier
+//                .width(200.dp)
+//                .clickable {
+//                    navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${true}/${false}/${item.name}")
+//                }) {
+//                SmallPhoto()
+//                Spacer(modifier = Modifier.width(5.dp))
+//                Column {
+//                    Text(
+//                        text = item.name,
+//                        style = TextStyle(
+//                            color = MainColor,
+//                            fontSize = 17.sp
+//                        ),
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis
+//                    )
+//                    Text(
+//                        text = item.bio,
+//                        style = TextStyle(color = RedColor, fontSize = 12.sp),
+//                        overflow = TextOverflow.Ellipsis,
+//                        maxLines = 1
+//                    )
+//                    Row {
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = null,
+//                            tint = if (item.stars >= 1) GoldColor else Color.Transparent
+//                        )
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = null,
+//                            tint = if (item.stars >= 2) GoldColor else Color.Transparent
+//                        )
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = null,
+//                            tint = if (item.stars >= 3) GoldColor else Color.Transparent
+//                        )
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = null,
+//                            tint = if (item.stars >= 4) GoldColor else Color.Transparent
+//                        )
+//                        Icon(
+//                            imageVector = Icons.Default.Star,
+//                            contentDescription = null,
+//                            tint = if (item.stars == 5) GoldColor else Color.Transparent
+//                        )
+//
+//                    }
+//                }
+//            }
+//            Row {
+//                IconButton(onClick = { navController.navigate(route = AllScreens.ChatDetails.name + "/${item.id}") }) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.chat),
+//                        contentDescription = null,
+//                        modifier = Modifier.size(40.dp), tint = MainColor
+//                    )
+//                }
+//            }
+//        }
+//        Spacer(modifier = Modifier.height(3.dp))
+//        //confirm and cancel buttons
+//        if (!confirmed.value) {
+//            Row(modifier = Modifier.fillMaxWidth()) {
+//                //Accept Button
+//                LoginButton(isLogin = true, label = "تأكيد", modifier = Modifier.width(80.dp)) {
+//                    onConfirmAction.invoke()
+//                }
+//                Spacer(modifier = Modifier.width(10.dp))
+//                //Reject Button
+//                LoginButton(isLogin = false, label = "تراجع", modifier = Modifier.width(80.dp)) {
+//                    onCancelAction.invoke()
+//                }
+//            }
+//        } else {
+//            LoginButton(
+//                isLogin = true,
+//                label = "تأكيد اكتمال المشروع",
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                onCompleteProjectConfirmation.invoke()
+//            }
+//            Spacer(modifier = Modifier.height(5.dp))
+//            //Reject Button
+//            LoginButton(
+//                isLogin = false,
+//                label = "تأكيد إلغاء العمل",
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                onCancelProjectConfirmation.invoke()
+//            }
+//
+//        }
+//    }
+//}
 
-@Composable
-fun AcceptRow(
-    item: OffersList,
-    confirmed: MutableState<Boolean>,
-    onConfirmAction: () -> Unit,
-    onCancelAction: () -> Unit,
-    navController: NavController,
-    onCompleteProjectConfirmation: () -> Unit,
-    onCancelProjectConfirmation: () -> Unit,
-) {
-    Column {
-        //The Whole Row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        )
-        {
-            //Navigate to Profile Row
-            Row(modifier = Modifier
-                .width(200.dp)
-                .clickable {
-                    navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${true}/${false}/${item.name}")
-                }) {
-                SmallPhoto()
-                Spacer(modifier = Modifier.width(5.dp))
-                Column {
-                    Text(
-                        text = item.name,
-                        style = TextStyle(
-                            color = MainColor,
-                            fontSize = 17.sp
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = item.bio,
-                        style = TextStyle(color = RedColor, fontSize = 12.sp),
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
-                    )
-                    Row {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = if (item.stars >= 1) GoldColor else Color.Transparent
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = if (item.stars >= 2) GoldColor else Color.Transparent
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = if (item.stars >= 3) GoldColor else Color.Transparent
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = if (item.stars >= 4) GoldColor else Color.Transparent
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = if (item.stars == 5) GoldColor else Color.Transparent
-                        )
 
-                    }
-                }
-            }
-            Row {
-                IconButton(onClick = { navController.navigate(route = AllScreens.ChatDetails.name + "/${item.id}") }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.chat),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp), tint = MainColor
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(3.dp))
-        //confirm and cancel buttons
-        if (!confirmed.value) {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                //Accept Button
-                LoginButton(isLogin = true, label = "تأكيد", modifier = Modifier.width(80.dp)) {
-                    onConfirmAction.invoke()
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-                //Reject Button
-                LoginButton(isLogin = false, label = "تراجع", modifier = Modifier.width(80.dp)) {
-                    onCancelAction.invoke()
-                }
-            }
-        } else {
-            LoginButton(
-                isLogin = true,
-                label = "تأكيد اكتمال المشروع",
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                onCompleteProjectConfirmation.invoke()
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            //Reject Button
-            LoginButton(
-                isLogin = false,
-                label = "تأكيد إلغاء العمل",
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                onCancelProjectConfirmation.invoke()
-            }
+//in items
 
-        }
-    }
-}
+//                    //Accept
+//                    //هيظهر ف حالة قيد التنفيذ
+//                    if (id.value != -1 && acceptState.value) {
+//                        if (item.id == id.value) {
+//                            AcceptRow(
+//                                item = item,
+//                                navController = navController,
+//                                onConfirmAction = {
+//                                    confirmed.value = true
+//                                },
+//                                confirmed = confirmed,
+//                                onCancelAction = {
+//                                    id.value = -1
+//                                },
+//                                onCompleteProjectConfirmation = {
+//                                    navController.navigate(route = AllScreens.ClientRateScreen.name)
+//                                },
+//                                onCancelProjectConfirmation = {
+//                                    confirmed.value = false
+//                                    id.value = -1
+//                                }
+//                            )
+//                        }
+//                    }
+//                    //Reject
+//                    else if (id.value != -1 && !acceptState.value) {
+//                        //Delete Offer
+//                        if (item.id != id.value) {
+//                            OfferRow(item = item, onAcceptAction = { AcceptedWorker ->
+//                                id.value = AcceptedWorker.id
+//                                acceptState.value = true
+//                            }, onRejectAction = { RejectedWorker ->
+//                                id.value = RejectedWorker.id
+//                                acceptState.value = false
+//                            }, navController = navController)
+//                        }
+//                    }

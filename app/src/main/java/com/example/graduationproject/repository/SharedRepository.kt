@@ -89,10 +89,10 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
         return getCraftList
     }
 
-    suspend fun getCraftOfWorker(craftId: String)
+    suspend fun getCraftOfWorker(workerId: String)
     : WrapperClass<GetCraftOfWorker , Boolean , Exception>{
         try {
-            getCraftOfWorker.data = api.getCraftOfWorker(craftId = craftId)
+            getCraftOfWorker.data = api.getCraftOfWorker(workerId = workerId)
         }
         catch (e: HttpException) {
             //addNewUser.loading = true

@@ -155,7 +155,7 @@ fun ClientMyCraftOrders(
                             MyCraftOrdersRow(item = itemlist,
                                 onClick = { orderData ->
                                     //nav to Offer Screen
-                                    navController.navigate(AllScreens.ClientOrderOfferScreen.name + "/${orderData.title}")
+                                    navController.navigate(AllScreens.ClientOrderOfferScreen.name + "/${orderData.title}/${orderData.description}/${orderData._id}")
                                 },
                                 onDeleteItem = { deleteOrder ->
                                     //Delete Problem "Trash Icon"
@@ -179,12 +179,10 @@ fun ClientMyCraftOrders(
                                                     orderList.emit(orderData.data!!.data!!)
                                                     loading = false
                                                 }
-                                            }
-                                            else {
+                                            } else {
                                                 loading = false
                                             }
-                                        }
-                                        else {
+                                        } else {
                                             loading = false
                                             Toast.makeText(
                                                 context,

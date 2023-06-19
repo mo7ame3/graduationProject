@@ -404,4 +404,7 @@ object Constant {
     //Create Offer
     const val CREATEOFFER = "api/v1/offers"
 
+    //Get Offers Of An Order
+    const val OFFEROFANORDER = "api/v1/offers/offersOfAnOrder"
+
 }

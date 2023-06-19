@@ -224,14 +224,13 @@ fun WorkerHomeScreen(
                         scaffoldState.drawerState.open()
                     }
                 }
-
             },
             bottomBar = { BottomBar(selected = homeNavBar, title = title, isClient = false) },
         ) {
             if (!loading && !exception) {
                 if (homeNavBar.value == "home") {
                     if (result.value != 0) {
-                        LazyColumn {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(homeList.value) {
                                 WorkerHomeRow(item = it) { data ->
                                     navController.navigate(AllScreens.WorkerProblemDetails.name + "/${data._id}")

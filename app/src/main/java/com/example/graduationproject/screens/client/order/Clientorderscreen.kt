@@ -67,7 +67,7 @@ fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewMod
     val craftList = MutableStateFlow<List<Craft>>(emptyList())
 
     // Swipe Refresh
-    var swipeLoading by remember {
+    val swipeLoading by remember {
         mutableStateOf(false)
     }
 
@@ -82,7 +82,6 @@ fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewMod
         }.value
 
     if (response.data?.status == "success") {
-        Log.d("TAG", "Sucess")
         if (response.data != null) {
             scope.launch {
                 craftList.emit(response.data!!.data?.crafts!!)
@@ -104,9 +103,9 @@ fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewMod
         if (!loading && !exception) {
             LazyColumn {
                 items(craftList.value) {
-                    OrderRow(onClick = { it ->
+                    OrderRow(onClick = { orderData ->
                         //navigate to my order
-                        navController.navigate(route = AllScreens.ClientMyCraftOrders.name + "/${it.id}/${it.name}")
+                        navController.navigate(route = AllScreens.ClientMyCraftOrders.name + "/${orderData.id}/${orderData.name}")
                     }, craft = it)
                     Spacer(modifier = Modifier.height(10.dp))
                 }

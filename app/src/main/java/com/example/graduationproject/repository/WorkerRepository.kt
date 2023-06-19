@@ -2,15 +2,12 @@ package com.example.graduationproject.repository
 
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.client.creatOrder.CreateOrder
-import com.example.graduationproject.model.shared.register.Register
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
-import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class WorkerRepository @Inject constructor(private val api: GraduationApi) {
