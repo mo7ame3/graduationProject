@@ -174,7 +174,8 @@ fun WorkerHomeScreen(
                     homeList.emit(homeData.data!!.data!!.orders)
                     swipeLoading = false
                 }
-            } else {
+            }
+            else {
                 swipeLoading = false
             }
         }

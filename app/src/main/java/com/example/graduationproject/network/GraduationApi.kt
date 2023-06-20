@@ -14,6 +14,7 @@ import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrd
 import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
+import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
@@ -166,5 +167,14 @@ interface GraduationApi {
         @Header("Authorization") authorization: String,
         @Query("orderId") orderId : String
         ): GetOfferOfAnOrder
+
+
+    //updateOffer
+    @PATCH(Constant.UPDATEOFFER + "/{offerID}")
+    suspend fun updateOffer(
+        @Path("offerID") offerId: String,
+        @Header("Authorization") authorization: String,
+        @Body updateBody: Map<String, String>
+    ): UpdateOffer
 
 }

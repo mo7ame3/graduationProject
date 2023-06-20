@@ -6,6 +6,7 @@ import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
+import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.repository.ClientRepository
 import com.example.graduationproject.repository.SharedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,6 +47,22 @@ class OrderViewModel @Inject constructor(
         return clientRepository.getOfferOfAnOrder(
             authorization = authorization,
             orderId = orderId
+        )
+    }
+
+    suspend fun updateOffer(
+        authorization: String,
+        offerId: String,
+        text: String,
+        status: String
+    ): WrapperClass<UpdateOffer, Boolean, Exception> {
+        return sharedRepository.updateOffer(
+            authorization = authorization,
+            offerId = offerId,
+            updateBody = mapOf(
+                "text" to text,
+                "status" to status
+            )
         )
     }
 }

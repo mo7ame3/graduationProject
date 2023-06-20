@@ -163,7 +163,8 @@ fun ClientHomeScreen(
                 }
             }
             }
-        }) {
+        })
+    {
         Scaffold(
             drawerContent = {
                 DrawerHeader()

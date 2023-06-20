@@ -6,6 +6,7 @@ import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
+import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
@@ -17,6 +18,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     private val getOneCrafts = WrapperClass<GetCraft, Boolean, Exception>()
     private val getCraftList = WrapperClass<CraftList, Boolean, Exception>()
     private val getCraftOfWorker = WrapperClass<GetCraftOfWorker, Boolean, Exception>()
+    private val updateOffer = WrapperClass<UpdateOffer, Boolean, Exception>()
 
 
     suspend fun getAllCrafts(authorization: String)
@@ -90,11 +92,10 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     }
 
     suspend fun getCraftOfWorker(workerId: String)
-    : WrapperClass<GetCraftOfWorker , Boolean , Exception>{
+            : WrapperClass<GetCraftOfWorker, Boolean, Exception> {
         try {
             getCraftOfWorker.data = api.getCraftOfWorker(workerId = workerId)
-        }
-        catch (e: HttpException) {
+        } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
@@ -108,6 +109,26 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
             getCraftOfWorker.e = e
         }
         return getCraftOfWorker
+    }
+
+    suspend fun updateOffer(offerId: String, authorization: String, updateBody: Map<String, String>)
+            : WrapperClass<UpdateOffer, Boolean, Exception> {
+        try {
+            updateOffer.data = api.updateOffer(offerId = offerId , authorization = authorization , updateBody = updateBody)
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            updateOffer.data = UpdateOffer(status = status, message = message)
+        } catch (e: Exception) {
+            Log.d("TAG", "updateOffer: $e")
+            updateOffer.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "updateOffer: $e")
+            updateOffer.e = e
+        }
+        return updateOffer
     }
 
 }
