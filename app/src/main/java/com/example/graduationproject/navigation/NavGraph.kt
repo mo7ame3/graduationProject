@@ -27,7 +27,9 @@ import com.example.graduationproject.screens.client.order.ClientOrderOfferScreen
 import com.example.graduationproject.screens.client.order.OrderViewModel
 import com.example.graduationproject.screens.client.postScreen.ClientPostScreen
 import com.example.graduationproject.screens.client.postScreen.PostViewModel
+import com.example.graduationproject.screens.client.profile.ClientMyProfileScreen
 import com.example.graduationproject.screens.client.profile.ClientProfileScreen
+import com.example.graduationproject.screens.client.profile.ClientProfileViewModel
 import com.example.graduationproject.screens.client.profileSettings.ClientProfileSettingsScreen
 import com.example.graduationproject.screens.client.rate.ClientRateScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatDetails
@@ -42,7 +44,9 @@ import com.example.graduationproject.screens.worker.home.WorkerHomeViewModel
 import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemDetails
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetailsViewModel
+import com.example.graduationproject.screens.worker.profile.WorkerMyProfileScreen
 import com.example.graduationproject.screens.worker.profile.WorkerProfileScreen
+import com.example.graduationproject.screens.worker.profile.WorkerProfileViewModel
 import com.example.graduationproject.screens.worker.profileSettings.WorkerProfileSettingsScreen
 
 @Composable
@@ -80,7 +84,7 @@ fun NavGraph() {
                 authenticationViewModel = viewModel
             )
         }
-        composable(route = AllScreens.ClientOrderOfferScreen.name + "/{problemTitle}/{orderDescription}/{orderId}",
+        composable(route = AllScreens.ClientOrderOfferScreen.name + "/{problemTitle}/{orderDescription}/{orderId}/{craftId}",
             arguments = listOf(
                 navArgument(name = "problemTitle") {
                     type = NavType.StringType
@@ -90,6 +94,9 @@ fun NavGraph() {
                 },
                 navArgument(name = "orderId") {
                     type = NavType.StringType
+                },
+                navArgument(name = "craftId") {
+                    type = NavType.StringType
                 }
             )) { data ->
             val orderViewModel = hiltViewModel<OrderViewModel>()
@@ -98,7 +105,8 @@ fun NavGraph() {
                 orderViewModel = orderViewModel,
                 orderTitle = data.arguments?.getString("problemTitle")!!,
                 orderDescription = data.arguments?.getString("orderDescription")!!,
-                orderId = data.arguments?.getString("orderId")!!
+                orderId = data.arguments?.getString("orderId")!!,
+                craftId = data.arguments?.getString("craftId")!!,
             )
         }
         composable(
@@ -171,7 +179,20 @@ fun NavGraph() {
                 ShowReportButton = data.arguments!!.getBoolean("showReport"),
                 completeProject = data.arguments!!.getBoolean("completeProject"),
                 isAdmin = data.arguments!!.getBoolean("admin"),
-                clientName = data.arguments!!.getString("name").toString(),
+                clientName = data.arguments!!.getString("name").toString()
+            )
+        }
+        composable(
+            route = "${AllScreens.ClientMyProfileScreen.name}/{completeProject}",
+            arguments = listOf(navArgument(name = "completeProject") {
+                type = NavType.BoolType
+            })
+        ) { data ->
+            val clientProfileViewModel = hiltViewModel<ClientProfileViewModel>()
+            ClientMyProfileScreen(
+                navController = navController,
+                completeProject = data.arguments!!.getBoolean("completeProject"),
+                clientProfileViewModel = clientProfileViewModel
             )
         }
         //Rate Screen
@@ -257,6 +278,15 @@ fun NavGraph() {
                 workerName = data.arguments!!.getString("name").toString()
             )
         }
+
+        composable(route = AllScreens.WorkerMyProfileScreen.name) {
+            val workerProfileViewModel = hiltViewModel<WorkerProfileViewModel>()
+            WorkerMyProfileScreen(
+                navController = navController,
+                workerProfileViewModel = workerProfileViewModel
+            )
+        }
+
         composable(route = AllScreens.WorkerProfileSettingsScreen.name) {
             WorkerProfileSettingsScreen(navController = navController)
         }

@@ -132,8 +132,6 @@ fun WorkerProfileScreen(
                 LoginButton(isLogin = !completeToggle.value, label = "معرض اعمالي") {
                     completeToggle.value = false
                 }
-
-
             }
             Spacer(modifier = Modifier.height(20.dp))
             if (completeToggle.value) {
@@ -148,7 +146,8 @@ fun WorkerProfileScreen(
                         Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
-            } else {
+            }
+            else {
                 //pictures
                 LazyColumn(
                     modifier = Modifier
@@ -168,7 +167,8 @@ fun WorkerProfileScreen(
                     // nav to Report
                     navController.navigate(AllScreens.ReportScreen.name + "/${true}/client")
                 }
-            } else {
+            }
+            else {
                 if (!completeToggle.value && !adminOrWorker) {
                     LoginButton(
                         isLogin = true,

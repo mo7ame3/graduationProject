@@ -18,6 +18,7 @@ class SharedPreference(private val context: Context) {
         val TOKEN = stringPreferencesKey("token")
         val NAME = stringPreferencesKey("name")
         val CRAFT_ID = stringPreferencesKey("worker_id")
+        val USER_ID = stringPreferencesKey("user_id")
     }
 
     //to get the email
@@ -38,6 +39,10 @@ class SharedPreference(private val context: Context) {
     val getCraftId: Flow<String?> = context.dataStore.data
         .map { Preferences ->
             Preferences[CRAFT_ID] ?: ""
+        }
+    val getUserId: Flow<String?> = context.dataStore.data
+        .map { Preferences ->
+            Preferences[USER_ID] ?: ""
         }
 
 
@@ -64,6 +69,13 @@ class SharedPreference(private val context: Context) {
     suspend fun saveCraftId(id: String) {
         context.dataStore.edit { Preferences ->
             Preferences[CRAFT_ID] = id
+        }
+    }
+
+    // save UserId
+    suspend fun saveUserId(id: String) {
+        context.dataStore.edit { Preferences ->
+            Preferences[USER_ID] = id
         }
     }
 

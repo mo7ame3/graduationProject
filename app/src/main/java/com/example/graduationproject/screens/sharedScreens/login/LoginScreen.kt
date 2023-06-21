@@ -213,6 +213,7 @@ fun LoginScreen(
                                     if (login.data?.status == "success") {
                                         sharedPreference.saveName(login.data!!.data?.user!!.name)
                                         sharedPreference.saveToken(login.data!!.token.toString())
+                                        sharedPreference.saveUserId(login.data!!.data?.user!!.id)
                                         Constant.token = login.data!!.token.toString()
                                         when (login.data!!.data?.user?.role) {
                                             "client" -> {
@@ -293,6 +294,7 @@ fun LoginScreen(
                                                 if (register.data?.status == "success") {
                                                     sharedPreference.saveName(register.data!!.data?.user!!.name)
                                                     sharedPreference.saveToken(register.data!!.token.toString())
+                                                    sharedPreference.saveUserId(register.data!!.data?.user!!.id)
                                                     Constant.token =
                                                         register.data!!.token.toString()
                                                     if (workerOrClintBack.value == "عميل") {

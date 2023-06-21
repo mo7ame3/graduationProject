@@ -42,6 +42,7 @@ fun ClientProfileScreen(
     val changeCompleteState = remember {
         mutableStateOf(true)
     }
+
     Scaffold(topBar = {
         TopAppBar(title = "") {
             navController.popBackStack()

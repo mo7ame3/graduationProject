@@ -5,6 +5,7 @@ import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
+import com.example.graduationproject.model.client.updateOrder.UpdateOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.repository.ClientRepository
@@ -63,6 +64,21 @@ class OrderViewModel @Inject constructor(
                 "text" to text,
                 "status" to status
             )
+        )
+    }
+
+    suspend fun updateOrderStatus(
+        authorization: String,
+        orderId: String,
+        craftId: String,
+        status: String,
+    )
+    : WrapperClass<UpdateOrder, Boolean, Exception> {
+        return clientRepository.updateOrder(
+            authorization = authorization,
+            orderId = orderId,
+            craftId = craftId,
+            updateOrderBody = mapOf("status" to status)
         )
     }
 }

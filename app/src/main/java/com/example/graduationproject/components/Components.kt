@@ -186,7 +186,9 @@ fun DrawerHeader() {
 
 @Composable
 fun DrawerBody(
-    isClient: Boolean, name: String, onClick: (DrawerData) -> Unit
+    isClient: Boolean,
+    name: String,
+    onClick: (DrawerData) -> Unit,
 ) {
     val drawerListClient = if (isClient) listOf(
         DrawerData(title = name, pic = R.drawable.person),
@@ -242,12 +244,14 @@ fun DrawerRow(
 
 @Composable
 fun TopAppBar(
-    title: String, onAction: () -> Unit
+    title: String,
+    isProfile: Boolean = false,
+    onAction: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = if (isProfile) Modifier.padding(end = 10.dp) else Modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp)
     ) {
@@ -282,9 +286,11 @@ fun SmallPhoto(uri: Uri? = null) {
 }
 
 @Composable
-fun GetSmallPhoto(uri: String? = null) {
+fun GetSmallPhoto(uri: String? = null, isProfile: Boolean = false) {
     Surface(
-        shape = CircleShape, color = MainColor, modifier = Modifier.size(50.dp)
+        shape = CircleShape,
+        color = MainColor,
+        modifier = if (isProfile) Modifier.size(120.dp) else Modifier.size(50.dp)
     ) {
         if (uri != null) {
             Image(
@@ -298,6 +304,7 @@ fun GetSmallPhoto(uri: String? = null) {
             )
         }
     }
+
 }
 
 //post Screen

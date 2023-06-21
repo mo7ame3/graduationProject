@@ -114,6 +114,13 @@ fun WorkerHomeScreen(
         mutableStateOf(0)
     }
 
+    val pendingOrder = remember {
+        mutableStateOf(0)
+    }
+    val length = remember {
+        mutableStateOf(0)
+    }
+
     //state flow list
     val homeList = MutableStateFlow<List<Order>>(emptyList())
 
@@ -134,8 +141,22 @@ fun WorkerHomeScreen(
             if (homeData.data!!.result != 0) {
                 scope.launch {
                     homeList.emit(homeData.data!!.data!!.orders)
-                    loading = false
-                    exception = false
+                    homeList.value.forEach {
+                        length.value = length.value + 1
+                        if (it.status == "pending") {
+                            pendingOrder.value = pendingOrder.value + 1
+                            if (length.value == homeList.value.size) {
+                                loading = false
+                                exception = false
+                            }
+                        } else {
+                            if (length.value == homeList.value.size) {
+                                loading = false
+                                exception = false
+                            }
+                        }
+                    }
+
                     result.value = homeData.data!!.result
                 }
             } else {
@@ -174,8 +195,7 @@ fun WorkerHomeScreen(
                     homeList.emit(homeData.data!!.data!!.orders)
                     swipeLoading = false
                 }
-            }
-            else {
+            } else {
                 swipeLoading = false
             }
         }
@@ -196,7 +216,7 @@ fun WorkerHomeScreen(
                     if (it.title == name.value.toString()) {
                         //Navigate to Profile
                         scope.launch {
-                            navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${false}/${false}/ ")
+                            navController.navigate(route = AllScreens.WorkerMyProfileScreen.name)
                             scaffoldState.drawerState.close()
                         }
                     }
@@ -231,15 +251,30 @@ fun WorkerHomeScreen(
             if (!loading && !exception) {
                 if (homeNavBar.value == "home") {
                     if (result.value != 0) {
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            items(homeList.value) {
-                                WorkerHomeRow(item = it) { data ->
-                                    navController.navigate(AllScreens.WorkerProblemDetails.name + "/${data._id}")
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = if (pendingOrder.value == 0) Arrangement.Center else Arrangement.Top
+                        ) {
+                            if (pendingOrder.value > 0) {
+                                items(homeList.value) {
+                                    WorkerHomeRow(item = it) { data ->
+                                        navController.navigate(AllScreens.WorkerProblemDetails.name + "/${data._id}")
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(15.dp))
-                            }
-                            item {
-                                Spacer(modifier = Modifier.height(50.dp))
+                                item {
+                                    Spacer(modifier = Modifier.height(50.dp))
+                                }
+                            } else {
+                                item {
+                                    Text(
+                                        text = "لا يوجد طلبات حاليا", style = TextStyle(
+                                            color = MainColor,
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 20.sp
+                                        )
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -319,69 +354,74 @@ fun WorkerHomeRow(
     item: Order,
     onAction: (Order) -> Unit
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(start = 25.dp, end = 25.dp)
-            .clickable { onAction(item) },
-        border = BorderStroke(width = 1.dp, color = GrayColor),
-        shape = RoundedCornerShape(30.dp)
-    )
-    {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 25.dp, end = 25.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                GetSmallPhoto(uri = if (item.user.avatar != null) item.user.avatar.toString() else null)
-                Spacer(modifier = Modifier.width(10.dp))
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = item.user.name, style = TextStyle(
-                                color = MainColor,
-                                fontSize = 20.sp
-                            )
-                        )
-                        Row {
+    if (item.status == "pending") {
+        Column {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(start = 25.dp, end = 25.dp)
+                    .clickable { onAction(item) },
+                border = BorderStroke(width = 1.dp, color = GrayColor),
+                shape = RoundedCornerShape(30.dp)
+            )
+            {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 25.dp, end = 25.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        GetSmallPhoto(uri = if (item.user.avatar != null) item.user.avatar.toString() else null)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = item.user.name, style = TextStyle(
+                                        color = MainColor,
+                                        fontSize = 20.sp
+                                    )
+                                )
+                                Row {
+                                    Text(
+                                        text = item.createdDate, style = TextStyle(
+                                            color = GrayColor,
+                                            fontSize = 12.sp
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.width(5.dp))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.clock),
+                                        contentDescription = null,
+                                        tint = GrayColor,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
                             Text(
-                                text = item.createdDate, style = TextStyle(
+                                text = item.title + "- " + item.orderDifficulty, style = TextStyle(
+                                    color = MainColor,
+                                    fontSize = 14.sp
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(
+                                text = item.user.address, style = TextStyle(
                                     color = GrayColor,
                                     fontSize = 12.sp
                                 )
                             )
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Icon(
-                                painter = painterResource(id = R.drawable.clock),
-                                contentDescription = null,
-                                tint = GrayColor,
-                                modifier = Modifier.size(20.dp)
-                            )
                         }
                     }
-                    Text(
-                        text = item.title + "- " + item.orderDifficulty, style = TextStyle(
-                            color = MainColor,
-                            fontSize = 14.sp
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(5.dp))
-                    Text(
-                        text = item.user.address, style = TextStyle(
-                            color = GrayColor,
-                            fontSize = 12.sp
-                        )
-                    )
                 }
             }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
 }

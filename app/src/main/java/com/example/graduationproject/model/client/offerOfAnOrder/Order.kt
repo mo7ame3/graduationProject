@@ -1,10 +1,8 @@
-package com.example.graduationproject.model.worker.home
+package com.example.graduationproject.model.client.offerOfAnOrder
 
 data class Order(
     val _id: String,
-    val createdDate: String,
     val orderDifficulty: String,
-    val status: String,
     val title: String,
     val user: User
 )

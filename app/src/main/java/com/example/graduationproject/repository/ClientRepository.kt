@@ -6,6 +6,7 @@ import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
+import com.example.graduationproject.model.client.updateOrder.UpdateOrder
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -19,6 +20,7 @@ class ClientRepository @Inject constructor(private val api: GraduationApi) {
     private val getMyOrder: WrapperClass<GetMyOrder, Boolean, Exception> = WrapperClass()
     private val delete = WrapperClass<Delete, Boolean, Exception>()
     private val getOfferOfAnCraft = WrapperClass<GetOfferOfAnOrder, Boolean, Exception>()
+    private val updateOrder = WrapperClass<UpdateOrder, Boolean, Exception>()
 
     suspend fun createOrder(
         image: MultipartBody.Part,
@@ -43,7 +45,6 @@ class ClientRepository @Inject constructor(private val api: GraduationApi) {
             val error = e.response()?.errorBody()?.string()
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
-            Log.d("TAG", "CreateOrder: $message")
             createNewOrder.data = CreateOrder(status = status, message = message)
 
         } catch (e: Exception) {
@@ -69,7 +70,6 @@ class ClientRepository @Inject constructor(private val api: GraduationApi) {
             val error = e.response()?.errorBody()?.string()
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
-            Log.d("TAG", "CreateOrder: $message")
             getMyOrder.data = GetMyOrder(status = status, message = message)
 
         } catch (e: Exception) {
@@ -119,13 +119,13 @@ class ClientRepository @Inject constructor(private val api: GraduationApi) {
         orderId: String,
     ): WrapperClass<GetOfferOfAnOrder, Boolean, Exception> {
         try {
-            getOfferOfAnCraft.data = api.getOfferOfAnOrder(authorization = authorization , orderId = orderId)
+            getOfferOfAnCraft.data =
+                api.getOfferOfAnOrder(authorization = authorization, orderId = orderId)
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
-            Log.d("TAG", "CreateOrder: $message")
             getOfferOfAnCraft.data = GetOfferOfAnOrder(status = status, message = message)
 
         } catch (e: Exception) {
@@ -137,5 +137,37 @@ class ClientRepository @Inject constructor(private val api: GraduationApi) {
             getOfferOfAnCraft.e = e
         }
         return getOfferOfAnCraft
+    }
+
+    suspend fun updateOrder(
+        authorization: String,
+        orderId: String,
+        craftId: String,
+        updateOrderBody: Map<String, String>
+    ): WrapperClass<UpdateOrder, Boolean, Exception> {
+        try {
+            updateOrder.data =
+                api.updateOrder(
+                    craftId = craftId,
+                    orderId = orderId,
+                    authorization = authorization,
+                    updateOrderBody = updateOrderBody
+                )
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            updateOrder.data = UpdateOrder(status = status, message = message)
+
+        } catch (e: Exception) {
+            //addNewUser.loading = false
+            Log.d("TAG", "updateOrder: $e")
+            updateOrder.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "updateOrder: $e")
+            updateOrder.e = e
+        }
+        return updateOrder
     }
 }

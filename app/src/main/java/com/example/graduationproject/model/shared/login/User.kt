@@ -18,5 +18,6 @@ data class User(
     val reports: List<Any>,
     val role: String,
     val tokens: List<Any>,
-    val updatedAt: String
+    val updatedAt: String,
+    val avatar: String? = null,
 )

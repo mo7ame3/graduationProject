@@ -11,9 +11,11 @@ import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
+import com.example.graduationproject.model.client.updateOrder.UpdateOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
+import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
@@ -165,8 +167,8 @@ interface GraduationApi {
     @GET(Constant.OFFEROFANORDER)
     suspend fun getOfferOfAnOrder(
         @Header("Authorization") authorization: String,
-        @Query("orderId") orderId : String
-        ): GetOfferOfAnOrder
+        @Query("orderId") orderId: String
+    ): GetOfferOfAnOrder
 
 
     //updateOffer
@@ -176,5 +178,22 @@ interface GraduationApi {
         @Header("Authorization") authorization: String,
         @Body updateBody: Map<String, String>
     ): UpdateOffer
+
+    //Get OrderOfAnCraft
+    @GET(Constant.GETPROFILE + "/{userId}")
+    suspend fun getProfile(
+        @Path("userId") userId: String,
+        @Header("Authorization") authorization: String,
+    ): GetProfile
+
+    //update Order
+    @PATCH("api/v1/crafts/{craftId}/orders/{orderId}")
+    suspend fun updateOrder(
+        @Path("craftId") craftId: String,
+        @Path("orderId") orderId: String,
+        @Header("Authorization") authorization: String,
+        @Body updateOrderBody: Map<String, String>
+    ): UpdateOrder
+
 
 }

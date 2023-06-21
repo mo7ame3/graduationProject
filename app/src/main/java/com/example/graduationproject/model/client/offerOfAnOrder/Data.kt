@@ -5,7 +5,7 @@ data class Data(
     val _id: String,
     val createdAt: String,
     val id: String,
-    val order: String,
+    val order: Order,
     val status: String,
     val text: String? = null,
     val updatedAt: String,

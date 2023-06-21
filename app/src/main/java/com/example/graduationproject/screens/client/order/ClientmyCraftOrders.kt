@@ -35,17 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.graduationproject.R
 import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.TopAppBar
 import com.example.graduationproject.data.WrapperClass
-import com.example.graduationproject.model.admin.deleteCraft.Delete
 import com.example.graduationproject.model.client.getMyOrder.Data
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.navigation.AllScreens
@@ -81,6 +78,12 @@ fun ClientMyCraftOrders(
     var exception by remember {
         mutableStateOf(false)
     }
+    val orderDonCont = remember {
+        mutableStateOf(0)
+    }
+    val length = remember {
+        mutableStateOf(0)
+    }
     //state flow list
     val orderList = MutableStateFlow<List<Data>>(emptyList())
 
@@ -96,8 +99,21 @@ fun ClientMyCraftOrders(
         if (response.data?.status == "success") {
             if (response.data!!.data != null) {
                 scope.launch {
-                    loading = false
+                    //  loading = false
                     orderList.emit(response.data!!.data!!)
+                    orderList.value.forEach {
+                        length.value = length.value + 1
+                        if (it.status == "orderDone" && length.value != orderList.value.size) {
+                            orderDonCont.value = orderDonCont.value + 1
+                        }
+                        if (it.status == "orderDone" && length.value == orderList.value.size) {
+                            orderDonCont.value = orderDonCont.value + 1
+                            loading = false
+                        }
+                        if (it.status != "orderDone" && length.value == orderList.value.size) {
+                            loading = false
+                        }
+                    }
                 }
             } else {
                 loading = false
@@ -110,7 +126,6 @@ fun ClientMyCraftOrders(
                 Toast.LENGTH_SHORT
             ).show()
         }
-
     }
 
     // Swipe Refresh
@@ -150,49 +165,32 @@ fun ClientMyCraftOrders(
         {
             if (!loading && !exception) {
                 if (orderList.value.isNotEmpty()) {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = if (orderDonCont.value == orderList.value.size) Arrangement.Center else Arrangement.Top
+                    ) {
+                        if (orderDonCont.value != orderList.value.size){
                         items(orderList.value) { itemlist ->
-                            MyCraftOrdersRow(item = itemlist,
-                                onClick = { orderData ->
-                                    //nav to Offer Screen
-                                    navController.navigate(AllScreens.ClientOrderOfferScreen.name + "/${orderData.title}/${orderData.description}/${orderData._id}")
-                                },
-                                onDeleteItem = { deleteOrder ->
-                                    //Delete Problem "Trash Icon"
-                                    loading = true
-                                    scope.launch {
-                                        val deleteResponse: WrapperClass<Delete, Boolean, Exception> =
-                                            orderViewModel.deleteOrder(
-                                                craftId = craftId,
-                                                authorization = "Bearer ${token.value.toString()}",
-                                                orderId = deleteOrder._id
-                                            )
+                            MyCraftOrdersRow(
+                                item = itemlist
+                            ) { orderData ->
+                                //nav to Offer Screen
+                                navController.navigate(AllScreens.ClientOrderOfferScreen.name + "/${orderData.title}/${orderData.description}/${orderData._id}/${craftId}")
+                            }
 
-                                        if (deleteResponse.data?.status == "success") {
-                                            val orderData: WrapperClass<GetMyOrder, Boolean, Exception> =
-                                                orderViewModel.getMyOrder(
-                                                    authorization = "Bearer ${token.value.toString()}",
-                                                    craftId = craftId
-                                                )
-                                            if (orderData.data?.status == "success") {
-                                                if (orderData.data != null) {
-                                                    orderList.emit(orderData.data!!.data!!)
-                                                    loading = false
-                                                }
-                                            } else {
-                                                loading = false
-                                            }
-                                        } else {
-                                            loading = false
-                                            Toast.makeText(
-                                                context,
-                                                "حدث خطأ ما",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                })
-                            Spacer(modifier = Modifier.height(15.dp))
+                        }
+                        }
+                        else {
+                            item {
+                                Text(
+                                    text = "لا يوجد طلبات حاليا", style = TextStyle(
+                                        color = MainColor,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 20.sp
+                                    )
+                                )
+                            }
                         }
                     }
                 } else {
@@ -256,7 +254,6 @@ fun ClientMyCraftOrders(
             }
         }
     }
-
 }
 
 
@@ -264,69 +261,52 @@ fun ClientMyCraftOrders(
 fun MyCraftOrdersRow(
     item: Data,
     onClick: (Data) -> Unit,
-    onDeleteItem: (Data) -> Unit,
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-            .padding(start = 15.dp, end = 15.dp)
-            .clickable { onClick.invoke(item) },
-        shape = RoundedCornerShape(25.dp), border = BorderStroke(width = 1.dp, color = MainColor)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 15.dp, end = 15.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = item.title,
-                    style = TextStyle(
-                        color = MainColor,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp
-                    )
-                )
-                Text(
-                    text = item.orderDifficulty, style = TextStyle(
-                        color = Color.Gray,
-                        fontSize = 18.sp
-                    )
-                )
-                Text(
-                    text = if (item.orderHavingOffers) "قيد التنفيذ..." else "قيد الانتظار...",
-                    style = TextStyle(
-                        color = RedColor,
-                        fontSize = 16.sp
-                    )
-                )
-            }
-            Row {
-                if (!item.orderHavingOffers) {
-                    Surface(
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clickable { onDeleteItem.invoke(item) },
-                        color = Color.Transparent
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.trash),
-                                contentDescription = null,
-                                tint = MainColor,
-                                modifier = Modifier.size(30.dp)
+    if (item.status != "orderDone") {
+        Column {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .padding(start = 15.dp, end = 15.dp)
+                    .clickable { onClick.invoke(item) },
+                shape = RoundedCornerShape(25.dp),
+                border = BorderStroke(width = 1.dp, color = MainColor)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 15.dp, end = 15.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = item.title,
+                            style = TextStyle(
+                                color = MainColor,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 20.sp
                             )
-                        }
+                        )
+                        Text(
+                            text = item.orderDifficulty, style = TextStyle(
+                                color = Color.Gray,
+                                fontSize = 18.sp
+                            )
+                        )
+                        Text(
+                            text = if (item.status == "carryingout") "قيد التنفيذ..." else if (item.status == "pending") "قيد الانتظار..." else "",
+                            style = TextStyle(
+                                color = RedColor,
+                                fontSize = 16.sp
+                            )
+                        )
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(15.dp))
         }
     }
+
 }
 

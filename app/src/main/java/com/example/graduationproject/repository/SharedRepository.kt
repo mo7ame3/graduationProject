@@ -6,6 +6,7 @@ import com.example.graduationproject.model.shared.craftList.CraftList
 import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
+import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
@@ -19,6 +20,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     private val getCraftList = WrapperClass<CraftList, Boolean, Exception>()
     private val getCraftOfWorker = WrapperClass<GetCraftOfWorker, Boolean, Exception>()
     private val updateOffer = WrapperClass<UpdateOffer, Boolean, Exception>()
+    private val getProfile = WrapperClass<GetProfile, Boolean, Exception>()
 
 
     suspend fun getAllCrafts(authorization: String)
@@ -131,4 +133,23 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
         return updateOffer
     }
 
+    suspend fun getProfile(userId: String, authorization: String)
+            : WrapperClass<GetProfile, Boolean, Exception> {
+        try {
+            getProfile.data = api.getProfile(userId = userId , authorization = authorization)
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            getProfile.data = GetProfile(status = status, message = message)
+        } catch (e: Exception) {
+            Log.d("TAG", "getCraftOfWorker: $e")
+            getProfile.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "getCraftOfWorker: $e")
+            getProfile.e = e
+        }
+        return getProfile
+    }
 }

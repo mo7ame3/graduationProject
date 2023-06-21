@@ -129,7 +129,8 @@ fun ClientHomeScreen(
                     exception = false
                 }
             }
-        } else if (craftData.data?.status == "fail" || craftData.data?.status == "error" || craftData.e != null) {
+        }
+        else if (craftData.data?.status == "fail" || craftData.data?.status == "error" || craftData.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -176,11 +177,10 @@ fun ClientHomeScreen(
                             scaffoldState.drawerState.close()
                         }
                     }
-
                     if (it.title == name.value.toString()) {
                         //Navigate to Profile
                         scope.launch {
-                            navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${false}/${false}/${false}/ ")
+                            navController.navigate(route = AllScreens.ClientMyProfileScreen.name + "/${false}")
                             scaffoldState.drawerState.close()
                         }
                     }
@@ -193,7 +193,7 @@ fun ClientHomeScreen(
                     if (it.title == "مكتملة") {
                         // nav to profile
                         scope.launch {
-                            navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${false}/${true}/${false}/ ")
+                            navController.navigate(route = AllScreens.ClientMyProfileScreen.name + "/${true}")
                             scaffoldState.drawerState.close()
                         }
                     }
