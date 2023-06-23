@@ -8,7 +8,9 @@ import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
+import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.network.GraduationApi
+import okhttp3.MultipartBody
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
@@ -21,6 +23,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     private val getCraftOfWorker = WrapperClass<GetCraftOfWorker, Boolean, Exception>()
     private val updateOffer = WrapperClass<UpdateOffer, Boolean, Exception>()
     private val getProfile = WrapperClass<GetProfile, Boolean, Exception>()
+    private val updateProfilePhoto = WrapperClass<UpdateProfilePhoto, Boolean, Exception>()
 
 
     suspend fun getAllCrafts(authorization: String)
@@ -116,7 +119,11 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     suspend fun updateOffer(offerId: String, authorization: String, updateBody: Map<String, String>)
             : WrapperClass<UpdateOffer, Boolean, Exception> {
         try {
-            updateOffer.data = api.updateOffer(offerId = offerId , authorization = authorization , updateBody = updateBody)
+            updateOffer.data = api.updateOffer(
+                offerId = offerId,
+                authorization = authorization,
+                updateBody = updateBody
+            )
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()
@@ -136,7 +143,7 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     suspend fun getProfile(userId: String, authorization: String)
             : WrapperClass<GetProfile, Boolean, Exception> {
         try {
-            getProfile.data = api.getProfile(userId = userId , authorization = authorization)
+            getProfile.data = api.getProfile(userId = userId, authorization = authorization)
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()
@@ -151,5 +158,34 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
             getProfile.e = e
         }
         return getProfile
+    }
+
+    suspend fun updateProfilePhoto(
+        userId: String,
+        authorization: String,
+        image: MultipartBody.Part
+    ): WrapperClass<UpdateProfilePhoto, Boolean, Exception> {
+        try {
+            updateProfilePhoto.data = api.updateProfilePhoto(
+                userId = userId,
+                authorization = authorization,
+                image = image
+            )
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            updateProfilePhoto.data = UpdateProfilePhoto(status = status, message = message)
+        }
+        catch (e: Exception) {
+            Log.d("TAG", "getCraftOfWorker: $e")
+            updateProfilePhoto.e = e
+        }
+        catch (e: SocketTimeoutException) {
+            Log.d("TAG", "getCraftOfWorker: $e")
+            updateProfilePhoto.e = e
+        }
+        return updateProfilePhoto
     }
 }

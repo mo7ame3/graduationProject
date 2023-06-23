@@ -17,6 +17,7 @@ import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
+import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
@@ -195,5 +196,13 @@ interface GraduationApi {
         @Body updateOrderBody: Map<String, String>
     ): UpdateOrder
 
+
+    @Multipart
+    @PATCH(Constant.UPDATEPROFILEPHOTO + "/{userId}")
+    suspend fun updateProfilePhoto(
+        @Path("userId") userId: String,
+        @Part image: MultipartBody.Part,
+        @Header("Authorization") authorization: String
+    ): UpdateProfilePhoto
 
 }

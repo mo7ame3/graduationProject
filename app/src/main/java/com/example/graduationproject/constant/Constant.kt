@@ -8,7 +8,7 @@ import com.example.graduationproject.data.BlockData
 import com.example.graduationproject.data.GoogleDriveList
 
 object Constant {
-    const val title = "Fixy"
+    const val title = "ورشة"
     @SuppressLint("NonConstantResourceId")
     const val logo = R.drawable.home
     val adminCraftList = listOf(
@@ -413,4 +413,6 @@ object Constant {
     //profile
     const val GETPROFILE = "api/v1/users/profile"
 
+    //updateProfilePhoto
+    const val UPDATEPROFILEPHOTO = "api/v1/users/image"
 }

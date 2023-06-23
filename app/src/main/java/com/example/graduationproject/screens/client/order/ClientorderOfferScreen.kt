@@ -1,7 +1,6 @@
 package com.example.graduationproject.screens.client.order
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -156,7 +155,8 @@ fun ClientOrderOfferScreen(
             } else {
                 loading = false
             }
-        } else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
+        }
+        else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
             Toast.makeText(
                 context,
                 "خطأ في الانترنت",
@@ -323,7 +323,8 @@ fun ClientOrderOfferScreen(
                                                     }
                                                 }
 
-                                            } else {
+                                            }
+                                            else {
                                                 loading = false
                                                 haveOffer = true
                                                 Toast.makeText(
@@ -373,20 +374,32 @@ fun ClientOrderOfferScreen(
                                             }
                                         }
                                     },
-                                    onCompleteAction = {
+                                    onCompleteAction = { completeOrder ->
                                         loading = true
+                                        haveOffer = false
                                         scope.launch {
-                                            val updateOrder: WrapperClass<UpdateOrder, Boolean, Exception> =
-                                                orderViewModel.updateOrderStatus(
+                                            val acceptWorker: WrapperClass<UpdateOffer, Boolean, Exception> =
+                                                orderViewModel.updateOffer(
                                                     authorization = "Bearer ${token.value.toString()}",
-                                                    orderId = orderId,
-                                                    craftId = craftId,
-                                                    status = "orderDone"
+                                                    offerId = completeOrder._id,
+                                                    text = "",
+                                                    status = "completed"
                                                 )
-                                            if (updateOrder.data?.status == "success") {
-                                                navController.navigate(route = AllScreens.ClientHomeScreen.name + "/orderdone")
-                                            } else {
+                                            if (acceptWorker.data?.status == "success") {
+                                                val updateOrder: WrapperClass<UpdateOrder, Boolean, Exception> =
+                                                    orderViewModel.updateOrderStatus(
+                                                        authorization = "Bearer ${token.value.toString()}",
+                                                        orderId = orderId,
+                                                        craftId = craftId,
+                                                        status = "orderDone"
+                                                    )
+                                                if (updateOrder.data?.status == "success") {
+                                                    navController.navigate(route = AllScreens.ClientHomeScreen.name + "/orderdone")
+                                                }
+                                            }
+                                            else {
                                                 loading = false
+                                                haveOffer = true
                                                 Toast.makeText(
                                                     context,
                                                     "خطأ في الانترنت",
@@ -452,7 +465,8 @@ fun ClientOrderOfferScreen(
                         }
 
                     }
-                } else {
+                }
+                else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -486,7 +500,6 @@ fun OfferRow(
     navController: NavController
 ) {
     //The Whole Row
-    Log.d("TAG", "OfferRow: $item")
     if (item.status != "canceled") {
         if (!acceptOffer.value) {
             Row(

@@ -97,7 +97,7 @@ fun ClientMyCraftOrders(
             }.value
 
         if (response.data?.status == "success") {
-            if (response.data!!.data != null) {
+            if (!response.data!!.data.isNullOrEmpty()) {
                 scope.launch {
                     //  loading = false
                     orderList.emit(response.data!!.data!!)
@@ -115,10 +115,12 @@ fun ClientMyCraftOrders(
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 loading = false
             }
-        } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+        }
+        else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -193,7 +195,8 @@ fun ClientMyCraftOrders(
                             }
                         }
                     }
-                } else {
+                }
+                else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -210,9 +213,11 @@ fun ClientMyCraftOrders(
                         }
                     }
                 }
-            } else if (loading && !exception) {
+            }
+            else if (loading && !exception) {
                 CircleProgress()
-            } else if (exception) {
+            }
+            else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,

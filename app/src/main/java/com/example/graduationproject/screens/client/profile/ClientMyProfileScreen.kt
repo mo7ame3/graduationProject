@@ -2,7 +2,6 @@ package com.example.graduationproject.screens.client.profile
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,14 +55,19 @@ import com.example.graduationproject.data.MyCraftOrderData
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.profile.User
+import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.MainColor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 
 @SuppressLint(
     "UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
-    "StateFlowValueCalledInComposition"
+    "StateFlowValueCalledInComposition", "Recycle"
 )
 @Composable
 fun ClientMyProfileScreen(
@@ -92,8 +96,10 @@ fun ClientMyProfileScreen(
     var exception by remember {
         mutableStateOf(false)
     }
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
     if (userId.value.toString().isNotEmpty() && token.value.toString().isNotEmpty()) {
-        Log.d("TAG", "ID: ${userId.value.toString()}")
         val getProfile: WrapperClass<GetProfile, Boolean, Exception> =
             produceState<WrapperClass<GetProfile, Boolean, Exception>>(
                 initialValue = WrapperClass(data = null)
@@ -104,8 +110,6 @@ fun ClientMyProfileScreen(
                 )
             }.value
         if (getProfile.data?.status == "fail" || getProfile.data?.status == "error" || getProfile.e != null) {
-            Log.d("TAG", "ClientMyProfileScreen: ${getProfile.e}")
-            Log.d("TAG", "ClientMyPr: ${getProfile.data?.message}")
             exception = true
             Toast.makeText(
                 context,
@@ -137,7 +141,57 @@ fun ClientMyProfileScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (changeProfilePhoto) {
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = {
+                    val imageName = uri?.toString()?.let { it1 -> File(it1) }
+                    val fileUri: Uri =
+                        uri!! // get the file URI from the file picker result
+                    val inputStream = context.contentResolver.openInputStream(fileUri)
+                    val file = inputStream?.readBytes()
+                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                    val filePart = file?.let {
+                        MultipartBody.Part.createFormData(
+                            "image", imageName!!.name, it
+                        )
+                    }
+                    scope.launch {
+                        loading = true
+                        val response: WrapperClass<UpdateProfilePhoto, Boolean, Exception> =
+                            clientProfileViewModel.updateProfilePhoto(
+                                authorization = "Bearer " + token.value.toString(),
+                                image = filePart!!,
+                                userId = userId.value.toString()
+                            )
+                        when (response.data?.status) {
+                            "success" -> {
+                                uri = null
+                                loading = false
+                                changeProfilePhoto = false
+                            }
+
+                            "error" -> {
+                                uri = null
+                                changeProfilePhoto = false
+                                loading = false
+                                Toast.makeText(
+                                    context,
+                                    "${response.data?.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            else -> {
+                                uri = null
+                                loading = false
+                                changeProfilePhoto = false
+                                Toast.makeText(
+                                    context,
+                                    "خطأ في الانترنت",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                }) {
                     Text(
                         text = "تحديث", style = TextStyle(
                             color = MainColor,
@@ -147,12 +201,12 @@ fun ClientMyProfileScreen(
                     )
                 }
             }
-            else{
-                Row() {
+            else {
+                Row {
 
                 }
             }
-            TopAppBar(title = "" , isProfile = true) {
+            TopAppBar(title = "", isProfile = true) {
                 navController.popBackStack()
             }
 
@@ -176,9 +230,6 @@ fun ClientMyProfileScreen(
                         .padding(start = 50.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    var uri by remember {
-                        mutableStateOf<Uri?>(null)
-                    }
                     val launcher =
                         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { URI ->
                             uri = URI
@@ -241,11 +292,9 @@ fun ClientMyProfileScreen(
                     }
                 }
             }
-        }
-        else if (loading && !exception) {
+        } else if (loading && !exception) {
             CircleProgress()
-        }
-        else if (exception) {
+        } else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,

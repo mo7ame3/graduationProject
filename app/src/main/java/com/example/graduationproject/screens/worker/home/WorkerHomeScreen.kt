@@ -50,6 +50,7 @@ import com.example.graduationproject.components.DrawerBody
 import com.example.graduationproject.components.DrawerHeader
 import com.example.graduationproject.components.GetSmallPhoto
 import com.example.graduationproject.components.TopMainBar
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.worker.home.Order
 import com.example.graduationproject.model.worker.home.WorkerHome
@@ -85,7 +86,7 @@ fun WorkerHomeScreen(
         mutableStateOf("home")
     }
     val title = remember {
-        mutableStateOf("خدماتي")
+        mutableStateOf(Constant.title)
     }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()

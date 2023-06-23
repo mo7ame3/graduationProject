@@ -60,16 +60,21 @@ import com.example.graduationproject.data.MyCraftOrderData
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.profile.User
+import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.GrayColor
 import com.example.graduationproject.ui.theme.MainColor
 import com.example.graduationproject.ui.theme.RedColor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 
 @SuppressLint(
     "UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
-    "StateFlowValueCalledInComposition"
+    "StateFlowValueCalledInComposition", "Recycle"
 )
 @Composable
 fun WorkerMyProfileScreen(
@@ -81,6 +86,11 @@ fun WorkerMyProfileScreen(
     val sharedPreference = SharedPreference(context)
     val token = sharedPreference.getToken.collectAsState(initial = "")
     val userId = sharedPreference.getUserId.collectAsState(initial = "")
+
+
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
 
     //coroutineScope
     val scope = rememberCoroutineScope()
@@ -96,8 +106,8 @@ fun WorkerMyProfileScreen(
         mutableStateListOf<Uri?>(null)
     }
     val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
-            picturesList.add(uri)
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uriPhoto ->
+            picturesList.add(uriPhoto)
         }
 
     var loading by remember {
@@ -146,7 +156,57 @@ fun WorkerMyProfileScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (changeProfilePhoto) {
-                    TextButton(onClick = { /*TODO*/ }) {
+                    TextButton(onClick = {
+                        val imageName = uri?.toString()?.let { it1 -> File(it1) }
+                        val fileUri: Uri =
+                            uri!! // get the file URI from the file picker result
+                        val inputStream = context.contentResolver.openInputStream(fileUri)
+                        val file = inputStream?.readBytes()
+                            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        val filePart = file?.let {
+                            MultipartBody.Part.createFormData(
+                                "image", imageName!!.name, it
+                            )
+                        }
+                        scope.launch {
+                            loading = true
+                            val response: WrapperClass<UpdateProfilePhoto, Boolean, Exception> =
+                                workerProfileViewModel.updateProfilePhoto(
+                                    authorization = "Bearer " + token.value.toString(),
+                                    image = filePart!!,
+                                    userId = userId.value.toString()
+                                )
+                            when (response.data?.status) {
+                                "success" -> {
+                                    uri = null
+                                    loading = false
+                                    changeProfilePhoto = false
+                                }
+
+                                "error" -> {
+                                    uri = null
+                                    changeProfilePhoto = false
+                                    loading = false
+                                    Toast.makeText(
+                                        context,
+                                        "${response.data?.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                else -> {
+                                    uri = null
+                                    loading = false
+                                    changeProfilePhoto = false
+                                    Toast.makeText(
+                                        context,
+                                        "خطأ في الانترنت",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }) {
                         Text(
                             text = "تحديث", style = TextStyle(
                                 color = MainColor,
@@ -180,9 +240,6 @@ fun WorkerMyProfileScreen(
                         .padding(start = 50.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    var uri by remember {
-                        mutableStateOf<Uri?>(null)
-                    }
                     val launcher1 =
                         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { URI ->
                             uri = URI

@@ -174,24 +174,41 @@ fun WorkerProblemDetails(
                         }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp),
-                        shape = RoundedCornerShape(25.dp),
-                        border = BorderStroke(width = 1.dp, color = MainColor)
-                    ) {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            TextInput(
-                                text = offerDetails,
-                                isBorder = false,
-                                label = if (offerDetails.value.isEmpty()) "اكتب تفاصيل العرض هنا..." else "",
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(0.dp),
-                                isSingleLine = false,
-                                isNotBackground = true,
-                            )
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        if (offerDetails.value.isEmpty()) {
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 25.dp))
+                            {
+                                Text(
+                                    text = "تفاصيل العرض ", style = TextStyle(
+                                        color = MainColor,
+                                        fontSize = 18.sp
+                                    )
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(5.dp))
+                        }
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp),
+                            shape = RoundedCornerShape(25.dp),
+                            border = BorderStroke(width = 1.dp, color = MainColor)
+                        ) {
+                            Column(modifier = Modifier.fillMaxSize()) {
+                                TextInput(
+                                    text = offerDetails,
+                                    isBorder = false,
+                                    label = if (offerDetails.value.isEmpty()) "اكتب تفاصيل العرض هنا..." else "",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(0.dp),
+                                    isSingleLine = false,
+                                    isNotBackground = true,
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
@@ -213,8 +230,7 @@ fun WorkerProblemDetails(
                                     navController.navigate(AllScreens.WorkerHomeScreen.name + "/login") {
                                         navController.popBackStack()
                                     }
-                                }
-                                else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+                                } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
                                     loading = false
                                     Toast.makeText(
                                         context,
