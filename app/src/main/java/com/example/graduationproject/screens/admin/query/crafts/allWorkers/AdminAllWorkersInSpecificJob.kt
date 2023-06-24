@@ -69,7 +69,7 @@ fun AdminAllWorkersInSpecificJob(
                             onReportAction = { report ->
                                 navController.navigate(AllScreens.AdminReportsQuery.name + "/${false}/${report}")
                             }) { name ->
-                            navController.navigate(AllScreens.WorkerProfileScreen.name + "/${false}/${true}/${name}")
+                            navController.navigate(AllScreens.AdminWorkerProfileScreen.name + "/${false}/${true}/${name}")
                         }
                         Spacer(modifier = Modifier.height(25.dp))
                     }

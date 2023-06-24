@@ -48,7 +48,8 @@ import com.example.graduationproject.ui.theme.MainColor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
+@SuppressLint(
+    "UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition",
     "StateFlowValueCalledInComposition"
 )
 @Composable
@@ -113,7 +114,7 @@ fun MyOfferProblemDetails(
                         .fillMaxWidth()
                         .clickable {
                             //get Client id from database and nav to client profile
-                            navController.navigate(route = AllScreens.AdminClientProfileScreen.name + "/${true}/${false}/${false}/ ")
+                            navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${orderDetails.value[0].user.id}")
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -131,7 +132,8 @@ fun MyOfferProblemDetails(
                     modifier = Modifier.padding(start = 25.dp),
                 ) {
                     Text(
-                        text = orderDetails.value[0].title + "- " + orderDetails.value[0].orderDifficulty, style = TextStyle(
+                        text = orderDetails.value[0].title + "- " + orderDetails.value[0].orderDifficulty,
+                        style = TextStyle(
                             color = MainColor,
                             fontSize = 18.sp
                         )
@@ -140,13 +142,12 @@ fun MyOfferProblemDetails(
                 Spacer(modifier = Modifier.height(15.dp))
                 //ProblemDescription
                 ProblemDescription(
-                    problemDescription =orderDetails.value[0].description,)
+                    problemDescription = orderDetails.value[0].description,
+                )
             }
-        }
-        else if (loading && !exception) {
+        } else if (loading && !exception) {
             CircleProgress()
-        }
-        else if (exception) {
+        } else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -156,7 +157,7 @@ fun MyOfferProblemDetails(
                     exception = false
                     loading = true
                     scope.launch {
-                        val response:WrapperClass<GetOrderDetails, Boolean, Exception> =
+                        val response: WrapperClass<GetOrderDetails, Boolean, Exception> =
                             myOffersViewModel.getOrderDetails(
                                 authorization = "Bearer " + Constant.token,
                                 orderId = orderId,

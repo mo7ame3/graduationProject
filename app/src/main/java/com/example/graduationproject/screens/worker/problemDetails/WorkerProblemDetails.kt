@@ -130,7 +130,7 @@ fun WorkerProblemDetails(
                             .fillMaxWidth()
                             .clickable {
                                 //get Client id from database and nav to client profile
-                                navController.navigate(route = AllScreens.AdminClientProfileScreen.name + "/${true}/${false}/${false}/ ")
+                                navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${orderDetails.value[0].user.id}")
                             },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {

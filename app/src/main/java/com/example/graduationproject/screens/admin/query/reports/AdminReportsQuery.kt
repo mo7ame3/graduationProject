@@ -67,7 +67,7 @@ fun AdminReportsQuery(
                 if (client) {
                     navController.navigate(AllScreens.AdminClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
                 } else {
-                    navController.navigate(AllScreens.WorkerProfileScreen.name + "/${false}/${true}/${name}")
+                    navController.navigate(AllScreens.AdminWorkerProfileScreen.name + "/${false}/${true}/${name}")
                 }
             }
             Spacer(modifier = Modifier.height(50.dp))
@@ -82,7 +82,7 @@ fun AdminReportsQuery(
                                 if (client) {
                                     navController.navigate(AllScreens.AdminClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
                                 } else {
-                                    navController.navigate(AllScreens.WorkerProfileScreen.name + "/${false}/${true}/${name}")
+                                    navController.navigate(AllScreens.AdminWorkerProfileScreen.name + "/${false}/${true}/${name}")
                                 }
                             })
                             { reportUserName ->

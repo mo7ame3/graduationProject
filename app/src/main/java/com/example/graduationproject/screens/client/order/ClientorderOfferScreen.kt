@@ -155,8 +155,7 @@ fun ClientOrderOfferScreen(
             } else {
                 loading = false
             }
-        }
-        else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
+        } else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
             Toast.makeText(
                 context,
                 "خطأ في الانترنت",
@@ -323,8 +322,7 @@ fun ClientOrderOfferScreen(
                                                     }
                                                 }
 
-                                            }
-                                            else {
+                                            } else {
                                                 loading = false
                                                 haveOffer = true
                                                 Toast.makeText(
@@ -396,8 +394,7 @@ fun ClientOrderOfferScreen(
                                                 if (updateOrder.data?.status == "success") {
                                                     navController.navigate(route = AllScreens.ClientHomeScreen.name + "/orderdone")
                                                 }
-                                            }
-                                            else {
+                                            } else {
                                                 loading = false
                                                 haveOffer = true
                                                 Toast.makeText(
@@ -465,8 +462,7 @@ fun ClientOrderOfferScreen(
                         }
 
                     }
-                }
-                else {
+                } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -516,7 +512,7 @@ fun OfferRow(
                 Row(modifier = Modifier
                     .width(200.dp)
                     .clickable {
-                        navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${true}/${false}/${item.worker.name}")
+                        navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${item.worker.id}")
                     }) {
                     GetSmallPhoto(uri = if (item.worker.avatar != null) item.worker.avatar.toString() else null)
                     Spacer(modifier = Modifier.width(5.dp))
@@ -624,7 +620,7 @@ fun OfferRow(
                         Row(modifier = Modifier
                             .width(300.dp)
                             .clickable {
-                                navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${true}/${false}/${item.worker.name}")
+                                navController.navigate(route = AllScreens.WorkerProfileScreen.name + "/${item.worker.id}")
                             }) {
                             GetSmallPhoto(uri = if (item.worker.avatar != null) item.worker.avatar.toString() else null)
                             Spacer(modifier = Modifier.width(5.dp))
