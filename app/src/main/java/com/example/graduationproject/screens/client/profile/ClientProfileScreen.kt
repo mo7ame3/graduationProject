@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -20,22 +21,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.graduationproject.R
 import com.example.graduationproject.components.*
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.MyCraftOrderData
+import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.shared.profile.GetProfile
+import com.example.graduationproject.model.shared.profile.User
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.MainColor
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ClientProfileScreen(
     navController: NavHostController,
-    ShowReportButton: Boolean = false,
-    completeProject: Boolean = false,
-    isAdmin: Boolean = false,
-    clientName: String
+    clientId: String,
+    clientProfileViewModel: ClientProfileViewModel
 ) {
-    val adminOrClient = remember {
-        if (ShowReportButton) true else isAdmin
-    }
     val isSelect = remember {
         mutableStateOf(false)
     }
@@ -43,12 +44,34 @@ fun ClientProfileScreen(
         mutableStateOf(true)
     }
 
+    //state flow list
+    val getProfileUser = MutableStateFlow<List<User>>(emptyList())
+
+    var loading by remember {
+        mutableStateOf(true)
+    }
+    var exception by remember {
+        mutableStateOf(false)
+    }
+    val context = LocalContext.current
+
+    if (Constant.token.isNotEmpty()) {
+        val response =
+            produceState<WrapperClass<GetProfile, Boolean, Exception>>(initialValue = WrapperClass()) {
+                value = clientProfileViewModel.getProfile(
+                    authorization = "Bearer " + Constant.token,
+                    userId = clientId
+                )
+            }.value
+
+    }
+
     Scaffold(topBar = {
         TopAppBar(title = "") {
             navController.popBackStack()
         }
     }) {
-        if (completeProject && changeCompleteState.value) {
+        if (changeCompleteState.value) {
             isSelect.value = true
             changeCompleteState.value = false
         }
@@ -61,10 +84,9 @@ fun ClientProfileScreen(
             verticalArrangement = Arrangement.Top
         ) {
             Row(
-                modifier = if (!adminOrClient) Modifier
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 50.dp) else Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                    .padding(start = 50.dp)
             ) {
                 var uri by remember {
                     mutableStateOf<Uri?>(null)
@@ -74,20 +96,19 @@ fun ClientProfileScreen(
                         uri = URI
                     }
                 ProfilePhoto(uri = uri)
-                if (!adminOrClient)
-                    IconButton(onClick = {
-                        //nav to edit photo
-                        launcher.launch("image/*")
-                    }, modifier = Modifier.padding(top = 85.dp)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.camera),
-                            contentDescription = null, tint = MainColor
-                        )
-                    }
+                IconButton(onClick = {
+                    //nav to edit photo
+                    launcher.launch("image/*")
+                }, modifier = Modifier.padding(top = 85.dp)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.camera),
+                        contentDescription = null, tint = MainColor
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = if (clientName.trim().isNotBlank()) clientName else "رغد محمود صالح",
+                text = "رغد محمود صالح",
                 style = TextStyle(
                     color = MainColor,
                     fontSize = 20.sp,
@@ -113,23 +134,18 @@ fun ClientProfileScreen(
                         .fillMaxWidth()
                         .height(400.dp)
                 ) {
-                    items(completeList) {
-                        CompleteProjectRow(item = it)
+                    items(completeList1) {
+                        CompleteProjectRow1(item = it)
                         Spacer(modifier = Modifier.height(20.dp))
-                    }
-                    item {
-                        //Spacer(modifier = Modifier.height(150.dp))
                     }
                 }
             }
-            if (adminOrClient && ShowReportButton) {
-                if (!isSelect.value) {
-                    Spacer(modifier = Modifier.height(400.dp))
-                }
-                DefaultButton(label = "تقديم بلاغ") {
-                    // nav to Report
-                    navController.navigate(AllScreens.ReportScreen.name + "/${false}/worker")
-                }
+            if (!isSelect.value) {
+                Spacer(modifier = Modifier.height(400.dp))
+            }
+            DefaultButton(label = "تقديم بلاغ") {
+                // nav to Report
+                navController.navigate(AllScreens.ReportScreen.name + "/${false}/worker")
             }
         }
     }
@@ -137,7 +153,7 @@ fun ClientProfileScreen(
 
 
 @Composable
-fun CompleteProjectRow(
+fun CompleteProjectRow1(
     item: MyCraftOrderData
 ) {
     Card(
@@ -178,7 +194,7 @@ fun CompleteProjectRow(
 }
 
 
-val completeList = listOf(
+val completeList1 = listOf(
     MyCraftOrderData(
         workerName = "أحمد محمد",
         workerRate = 5,

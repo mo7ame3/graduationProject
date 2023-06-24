@@ -102,7 +102,8 @@ fun WorkerProblemDetails(
                 exception = false
                 orderDetails.emit(response.data!!.data!!.order)
             }
-        } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+        }
+        else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -129,7 +130,7 @@ fun WorkerProblemDetails(
                             .fillMaxWidth()
                             .clickable {
                                 //get Client id from database and nav to client profile
-                                navController.navigate(route = AllScreens.ClientProfileScreen.name + "/${true}/${false}/${false}/ ")
+                                navController.navigate(route = AllScreens.AdminClientProfileScreen.name + "/${true}/${false}/${false}/ ")
                             },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {

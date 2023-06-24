@@ -65,7 +65,7 @@ fun AdminReportsQuery(
                     //not Work
                 }) { name ->
                 if (client) {
-                    navController.navigate(AllScreens.ClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
+                    navController.navigate(AllScreens.AdminClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
                 } else {
                     navController.navigate(AllScreens.WorkerProfileScreen.name + "/${false}/${true}/${name}")
                 }
@@ -80,7 +80,7 @@ fun AdminReportsQuery(
                         items(item.reportList) {
                             ReportRow(it, onAction = { name ->
                                 if (client) {
-                                    navController.navigate(AllScreens.ClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
+                                    navController.navigate(AllScreens.AdminClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
                                 } else {
                                     navController.navigate(AllScreens.WorkerProfileScreen.name + "/${false}/${true}/${name}")
                                 }

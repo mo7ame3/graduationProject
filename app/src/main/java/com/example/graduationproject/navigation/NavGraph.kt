@@ -28,7 +28,7 @@ import com.example.graduationproject.screens.client.order.OrderViewModel
 import com.example.graduationproject.screens.client.postScreen.ClientPostScreen
 import com.example.graduationproject.screens.client.postScreen.PostViewModel
 import com.example.graduationproject.screens.client.profile.ClientMyProfileScreen
-import com.example.graduationproject.screens.client.profile.ClientProfileScreen
+import com.example.graduationproject.screens.client.profile.AdminClientProfileScreen
 import com.example.graduationproject.screens.client.profile.ClientProfileViewModel
 import com.example.graduationproject.screens.client.rate.ClientRateScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatDetails
@@ -173,7 +173,7 @@ fun NavGraph() {
 
         }
 
-        val profileScreen = AllScreens.ClientProfileScreen.name
+        val profileScreen = AllScreens.AdminClientProfileScreen.name
         composable(
             route = "$profileScreen/{showReport}/{completeProject}/{admin}/{name}",
             arguments = listOf(navArgument(name = "showReport") {
@@ -189,7 +189,7 @@ fun NavGraph() {
                     type = NavType.StringType
                 })
         ) { data ->
-            ClientProfileScreen(
+            AdminClientProfileScreen(
                 navController = navController,
                 ShowReportButton = data.arguments!!.getBoolean("showReport"),
                 completeProject = data.arguments!!.getBoolean("completeProject"),
@@ -306,8 +306,18 @@ fun NavGraph() {
             )
         }
 
-        composable(route = AllScreens.MyProjectProblemDetails.name) {
-            MyOfferProblemDetails(navController = navController)
+        composable(route = AllScreens.MyProjectProblemDetails.name + "/{orderId}",
+            arguments = listOf(
+                navArgument(name = "orderId") {
+                    type = NavType.StringType
+                }
+            )) {
+            val myOffersViewModel = hiltViewModel<MyOffersViewModel>()
+            MyOfferProblemDetails(
+                navController = navController,
+                myOffersViewModel = myOffersViewModel,
+                orderId = it.arguments!!.getString("orderId").toString()
+            )
         }
 
 

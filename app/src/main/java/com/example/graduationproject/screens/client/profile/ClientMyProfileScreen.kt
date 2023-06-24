@@ -116,7 +116,8 @@ fun ClientMyProfileScreen(
                 "خطأ في الانترنت",
                 Toast.LENGTH_SHORT
             ).show()
-        } else {
+        }
+        else {
             if (getProfile.data != null) {
                 scope.launch {
                     getProfileUser.emit(getProfile.data!!.data?.user!!)

@@ -226,8 +226,11 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                 ) {
                                     if (acceptedCount.value > 0) {
                                         items(offerData.value) {
-                                            UnderwayRow(item = it, navController = navController) {
-                                                navController.navigate(route = AllScreens.MyProjectProblemDetails.name)
+                                            UnderwayRow(
+                                                item = it,
+                                                navController = navController
+                                            ) { data ->
+                                                navController.navigate(route = AllScreens.MyProjectProblemDetails.name + "/${data.order._id}")
                                             }
                                         }
                                         item {
@@ -261,8 +264,8 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                 ) {
                                     if (pendingCount.value > 0) {
                                         items(offerData.value) {
-                                            OffersDidNotStartYet(item = it) {
-                                                navController.navigate(route = AllScreens.MyProjectProblemDetails.name)
+                                            OffersDidNotStartYet(item = it) { data ->
+                                                navController.navigate(route = AllScreens.MyProjectProblemDetails.name + "/${data.order._id}")
                                             }
                                         }
                                         item {
@@ -285,9 +288,11 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                 EmptyColumn(text = "لا يوجد عروض قيد الانتظار")
                             }
                         }
-                    } else if (loading && !exception) {
+                    }
+                    else if (loading && !exception) {
                         CircleProgress()
-                    } else if (exception) {
+                    }
+                    else if (exception) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
@@ -336,8 +341,7 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                                 }
                                             }
                                         }
-                                    }
-                                    else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+                                    } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
                                         exception = true
                                         Toast.makeText(
                                             context,
@@ -384,7 +388,7 @@ fun UnderwayRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                SmallPhoto()
+                GetSmallPhoto(uri = if (item.order.user.avatar != null) item.order.user.avatar else null)
                 Column {
                     Text(
                         text = item.order.user.name, style = TextStyle(

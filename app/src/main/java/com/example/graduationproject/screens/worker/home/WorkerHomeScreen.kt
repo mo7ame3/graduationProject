@@ -36,13 +36,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.graduationproject.R
 import com.example.graduationproject.components.BottomBar
 import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.DrawerBody
@@ -288,9 +286,11 @@ fun WorkerHomeScreen(
                 if (homeNavBar.value == "order") {
                     MyOffersScreen(navController, myOffersViewModel)
                 }
-            } else if (loading && !exception) {
+            }
+            else if (loading && !exception) {
                 CircleProgress()
-            } else if (exception) {
+            }
+            else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -391,19 +391,19 @@ fun WorkerHomeRow(
                                     )
                                 )
                                 Row {
-                                    Text(
-                                        text = item.createdDate, style = TextStyle(
-                                            color = GrayColor,
-                                            fontSize = 12.sp
-                                        )
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.clock),
-                                        contentDescription = null,
-                                        tint = GrayColor,
-                                        modifier = Modifier.size(20.dp)
-                                    )
+//                                    Text(
+//                                        text = item.createdDate, style = TextStyle(
+//                                            color = GrayColor,
+//                                            fontSize = 12.sp
+//                                        )
+//                                    )
+//                                    Spacer(modifier = Modifier.width(5.dp))
+//                                    Icon(
+//                                        painter = painterResource(id = R.drawable.clock),
+//                                        contentDescription = null,
+//                                        tint = GrayColor,
+//                                        modifier = Modifier.size(20.dp)
+//                                    )
                                 }
                             }
                             Text(

@@ -15,7 +15,7 @@ enum class AllScreens {
     ClientHomeScreen,
     ClientPostScreen,
     ClientMyCraftOrders,
-    ClientProfileScreen,
+    AdminClientProfileScreen,
     ClientMyProfileScreen,
     ClientOrderOfferScreen,
     ClientRateScreen,

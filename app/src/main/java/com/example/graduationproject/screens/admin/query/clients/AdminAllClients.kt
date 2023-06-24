@@ -62,7 +62,7 @@ fun AdminAllClients(navController: NavController) {
                             onReportAction = { report ->
                                 navController.navigate(AllScreens.AdminReportsQuery.name + "/${true}/${report}")
                             }) { name ->
-                            navController.navigate(AllScreens.ClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
+                            navController.navigate(AllScreens.AdminClientProfileScreen.name + "/${false}/${false}/${true}/${name}")
                         }
                         Spacer(modifier = Modifier.height(25.dp))
                     }
