@@ -2,6 +2,7 @@ package com.example.graduationproject.screens.client.profile
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -29,8 +30,9 @@ import com.example.graduationproject.model.shared.profile.User
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.MainColor
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun ClientProfileScreen(
     navController: NavHostController,
@@ -43,6 +45,9 @@ fun ClientProfileScreen(
     val changeCompleteState = remember {
         mutableStateOf(true)
     }
+
+    //coroutineScope
+    val scope = rememberCoroutineScope()
 
     //state flow list
     val getProfileUser = MutableStateFlow<List<User>>(emptyList())
@@ -63,7 +68,22 @@ fun ClientProfileScreen(
                     userId = clientId
                 )
             }.value
-
+        if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+            exception = true
+            Toast.makeText(
+                context,
+                "خطأ في الانترنت",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            if (response.data != null) {
+                scope.launch {
+                    getProfileUser.emit(response.data!!.data?.user!!)
+                    loading = false
+                    exception = false
+                }
+            }
+        }
     }
 
     Scaffold(topBar = {
