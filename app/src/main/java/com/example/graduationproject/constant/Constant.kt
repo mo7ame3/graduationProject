@@ -418,4 +418,7 @@ object Constant {
 
     //GetMyOffer
     const val GETMYOFFER = "api/v1/offers/myOffers"
+
+    //updatePassword
+    const val UPDATEPASSWORD  = "api/v1/users/updatePassword"
 }

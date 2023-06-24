@@ -140,8 +140,8 @@ fun WorkerMyProfileScreen(
                 initialValue = WrapperClass(data = null)
             ) {
                 value = workerProfileViewModel.getProfile(
-                    userId = userId.value.toString(),
-                    authorization = "Bearer " + token.value.toString()
+                    authorization = "Bearer " + token.value.toString(),
+                    userId = userId.value.toString()
                 )
             }.value
         if (getProfile.data?.status == "fail" || getProfile.data?.status == "error" || getProfile.e != null) {
@@ -159,7 +159,10 @@ fun WorkerMyProfileScreen(
                     exception = false
 
                     val response: WrapperClass<GetMyOffer, Boolean, Exception> =
-                        workerProfileViewModel.getMyCompletedOffer(authorization = "Bearer " + Constant.token)
+                        workerProfileViewModel.getMyCompletedOffer(
+                            authorization = "Bearer " + Constant.token,
+                            userId = userId.value.toString()
+                        )
                     if (response.data?.status == "success") {
                         response.data!!.data?.forEach {
                             length.value = length.value + 1
@@ -224,6 +227,7 @@ fun WorkerMyProfileScreen(
                                         changeProfilePhoto = false
                                     }
                                 }
+
                                 "error" -> {
                                     uri = null
                                     changeProfilePhoto = false
@@ -378,7 +382,7 @@ fun WorkerMyProfileScreen(
                     ) {
                         items(picturesList) {
                             if (it != null) {
-                                PickPhotoRow(it)
+                                PickMyPhotoRow(it)
                                 Spacer(modifier = Modifier.height(10.dp))
                             }
                         }

@@ -8,6 +8,8 @@ import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
+import com.example.graduationproject.model.shared.updatePassword.UpdatePassword
+import com.example.graduationproject.model.shared.updateProfileData.UpdateProfileData
 import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.network.GraduationApi
 import okhttp3.MultipartBody
@@ -24,6 +26,8 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
     private val updateOffer = WrapperClass<UpdateOffer, Boolean, Exception>()
     private val getProfile = WrapperClass<GetProfile, Boolean, Exception>()
     private val updateProfilePhoto = WrapperClass<UpdateProfilePhoto, Boolean, Exception>()
+    private val updateProfileData = WrapperClass<UpdateProfileData, Boolean, Exception>()
+    private val updatePassword = WrapperClass<UpdatePassword, Boolean, Exception>()
 
 
     suspend fun getAllCrafts(authorization: String)
@@ -177,15 +181,65 @@ class SharedRepository @Inject constructor(private val api: GraduationApi) {
             val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
             val message = error.split("message")[1].split("\":")[1]
             updateProfilePhoto.data = UpdateProfilePhoto(status = status, message = message)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             Log.d("TAG", "getCraftOfWorker: $e")
             updateProfilePhoto.e = e
-        }
-        catch (e: SocketTimeoutException) {
+        } catch (e: SocketTimeoutException) {
             Log.d("TAG", "getCraftOfWorker: $e")
             updateProfilePhoto.e = e
         }
         return updateProfilePhoto
+    }
+
+    suspend fun updateProfileData(
+        userId: String,
+        authorization: String,
+        updateProfileBody: Map<String, String>
+    ): WrapperClass<UpdateProfileData, Boolean, Exception> {
+        try {
+            updateProfileData.data = api.updateProfileData(
+                userId = userId,
+                authorization = authorization,
+                updateProfileBody = updateProfileBody
+            )
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            updateProfileData.data = UpdateProfileData(status = status, message = message)
+        } catch (e: Exception) {
+            Log.d("TAG", "updateProfileData: $e")
+            updateProfileData.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "updateProfileData: $e")
+            updateProfileData.e = e
+        }
+        return updateProfileData
+    }
+
+    suspend fun updatePassword(
+        authorization: String,
+        updatePasswordBody: Map<String, String>
+    ): WrapperClass<UpdatePassword, Boolean, Exception> {
+        try {
+            updatePassword.data = api.updatePassword(
+                authorization = authorization,
+                updatePasswordBody = updatePasswordBody
+            )
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            updatePassword.data = UpdatePassword(status = status, message = message)
+        } catch (e: Exception) {
+            Log.d("TAG", "updatePassword: $e")
+            updatePassword.e = e
+        } catch (e: SocketTimeoutException) {
+            Log.d("TAG", "updatePassword: $e")
+            updatePassword.e = e
+        }
+        return updatePassword
     }
 }

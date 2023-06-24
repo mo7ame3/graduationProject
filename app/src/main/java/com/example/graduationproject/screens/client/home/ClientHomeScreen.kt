@@ -186,7 +186,7 @@ fun ClientHomeScreen(
                     }
                     if (it.title == "إعدادات حسابي") {
                         scope.launch {
-                            navController.navigate(route = AllScreens.ClientProfileSettingsScreen.name)
+                            navController.navigate(route = AllScreens.ProfileScreen.name+"/${true}")
                             scaffoldState.drawerState.close()
                         }
                     }

@@ -3,20 +3,22 @@ package com.example.graduationproject.network
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.model.admin.createCraft.CreateNewCraft
 import com.example.graduationproject.model.admin.deleteCraft.Delete
-import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
-import com.example.graduationproject.model.shared.login.Login
-import com.example.graduationproject.model.shared.register.Register
-import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.admin.updateCraft.UpdateCraft
 import com.example.graduationproject.model.client.creatOrder.CreateOrder
 import com.example.graduationproject.model.client.getMyOrder.GetMyOrder
 import com.example.graduationproject.model.client.offerOfAnOrder.GetOfferOfAnOrder
 import com.example.graduationproject.model.client.updateOrder.UpdateOrder
 import com.example.graduationproject.model.shared.craftList.CraftList
+import com.example.graduationproject.model.shared.getAllCrafts.GetAllCrafts
 import com.example.graduationproject.model.shared.getCraft.GetCraft
 import com.example.graduationproject.model.shared.getCraftOfWorker.GetCraftOfWorker
+import com.example.graduationproject.model.shared.login.Login
 import com.example.graduationproject.model.shared.profile.GetProfile
+import com.example.graduationproject.model.shared.register.Register
+import com.example.graduationproject.model.shared.register.myCraft.MyCraft
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
+import com.example.graduationproject.model.shared.updatePassword.UpdatePassword
+import com.example.graduationproject.model.shared.updateProfileData.UpdateProfileData
 import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
 import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
@@ -34,7 +36,6 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
-import retrofit2.http.Query
 import javax.inject.Singleton
 
 
@@ -159,7 +160,7 @@ interface GraduationApi {
     ): Delete
 
     //Create Offer
-    @POST(Constant.CREATEOFFER +"/{orderId}")
+    @POST(Constant.CREATEOFFER + "/{orderId}")
     suspend fun createOffer(
         @Header("Authorization") authorization: String,
         @Path("orderId") orderId: String,
@@ -167,10 +168,10 @@ interface GraduationApi {
     ): CreateOffer
 
     //Get OrderOfAnCraft
-    @GET(Constant.OFFEROFANORDER)
+    @GET(Constant.OFFEROFANORDER + "/{orderId}")
     suspend fun getOfferOfAnOrder(
         @Header("Authorization") authorization: String,
-        @Query("orderId") orderId: String
+        @Path("orderId") orderId: String
     ): GetOfferOfAnOrder
 
 
@@ -198,6 +199,14 @@ interface GraduationApi {
         @Body updateOrderBody: Map<String, String>
     ): UpdateOrder
 
+    //Update Profile Setting
+    @PATCH(Constant.GETPROFILE + "/{userId}")
+    suspend fun updateProfileData(
+        @Path("userId") userId: String,
+        @Header("Authorization") authorization: String,
+        @Body updateProfileBody: Map<String, String>
+    ): UpdateProfileData
+
 
     //update profile photo
     @Multipart
@@ -210,8 +219,17 @@ interface GraduationApi {
 
 
     //get my offer
-    @GET(Constant.GETMYOFFER)
+    @GET(Constant.GETMYOFFER + "/{userId}")
     suspend fun getMyOffer(
+        @Path("userId") userId: String,
         @Header("Authorization") authorization: String
     ): GetMyOffer
+
+    //update Password
+
+    @PATCH(Constant.UPDATEPASSWORD)
+    suspend fun updatePassword(
+        @Header("Authorization") authorization: String,
+        @Body updatePasswordBody: Map<String, String>
+    ): UpdatePassword
 }

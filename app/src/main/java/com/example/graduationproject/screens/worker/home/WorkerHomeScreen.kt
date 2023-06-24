@@ -1,7 +1,6 @@
 package com.example.graduationproject.screens.worker.home
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -183,7 +182,7 @@ fun WorkerHomeScreen(
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
 
     SwipeRefresh(state = swipeRefreshState, onRefresh = {
-        if(homeNavBar.value == "home") {
+        if (homeNavBar.value == "home") {
             swipeLoading = true
             loading = false
             scope.launch {
@@ -223,7 +222,7 @@ fun WorkerHomeScreen(
                     }
                     if (it.title == "إعدادات حسابي") {
                         scope.launch {
-                            navController.navigate(route = AllScreens.WorkerProfileSettingsScreen.name)
+                            navController.navigate(route = AllScreens.ProfileScreen.name + "/${false}")
                             scaffoldState.drawerState.close()
                         }
                     }

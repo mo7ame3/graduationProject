@@ -18,7 +18,11 @@ import com.example.graduationproject.ui.theme.MainColor
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MyOfferProblemDetails(navController: NavController) {
+fun MyOfferProblemDetails(
+    navController: NavController,
+   // userId: String,
+) {
+
     Scaffold(topBar = {
         TopAppBar(title = "تفاصيل الطلب") {
             navController.popBackStack()

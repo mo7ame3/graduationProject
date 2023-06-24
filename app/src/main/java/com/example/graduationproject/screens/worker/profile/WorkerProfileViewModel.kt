@@ -37,7 +37,7 @@ class WorkerProfileViewModel @Inject constructor(
         )
     }
 
-    suspend fun getMyCompletedOffer(authorization: String): WrapperClass<GetMyOffer, Boolean, Exception> {
-        return workerRepository.getMyOffer(authorization = authorization)
+    suspend fun getMyCompletedOffer(authorization: String , userId : String): WrapperClass<GetMyOffer, Boolean, Exception> {
+        return workerRepository.getMyOffer(authorization = authorization , userId = userId)
     }
 }

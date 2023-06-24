@@ -9,7 +9,6 @@ import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 class WorkerRepository @Inject constructor(private val api: GraduationApi) {
@@ -111,9 +110,10 @@ class WorkerRepository @Inject constructor(private val api: GraduationApi) {
 
     suspend fun getMyOffer(
         authorization: String,
+        userId: String
     ): WrapperClass<GetMyOffer, Boolean, Exception> {
         try {
-            getMyOffer.data = api.getMyOffer(authorization = authorization)
+            getMyOffer.data = api.getMyOffer(authorization = authorization, userId = userId)
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()

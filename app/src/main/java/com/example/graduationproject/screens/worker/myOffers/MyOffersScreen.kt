@@ -24,6 +24,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -47,11 +48,11 @@ import com.example.graduationproject.components.GetSmallPhoto
 import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.SmallPhoto
 import com.example.graduationproject.constant.Constant
-import com.example.graduationproject.data.MyCraftOrderData
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.worker.getMyOffer.Data
 import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
 import com.example.graduationproject.navigation.AllScreens
+import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.GrayColor
 import com.example.graduationproject.ui.theme.MainColor
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -67,6 +68,8 @@ import kotlinx.coroutines.launch
 fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersViewModel) {
 
     val context = LocalContext.current
+    val sharedPreference = SharedPreference(context)
+    val userId = sharedPreference.getUserId.collectAsState(initial = "")
     val scope = rememberCoroutineScope()
     val toggleButton = remember {
         mutableStateOf(true)
@@ -97,13 +100,13 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
         mutableStateOf(0)
     }
 
-
     val offerData = MutableStateFlow<List<Data>>(emptyList())
-    if (Constant.token.isNotEmpty()) {
+    if (Constant.token.isNotEmpty() && userId.value.toString().isNotEmpty()) {
         val response: WrapperClass<GetMyOffer, Boolean, Exception> =
             produceState<WrapperClass<GetMyOffer, Boolean, Exception>>(initialValue = WrapperClass()) {
                 value = myOffersViewModel.getMyOffers(
-                    authorization = "Bearer " + Constant.token
+                    authorization = "Bearer " + Constant.token,
+                    userId = userId.value.toString()
                 )
             }.value
         if (response.data?.status == "success") {
@@ -130,7 +133,8 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                     }
                 }
             }
-        } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+        }
+        else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -161,6 +165,7 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                         val response: WrapperClass<GetMyOffer, Boolean, Exception> =
                             myOffersViewModel.getMyOffers(
                                 authorization = "Bearer ${Constant.token}",
+                                userId = userId.value.toString()
                             )
                         if (response.data?.status == "success") {
                             if (response.data != null) {
@@ -186,8 +191,7 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                     }
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             swipeLoading = false
                         }
                     }
@@ -214,7 +218,9 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                         if (toggleButton.value) {
                             if (offerData.value.isNotEmpty()) {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize().padding(top = 20.dp),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(top = 20.dp),
                                     verticalArrangement = if (acceptedCount.value == 0) Arrangement.Center else Arrangement.Top,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -247,7 +253,9 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                         } else {
                             if (offerData.value.isNotEmpty()) {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize().padding(top = 20.dp),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(top = 20.dp),
                                     verticalArrangement = if (pendingCount.value == 0) Arrangement.Center else Arrangement.Top,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
@@ -292,6 +300,7 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                     val response: WrapperClass<GetMyOffer, Boolean, Exception> =
                                         myOffersViewModel.getMyOffers(
                                             authorization = "Bearer ${Constant.token}",
+                                            userId = userId.value.toString()
                                         )
                                     if (response.data?.status == "success") {
                                         if (response.data != null) {
@@ -327,7 +336,8 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                                 }
                                             }
                                         }
-                                    } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+                                    }
+                                    else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
                                         exception = true
                                         Toast.makeText(
                                             context,

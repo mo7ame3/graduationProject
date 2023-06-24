@@ -11,7 +11,10 @@ import javax.inject.Inject
 class MyOffersViewModel @Inject constructor(private val workerRepository: WorkerRepository) :
     ViewModel() {
 
-        suspend fun getMyOffers(authorization : String) : WrapperClass<GetMyOffer , Boolean , Exception>{
-            return workerRepository.getMyOffer(authorization = authorization)
-        }
+    suspend fun getMyOffers(
+        authorization: String,
+        userId: String
+    ): WrapperClass<GetMyOffer, Boolean, Exception> {
+        return workerRepository.getMyOffer(authorization = authorization, userId = userId)
+    }
 }

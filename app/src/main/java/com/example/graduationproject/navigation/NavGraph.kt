@@ -30,13 +30,14 @@ import com.example.graduationproject.screens.client.postScreen.PostViewModel
 import com.example.graduationproject.screens.client.profile.ClientMyProfileScreen
 import com.example.graduationproject.screens.client.profile.ClientProfileScreen
 import com.example.graduationproject.screens.client.profile.ClientProfileViewModel
-import com.example.graduationproject.screens.client.profileSettings.ClientProfileSettingsScreen
 import com.example.graduationproject.screens.client.rate.ClientRateScreen
 import com.example.graduationproject.screens.sharedScreens.chat.ChatDetails
 import com.example.graduationproject.screens.sharedScreens.login.AuthenticationViewModel
 import com.example.graduationproject.screens.sharedScreens.login.ChangePasswordScreen
 import com.example.graduationproject.screens.sharedScreens.login.ForgotPasswordScreen
 import com.example.graduationproject.screens.sharedScreens.login.LoginScreen
+import com.example.graduationproject.screens.sharedScreens.profileSetting.ProfileSettingScreen
+import com.example.graduationproject.screens.sharedScreens.profileSetting.ProfileSettingViewModel
 import com.example.graduationproject.screens.sharedScreens.report.ReportScreen
 import com.example.graduationproject.screens.sharedScreens.splash.SplashScreen
 import com.example.graduationproject.screens.worker.home.WorkerHomeScreen
@@ -48,7 +49,6 @@ import com.example.graduationproject.screens.worker.problemDetails.WorkerProblem
 import com.example.graduationproject.screens.worker.profile.WorkerMyProfileScreen
 import com.example.graduationproject.screens.worker.profile.WorkerProfileScreen
 import com.example.graduationproject.screens.worker.profile.WorkerProfileViewModel
-import com.example.graduationproject.screens.worker.profileSettings.WorkerProfileSettingsScreen
 
 @Composable
 fun NavGraph() {
@@ -138,9 +138,22 @@ fun NavGraph() {
             ChangePasswordScreen(navController = navController)
         }
 
-        composable(route = AllScreens.ClientProfileSettingsScreen.name) {
-            ClientProfileSettingsScreen(navController = navController)
+
+        composable(
+            route = AllScreens.ProfileScreen.name + "/{client}",
+            arguments = listOf(navArgument(name = "client") {
+                type = NavType.BoolType
+            })
+        )
+        {
+            val profileSettingViewModel = hiltViewModel<ProfileSettingViewModel>()
+            ProfileSettingScreen(
+                navController = navController,
+                client = it.arguments!!.getBoolean("client"),
+                profileSettingViewModel = profileSettingViewModel
+            )
         }
+
         val myCraftOrders = AllScreens.ClientMyCraftOrders.name
         composable(
             route = "$myCraftOrders/{craftId}/{craftName}",
@@ -165,9 +178,10 @@ fun NavGraph() {
             route = "$profileScreen/{showReport}/{completeProject}/{admin}/{name}",
             arguments = listOf(navArgument(name = "showReport") {
                 type = NavType.BoolType
-            }, navArgument(name = "completeProject") {
-                type = NavType.BoolType
             },
+                navArgument(name = "completeProject") {
+                    type = NavType.BoolType
+                },
                 navArgument(name = "admin") {
                     type = NavType.BoolType
                 },
@@ -292,9 +306,6 @@ fun NavGraph() {
             )
         }
 
-        composable(route = AllScreens.WorkerProfileSettingsScreen.name) {
-            WorkerProfileSettingsScreen(navController = navController)
-        }
         composable(route = AllScreens.MyProjectProblemDetails.name) {
             MyOfferProblemDetails(navController = navController)
         }

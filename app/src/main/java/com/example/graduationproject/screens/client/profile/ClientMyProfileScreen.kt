@@ -298,9 +298,11 @@ fun ClientMyProfileScreen(
                     }
                 }
             }
-        } else if (loading && !exception) {
+        }
+        else if (loading && !exception) {
             CircleProgress()
-        } else if (exception) {
+        }
+        else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
