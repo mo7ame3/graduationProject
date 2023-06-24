@@ -41,7 +41,8 @@ import com.example.graduationproject.screens.sharedScreens.report.ReportScreen
 import com.example.graduationproject.screens.sharedScreens.splash.SplashScreen
 import com.example.graduationproject.screens.worker.home.WorkerHomeScreen
 import com.example.graduationproject.screens.worker.home.WorkerHomeViewModel
-import com.example.graduationproject.screens.worker.myProjects.MyProjectProblemDetails
+import com.example.graduationproject.screens.worker.myOffers.MyOfferProblemDetails
+import com.example.graduationproject.screens.worker.myOffers.MyOffersViewModel
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetails
 import com.example.graduationproject.screens.worker.problemDetails.WorkerProblemDetailsViewModel
 import com.example.graduationproject.screens.worker.profile.WorkerMyProfileScreen
@@ -237,9 +238,13 @@ fun NavGraph() {
             })
         ) { data ->
             val viewModel = hiltViewModel<WorkerHomeViewModel>()
+            val myOfferViewModel = hiltViewModel<MyOffersViewModel>()
             data.arguments!!.getString("route")?.let {
                 WorkerHomeScreen(
-                    navController = navController, route = it, workerHomeViewModel = viewModel
+                    navController = navController,
+                    route = it,
+                    workerHomeViewModel = viewModel,
+                    myOffersViewModel = myOfferViewModel
                 )
             }
         }
@@ -291,7 +296,7 @@ fun NavGraph() {
             WorkerProfileSettingsScreen(navController = navController)
         }
         composable(route = AllScreens.MyProjectProblemDetails.name) {
-            MyProjectProblemDetails(navController = navController)
+            MyOfferProblemDetails(navController = navController)
         }
 
 

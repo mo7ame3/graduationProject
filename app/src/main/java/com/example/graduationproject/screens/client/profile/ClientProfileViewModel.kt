@@ -10,7 +10,9 @@ import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
-class ClientProfileViewModel @Inject constructor(private val sharedRepository: SharedRepository) :
+class ClientProfileViewModel @Inject constructor(
+    private val sharedRepository: SharedRepository
+) :
     ViewModel() {
 
     suspend fun getProfile(
@@ -31,4 +33,5 @@ class ClientProfileViewModel @Inject constructor(private val sharedRepository: S
             image = image
         )
     }
+
 }

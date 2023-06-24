@@ -415,4 +415,7 @@ object Constant {
 
     //updateProfilePhoto
     const val UPDATEPROFILEPHOTO = "api/v1/users/image"
+
+    //GetMyOffer
+    const val GETMYOFFER = "api/v1/offers/myOffers"
 }

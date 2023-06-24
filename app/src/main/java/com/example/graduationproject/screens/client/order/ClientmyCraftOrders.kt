@@ -84,6 +84,12 @@ fun ClientMyCraftOrders(
     val length = remember {
         mutableStateOf(0)
     }
+    val lengthRefresh = remember {
+        mutableStateOf(0)
+    }
+    val orderDonContRefresh = remember {
+        mutableStateOf(0)
+    }
     //state flow list
     val orderList = MutableStateFlow<List<Data>>(emptyList())
 
@@ -115,12 +121,10 @@ fun ClientMyCraftOrders(
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 loading = false
             }
-        }
-        else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+        } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -138,6 +142,8 @@ fun ClientMyCraftOrders(
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
     SwipeRefresh(state = swipeRefreshState,
         onRefresh = {
+            lengthRefresh.value = 0
+            orderDonContRefresh.value = 0
             swipeLoading = true
             loading = false
             scope.launch {
@@ -149,7 +155,20 @@ fun ClientMyCraftOrders(
                 if (orderData.data?.status == "success") {
                     if (orderData.data != null) {
                         orderList.emit(orderData.data!!.data!!)
-                        swipeLoading = false
+                        orderList.value.forEach {
+                            lengthRefresh.value = lengthRefresh.value + 1
+                            if (it.status == "orderDone" && lengthRefresh.value != orderList.value.size) {
+                                orderDonContRefresh.value = orderDonContRefresh.value + 1
+                            }
+                            if (it.status == "orderDone" && lengthRefresh.value == orderList.value.size) {
+                                orderDonContRefresh.value = orderDonContRefresh.value + 1
+                                orderDonCont.value = orderDonContRefresh.value
+                                swipeLoading = false
+                            }
+                            if (it.status != "orderDone" && lengthRefresh.value == orderList.value.size) {
+                                swipeLoading = false
+                            }
+                        }
                     }
                 } else {
                     swipeLoading = false
@@ -172,18 +191,17 @@ fun ClientMyCraftOrders(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = if (orderDonCont.value == orderList.value.size) Arrangement.Center else Arrangement.Top
                     ) {
-                        if (orderDonCont.value != orderList.value.size){
-                        items(orderList.value) { itemlist ->
-                            MyCraftOrdersRow(
-                                item = itemlist
-                            ) { orderData ->
-                                //nav to Offer Screen
-                                navController.navigate(AllScreens.ClientOrderOfferScreen.name + "/${orderData.title}/${orderData.description}/${orderData._id}/${craftId}")
-                            }
+                        if (orderDonCont.value != orderList.value.size) {
+                            items(orderList.value) { itemlist ->
+                                MyCraftOrdersRow(
+                                    item = itemlist
+                                ) { orderData ->
+                                    //nav to Offer Screen
+                                    navController.navigate(AllScreens.ClientOrderOfferScreen.name + "/${orderData.title}/${orderData.description}/${orderData._id}/${craftId}")
+                                }
 
-                        }
-                        }
-                        else {
+                            }
+                        } else {
                             item {
                                 Text(
                                     text = "لا يوجد طلبات حاليا", style = TextStyle(
@@ -195,8 +213,7 @@ fun ClientMyCraftOrders(
                             }
                         }
                     }
-                }
-                else {
+                } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -213,11 +230,9 @@ fun ClientMyCraftOrders(
                         }
                     }
                 }
-            }
-            else if (loading && !exception) {
+            } else if (loading && !exception) {
                 CircleProgress()
-            }
-            else if (exception) {
+            } else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,

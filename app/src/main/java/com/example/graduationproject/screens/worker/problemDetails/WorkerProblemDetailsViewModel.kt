@@ -29,11 +29,11 @@ class WorkerProblemDetailsViewModel @Inject constructor(private val workerReposi
     ): WrapperClass<CreateOffer, Boolean, Exception> {
         return workerRepository.createOffer(
             authorization = authorization,
-            offerBody = if (offerDetails == null) mapOf("order" to orderId)
+            offerBody = if (offerDetails == null) mapOf("" to "")
             else mapOf(
                 "text" to offerDetails,
-                "order" to orderId
-            )
+            ),
+            orderId = orderId
         )
     }
 }

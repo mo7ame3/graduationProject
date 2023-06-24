@@ -50,17 +50,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.graduationproject.R
 import com.example.graduationproject.components.CircleProgress
+import com.example.graduationproject.components.EmptyColumn
 import com.example.graduationproject.components.GetSmallPhoto
 import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.ProfilePhoto
-import com.example.graduationproject.components.SmallPhoto
 import com.example.graduationproject.components.StarsNumber
 import com.example.graduationproject.components.TopAppBar
-import com.example.graduationproject.data.MyCraftOrderData
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.profile.User
 import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
+import com.example.graduationproject.model.worker.getMyOffer.Data
+import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.GrayColor
 import com.example.graduationproject.ui.theme.MainColor
@@ -88,15 +90,14 @@ fun WorkerMyProfileScreen(
     val userId = sharedPreference.getUserId.collectAsState(initial = "")
 
 
-    var uri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-
     //coroutineScope
     val scope = rememberCoroutineScope()
 
     //state flow list
     val getProfileUser = MutableStateFlow<List<User>>(emptyList())
+
+    //state my Offer
+    //val getMyOfferData = MutableStateFlow<List<Data>>(emptyList())
 
 
     val completeToggle = remember {
@@ -119,6 +120,20 @@ fun WorkerMyProfileScreen(
     var exception by remember {
         mutableStateOf(false)
     }
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    var loading2 by remember {
+        mutableStateOf(true)
+    }
+    val myOfferData = remember {
+        mutableStateListOf<Data>()
+    }
+    val length = remember {
+        mutableStateOf(0)
+    }
+
     if (userId.value.toString().isNotEmpty() && token.value.toString().isNotEmpty()) {
         val getProfile: WrapperClass<GetProfile, Boolean, Exception> =
             produceState<WrapperClass<GetProfile, Boolean, Exception>>(
@@ -142,6 +157,24 @@ fun WorkerMyProfileScreen(
                     getProfileUser.emit(getProfile.data!!.data?.user!!)
                     loading = false
                     exception = false
+
+                    val response: WrapperClass<GetMyOffer, Boolean, Exception> =
+                        workerProfileViewModel.getMyCompletedOffer(authorization = "Bearer " + Constant.token)
+                    if (response.data?.status == "success") {
+                        response.data!!.data?.forEach {
+                            length.value = length.value + 1
+                            if (it.status == "completed") {
+                                myOfferData.add(it)
+                                if (length.value == response.data!!.data?.size) {
+                                    loading2 = false
+                                }
+                            } else {
+                                if (length.value == response.data!!.data?.size) {
+                                    loading2 = false
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -154,7 +187,8 @@ fun WorkerMyProfileScreen(
                     .fillMaxWidth()
                     .padding(start = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            )
+            {
                 if (changeProfilePhoto) {
                     TextButton(onClick = {
                         val imageName = uri?.toString()?.let { it1 -> File(it1) }
@@ -310,15 +344,23 @@ fun WorkerMyProfileScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 if (completeToggle.value) {
                     //Complete
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(350.dp)
-                    ) {
-                        items(completeMyList) {
-                            CompleteMyProjectRow(it)
-                            Spacer(modifier = Modifier.height(10.dp))
+                    if (!loading2) {
+                        if (!myOfferData.isEmpty()) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(350.dp)
+                            ) {
+                                items(myOfferData) {
+                                    CompleteMyProjectRow(it)
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                }
+                            }
+                        } else {
+                            EmptyColumn(text = "لا يوجد مشاريع مكتملة")
                         }
+                    } else {
+                        CircleProgress()
                     }
                 } else {
                     //pictures
@@ -345,11 +387,9 @@ fun WorkerMyProfileScreen(
                     }
                 }
             }
-        }
-        else if (loading && !exception) {
+        } else if (loading && !exception) {
             CircleProgress()
-        }
-        else if (exception) {
+        } else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -395,7 +435,7 @@ fun WorkerMyProfileScreen(
 
 @Composable
 fun CompleteMyProjectRow(
-    item: MyCraftOrderData
+    item: Data
 ) {
     Card(
         modifier = Modifier
@@ -411,24 +451,24 @@ fun CompleteMyProjectRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // photo url from data base workers photos
-            SmallPhoto()
+            GetSmallPhoto(uri = if (item.order.user.avatar != null) item.order.user.avatar.toString() else null)
             Spacer(modifier = Modifier.width(5.dp))
             Column {
                 Text(
-                    text = item.clientName.toString(), style = TextStyle(
+                    text = item.order.user.name, style = TextStyle(
                         color = MainColor,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                 )
                 Text(
-                    text = item.problemTitle, style = TextStyle(
+                    text = item.order.title, style = TextStyle(
                         color = MainColor,
                         fontSize = 15.sp,
                     )
                 )
                 Text(
-                    text = item.problemType, style = TextStyle(
+                    text = item.order.orderDifficulty, style = TextStyle(
                         color = GrayColor,
                         fontSize = 12.sp,
                     )
@@ -456,41 +496,3 @@ fun PickMyPhotoRow(
     }
 }
 
-
-val completeMyList = listOf(
-    MyCraftOrderData(
-        clientName = "عبدالرحمن محمد",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-    MyCraftOrderData(
-        clientName = "عبدالله محمد",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-    MyCraftOrderData(
-        clientName = "احمد محمد",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-    MyCraftOrderData(
-        clientName = "محمد احمد",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-    MyCraftOrderData(
-        clientName = "محمود محمد",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-    MyCraftOrderData(
-        clientName = "محمد محمود",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-    MyCraftOrderData(
-        clientName = "رغد محمود",
-        problemType = "صيانة بسيطة",
-        problemTitle = "تصليح كرسي"
-    ),
-)

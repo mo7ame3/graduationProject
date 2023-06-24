@@ -3,11 +3,13 @@ package com.example.graduationproject.repository
 import android.util.Log
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
+import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import com.example.graduationproject.network.GraduationApi
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class WorkerRepository @Inject constructor(private val api: GraduationApi) {
@@ -15,6 +17,7 @@ class WorkerRepository @Inject constructor(private val api: GraduationApi) {
     private val getHome = WrapperClass<WorkerHome, Boolean, Exception>()
     private val getOrderDetails = WrapperClass<GetOrderDetails, Boolean, Exception>()
     private val createOffer = WrapperClass<CreateOffer, Boolean, Exception>()
+    private val getMyOffer = WrapperClass<GetMyOffer, Boolean, Exception>()
 
     //-----------------------
     suspend fun getHome(
@@ -36,6 +39,9 @@ class WorkerRepository @Inject constructor(private val api: GraduationApi) {
             getHome.e = e
             Log.d("TAG", "getHomeWorker: $e")
 
+        } catch (e: Exception) {
+            getHome.e = e
+            Log.d("TAG", "getHomeWorker: $e")
         }
 
         return getHome
@@ -63,6 +69,9 @@ class WorkerRepository @Inject constructor(private val api: GraduationApi) {
             getOrderDetails.e = e
             Log.d("TAG", "getOrderDetails: $e")
 
+        } catch (e: Exception) {
+            getHome.e = e
+            Log.d("TAG", "getOrderDetails: $e")
         }
 
         return getOrderDetails
@@ -70,10 +79,15 @@ class WorkerRepository @Inject constructor(private val api: GraduationApi) {
 
     suspend fun createOffer(
         authorization: String,
+        orderId: String,
         offerBody: Map<String, String>
     ): WrapperClass<CreateOffer, Boolean, Exception> {
         try {
-            createOffer.data = api.createOffer(authorization = authorization, offerBody = offerBody)
+            createOffer.data = api.createOffer(
+                authorization = authorization,
+                offerBody = offerBody,
+                orderId = orderId
+            )
         } catch (e: HttpException) {
             //addNewUser.loading = true
             val error = e.response()?.errorBody()?.string()
@@ -86,9 +100,36 @@ class WorkerRepository @Inject constructor(private val api: GraduationApi) {
             createOffer.e = e
             Log.d("TAG", "createOffer: $e")
 
+        } catch (e: Exception) {
+            getHome.e = e
+            Log.d("TAG", "createOffer: $e")
         }
 
         return createOffer
     }
 
+
+    suspend fun getMyOffer(
+        authorization: String,
+    ): WrapperClass<GetMyOffer, Boolean, Exception> {
+        try {
+            getMyOffer.data = api.getMyOffer(authorization = authorization)
+        } catch (e: HttpException) {
+            //addNewUser.loading = true
+            val error = e.response()?.errorBody()?.string()
+            val status = error!!.split("status")[1].split(":")[1].split("\"")[1]
+            val message = error.split("message")[1].split("\":")[1]
+            Log.d("TAG", "getMyOffer: $message")
+            getMyOffer.data = GetMyOffer(status = status, message = message)
+
+        } catch (e: SocketTimeoutException) {
+            getMyOffer.e = e
+            Log.d("TAG", "getMyOffer: $e")
+
+        } catch (e: Exception) {
+            getHome.e = e
+            Log.d("TAG", "getMyOffer: $e")
+        }
+        return getMyOffer
+    }
 }

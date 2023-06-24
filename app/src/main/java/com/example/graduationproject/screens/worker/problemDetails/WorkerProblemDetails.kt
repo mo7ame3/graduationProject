@@ -106,7 +106,7 @@ fun WorkerProblemDetails(
             exception = true
             Toast.makeText(
                 context,
-                "خطأ في الانترنت",
+                if(response.e == null)"خطأ في الانترنت" else response.e!!.message,
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -234,7 +234,7 @@ fun WorkerProblemDetails(
                                     loading = false
                                     Toast.makeText(
                                         context,
-                                        "خطأ في الانترنت",
+                                        if(response.e == null)"خطأ في الانترنت" else response.e!!.message,
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -273,7 +273,7 @@ fun WorkerProblemDetails(
                             exception = true
                             Toast.makeText(
                                 context,
-                                "خطأ في الانترنت",
+                                if(reloadResponse.e == null)"خطأ في الانترنت" else reloadResponse.e!!.message,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

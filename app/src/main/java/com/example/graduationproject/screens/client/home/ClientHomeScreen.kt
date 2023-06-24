@@ -100,7 +100,7 @@ fun ClientHomeScreen(
             home.value = route
             isFirst.value = false
             title.value =
-                if (route == "home") "خدماتي" else if (route == "chat") "المحادثات" else "طلباتي"
+                if (route == "home") Constant.title else if (route == "chat") "المحادثات" else "طلباتي"
         }
     }
 

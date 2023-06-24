@@ -48,6 +48,7 @@ import com.example.graduationproject.components.BottomBar
 import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.DrawerBody
 import com.example.graduationproject.components.DrawerHeader
+import com.example.graduationproject.components.EmptyColumn
 import com.example.graduationproject.components.GetSmallPhoto
 import com.example.graduationproject.components.TopMainBar
 import com.example.graduationproject.constant.Constant
@@ -56,7 +57,8 @@ import com.example.graduationproject.model.worker.home.Order
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.screens.sharedScreens.chat.ChatList
-import com.example.graduationproject.screens.worker.myProjects.MyProjects
+import com.example.graduationproject.screens.worker.myOffers.MyOffersScreen
+import com.example.graduationproject.screens.worker.myOffers.MyOffersViewModel
 import com.example.graduationproject.sharedpreference.SharedPreference
 import com.example.graduationproject.ui.theme.GrayColor
 import com.example.graduationproject.ui.theme.MainColor
@@ -73,7 +75,8 @@ import kotlinx.coroutines.launch
 fun WorkerHomeScreen(
     navController: NavHostController,
     route: String,
-    workerHomeViewModel: WorkerHomeViewModel
+    workerHomeViewModel: WorkerHomeViewModel,
+    myOffersViewModel: MyOffersViewModel
 ) {
     //Log out Variables
     val context = LocalContext.current
@@ -100,10 +103,9 @@ fun WorkerHomeScreen(
             homeNavBar.value = route
             isFirst.value = false
             title.value =
-                if (route == "home") "خدماتي" else if (route == "chat") "المحادثات" else "مشاريعي"
+                if (route == "home") Constant.title else if (route == "chat") "المحادثات" else "مشاريعي"
         }
     }
-
 
     var loading by remember {
         mutableStateOf(true)
@@ -157,7 +159,6 @@ fun WorkerHomeScreen(
                             }
                         }
                     }
-
                     result.value = homeData.data!!.result
                 }
             } else {
@@ -181,26 +182,26 @@ fun WorkerHomeScreen(
     }
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
 
-
     SwipeRefresh(state = swipeRefreshState, onRefresh = {
-        swipeLoading = true
-        loading = false
-        scope.launch {
-            val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
-                workerHomeViewModel.getHome(
-                    authorization = "Bearer ${token.value.toString()}",
-                    craftId = craftId.value.toString()
-                )
-            if (homeData.data?.status == "success") {
-                if (homeData.data != null) {
-                    homeList.emit(homeData.data!!.data!!.orders)
+        if(homeNavBar.value == "home") {
+            swipeLoading = true
+            loading = false
+            scope.launch {
+                val homeData: WrapperClass<WorkerHome, Boolean, Exception> =
+                    workerHomeViewModel.getHome(
+                        authorization = "Bearer ${token.value.toString()}",
+                        craftId = craftId.value.toString()
+                    )
+                if (homeData.data?.status == "success") {
+                    if (homeData.data != null) {
+                        homeList.emit(homeData.data!!.data!!.orders)
+                        swipeLoading = false
+                    }
+                } else {
                     swipeLoading = false
                 }
-            } else {
-                swipeLoading = false
             }
         }
-
     }) {
         Scaffold(
             drawerContent = {
@@ -209,7 +210,6 @@ fun WorkerHomeScreen(
                 DrawerBody(isClient = false, name = name.value.toString()) {
                     if (it.title == "مشاريعي") {
                         scope.launch {
-                            Log.d("TAG", "WorkerHomeScreen: ${it.title}")
                             homeNavBar.value = "order"
                             scaffoldState.drawerState.close()
                         }
@@ -279,21 +279,7 @@ fun WorkerHomeScreen(
                             }
                         }
                     } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            item {
-                                Text(
-                                    text = "لا يوجد طلبات حاليا", style = TextStyle(
-                                        color = MainColor,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 20.sp
-                                    )
-                                )
-                            }
-                        }
+                        EmptyColumn(text = "لا يوجد طلبات حاليا")
                     }
                 }
                 if (homeNavBar.value == "chat") {
@@ -301,7 +287,7 @@ fun WorkerHomeScreen(
                 }
                 //my projects
                 if (homeNavBar.value == "order") {
-                    MyProjects(navController)
+                    MyOffersScreen(navController, myOffersViewModel)
                 }
             } else if (loading && !exception) {
                 CircleProgress()
@@ -323,9 +309,25 @@ fun WorkerHomeScreen(
                             if (homeData.data?.status == "success") {
                                 if (homeData.data != null) {
                                     scope.launch {
-                                        homeList.emit(homeData.data!!.data?.orders!!)
-                                        loading = false
-                                        exception = false
+                                        if (homeData.data!!.result != 0) {
+                                            homeList.emit(homeData.data!!.data!!.orders)
+                                            homeList.value.forEach {
+                                                length.value = length.value + 1
+                                                if (it.status == "pending") {
+                                                    pendingOrder.value = pendingOrder.value + 1
+                                                    if (length.value == homeList.value.size) {
+                                                        loading = false
+                                                        exception = false
+                                                    }
+                                                } else {
+                                                    if (length.value == homeList.value.size) {
+                                                        loading = false
+                                                        exception = false
+                                                    }
+                                                }
+                                            }
+                                            result.value = homeData.data!!.result
+                                        }
                                     }
                                 }
                             } else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
@@ -426,12 +428,3 @@ fun WorkerHomeRow(
         }
     }
 }
-
-
-
-
-
-
-
-
-

@@ -19,6 +19,7 @@ import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateOffer.UpdateOffer
 import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
 import com.example.graduationproject.model.worker.createOffer.CreateOffer
+import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
 import com.example.graduationproject.model.worker.home.WorkerHome
 import com.example.graduationproject.model.worker.orderDetails.GetOrderDetails
 import okhttp3.MultipartBody
@@ -158,9 +159,10 @@ interface GraduationApi {
     ): Delete
 
     //Create Offer
-    @POST(Constant.CREATEOFFER)
+    @POST(Constant.CREATEOFFER +"/{orderId}")
     suspend fun createOffer(
         @Header("Authorization") authorization: String,
+        @Path("orderId") orderId: String,
         @Body offerBody: Map<String, String>
     ): CreateOffer
 
@@ -197,6 +199,7 @@ interface GraduationApi {
     ): UpdateOrder
 
 
+    //update profile photo
     @Multipart
     @PATCH(Constant.UPDATEPROFILEPHOTO + "/{userId}")
     suspend fun updateProfilePhoto(
@@ -205,4 +208,10 @@ interface GraduationApi {
         @Header("Authorization") authorization: String
     ): UpdateProfilePhoto
 
+
+    //get my offer
+    @GET(Constant.GETMYOFFER)
+    suspend fun getMyOffer(
+        @Header("Authorization") authorization: String
+    ): GetMyOffer
 }

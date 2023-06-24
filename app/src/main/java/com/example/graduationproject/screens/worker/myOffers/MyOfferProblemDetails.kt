@@ -1,4 +1,4 @@
-package com.example.graduationproject.screens.worker.myProjects
+package com.example.graduationproject.screens.worker.myOffers
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
@@ -18,7 +18,7 @@ import com.example.graduationproject.ui.theme.MainColor
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MyProjectProblemDetails(navController: NavController) {
+fun MyOfferProblemDetails(navController: NavController) {
     Scaffold(topBar = {
         TopAppBar(title = "تفاصيل الطلب") {
             navController.popBackStack()

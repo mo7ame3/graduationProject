@@ -182,62 +182,66 @@ fun ClientPostScreen(
                 //Ellipse
 
                 DefaultButton(label = "ارسل", enabled = valid) {
-                    val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
-                    val fileUri: Uri =
-                        selectedImage!! // get the file URI from the file picker result
-                    val inputStream = context.contentResolver.openInputStream(fileUri)
-                    val file = inputStream?.readBytes()
-                        ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    val filePart = file?.let {
-                        MultipartBody.Part.createFormData(
-                            "image", imageName!!.name, it
-                        )
-                    }
-                    val problemTitlePart = problemTitle.value
-                        .toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    val problemTypePart = problemType.value
-                        .toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    val problemDescriptionPart = problemDescription.value
-                        .toRequestBody("multipart/form-data".toMediaTypeOrNull())
-                    scope.launch {
-                        loading = true
-                        if (token.value.toString().isNotEmpty()) {
-                            val response: WrapperClass<CreateOrder, Boolean, Exception> =
-                                postViewModel.createOrder(
-                                    token = "Bearer " + token.value.toString(),
-                                    craftId = craftId,
-                                    image = filePart!!,
-                                    description = problemDescriptionPart,
-                                    title = problemTitlePart,
-                                    orderDifficulty = problemTypePart
-                                )
-                            when (response.data?.status) {
-                                "success" -> {
-                                    navController.navigate(AllScreens.ClientHomeScreen.name + "/home") {
-                                        navController.popBackStack()
-                                        navController.popBackStack()
+                    if (selectedImage != null) {
+                        val imageName = selectedImage?.toString()?.let { it1 -> File(it1) }
+                        val fileUri: Uri =
+                            selectedImage!! // get the file URI from the file picker result
+                        val inputStream = context.contentResolver.openInputStream(fileUri)
+                        val file = inputStream?.readBytes()
+                            ?.toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        val filePart = file?.let {
+                            MultipartBody.Part.createFormData(
+                                "image", imageName!!.name, it
+                            )
+                        }
+                        val problemTitlePart = problemTitle.value
+                            .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        val problemTypePart = problemType.value
+                            .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        val problemDescriptionPart = problemDescription.value
+                            .toRequestBody("multipart/form-data".toMediaTypeOrNull())
+                        scope.launch {
+                            loading = true
+                            if (token.value.toString().isNotEmpty()) {
+                                val response: WrapperClass<CreateOrder, Boolean, Exception> =
+                                    postViewModel.createOrder(
+                                        token = "Bearer " + token.value.toString(),
+                                        craftId = craftId,
+                                        image = filePart!!,
+                                        description = problemDescriptionPart,
+                                        title = problemTitlePart,
+                                        orderDifficulty = problemTypePart
+                                    )
+                                when (response.data?.status) {
+                                    "success" -> {
+                                        navController.navigate(AllScreens.ClientHomeScreen.name + "/home") {
+                                            navController.popBackStack()
+                                            navController.popBackStack()
+                                        }
                                     }
-                                }
 
-                                "error" -> {
-                                    loading = false
-                                    Toast.makeText(
-                                        context,
-                                        "${response.data?.message}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                    "error" -> {
+                                        loading = false
+                                        Toast.makeText(
+                                            context,
+                                            "${response.data?.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
 
-                                else -> {
-                                    loading = false
-                                    Toast.makeText(
-                                        context,
-                                        "خطأ في الانترنت",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    else -> {
+                                        loading = false
+                                        Toast.makeText(
+                                            context,
+                                            "خطأ في الانترنت",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        Toast.makeText(context, "لم تقم بإضافة صورة", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

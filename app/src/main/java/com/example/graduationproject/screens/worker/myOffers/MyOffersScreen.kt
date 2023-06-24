@@ -1,19 +1,39 @@
-package com.example.graduationproject.screens.worker.myProjects
+package com.example.graduationproject.screens.worker.myOffers
 
+import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -21,65 +41,309 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.graduationproject.R
+import com.example.graduationproject.components.CircleProgress
+import com.example.graduationproject.components.EmptyColumn
+import com.example.graduationproject.components.GetSmallPhoto
 import com.example.graduationproject.components.LoginButton
 import com.example.graduationproject.components.SmallPhoto
+import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.MyCraftOrderData
+import com.example.graduationproject.data.WrapperClass
+import com.example.graduationproject.model.worker.getMyOffer.Data
+import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
 import com.example.graduationproject.navigation.AllScreens
 import com.example.graduationproject.ui.theme.GrayColor
 import com.example.graduationproject.ui.theme.MainColor
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
+@SuppressLint(
+    "CoroutineCreationDuringComposition", "StateFlowValueCalledInComposition",
+    "UnusedMaterialScaffoldPaddingParameter", "RememberReturnType"
+)
 @Composable
-fun MyProjects(navController: NavController) {
+fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersViewModel) {
 
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val toggleButton = remember {
         mutableStateOf(true)
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 35.dp, end = 35.dp, top = 20.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            LoginButton(isLogin = toggleButton.value, label = "قيد التنفيذ") {
-                toggleButton.value = true
+    var loading by remember {
+        mutableStateOf(true)
+    }
+    var exception by remember {
+        mutableStateOf(false)
+    }
+
+    val length = remember {
+        mutableStateOf(0)
+    }
+    val pendingCount = remember {
+        mutableStateOf(0)
+    }
+    val acceptedCount = remember {
+        mutableStateOf(0)
+    }
+    val lengthRefresh = remember {
+        mutableStateOf(0)
+    }
+    val pendingCountRefresh = remember {
+        mutableStateOf(0)
+    }
+    val acceptedCountRefresh = remember {
+        mutableStateOf(0)
+    }
+
+
+    val offerData = MutableStateFlow<List<Data>>(emptyList())
+    if (Constant.token.isNotEmpty()) {
+        val response: WrapperClass<GetMyOffer, Boolean, Exception> =
+            produceState<WrapperClass<GetMyOffer, Boolean, Exception>>(initialValue = WrapperClass()) {
+                value = myOffersViewModel.getMyOffers(
+                    authorization = "Bearer " + Constant.token
+                )
+            }.value
+        if (response.data?.status == "success") {
+            if (!response.data?.data.isNullOrEmpty()) {
+                scope.launch {
+                    offerData.emit(response.data!!.data!!)
+                    offerData.value.forEach {
+                        length.value = length.value + 1
+                        if (it.status == "pending") {
+                            pendingCount.value = pendingCount.value + 1
+                            if (length.value == offerData.value.size) {
+                                loading = false
+                            }
+                        } else if (it.status == "accepted") {
+                            acceptedCount.value = acceptedCount.value + 1
+                            if (length.value == offerData.value.size) {
+                                loading = false
+                            }
+                        } else {
+                            if (length.value == offerData.value.size) {
+                                loading = false
+                            }
+                        }
+                    }
+                }
             }
-            LoginButton(isLogin = !toggleButton.value, label = "مشاريع لم تبدأ") {
-                toggleButton.value = false
-            }
+        } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+            exception = true
+            Toast.makeText(
+                context,
+                "خطأ في الانترنت",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-        if (toggleButton.value) {
-            LazyColumn(modifier = Modifier.padding(top = 20.dp)) {
-                items(underwayList) {
-                    UnderwayRow(item = it, navController = navController) {
-                        navController.navigate(route = AllScreens.MyProjectProblemDetails.name)
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-                item {
-                    Spacer(modifier = Modifier.height(50.dp))
-                }
+
+    }
+    Scaffold {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            // Swipe Refresh
+            var swipeLoading by remember {
+                mutableStateOf(false)
             }
-        } else {
-            LazyColumn(modifier = Modifier.padding(top = 20.dp)) {
-                items(underwayList) {
-                    ProjectsDidNotStartYet(item = it,
-                        navController = navController,
-                        onAcceptAction = {
-                            // Add to accept in database
-                        },
-                        onRejectAction = {
-                            // Remove from database
-                        }) {
-                        navController.navigate(route = AllScreens.MyProjectProblemDetails.name)
+            val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = swipeLoading)
+
+            SwipeRefresh(state = swipeRefreshState,
+                onRefresh = {
+                    lengthRefresh.value = 0
+                    acceptedCountRefresh.value = 0
+                    pendingCountRefresh.value = 0
+                    swipeLoading = true
+                    scope.launch {
+                        val response: WrapperClass<GetMyOffer, Boolean, Exception> =
+                            myOffersViewModel.getMyOffers(
+                                authorization = "Bearer ${Constant.token}",
+                            )
+                        if (response.data?.status == "success") {
+                            if (response.data != null) {
+                                offerData.emit(response.data!!.data!!)
+                                offerData.value.forEach {
+                                    lengthRefresh.value = lengthRefresh.value + 1
+                                    if (it.status == "pending") {
+                                        pendingCountRefresh.value = pendingCountRefresh.value + 1
+                                        if (lengthRefresh.value == offerData.value.size) {
+                                            pendingCount.value = pendingCountRefresh.value
+                                            swipeLoading = false
+                                        }
+                                    } else if (it.status == "accepted") {
+                                        acceptedCountRefresh.value = acceptedCountRefresh.value + 1
+                                        if (lengthRefresh.value == offerData.value.size) {
+                                            acceptedCount.value = acceptedCountRefresh.value
+                                            swipeLoading = false
+                                        }
+                                    } else {
+                                        if (lengthRefresh.value == offerData.value.size) {
+                                            swipeLoading = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            swipeLoading = false
+                        }
                     }
-                    Spacer(modifier = Modifier.height(20.dp))
-                }
-                item {
-                    Spacer(modifier = Modifier.height(50.dp))
+                })
+            {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 35.dp, end = 35.dp, top = 20.dp)
+                ) {
+                    if (!loading && !exception) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            LoginButton(isLogin = toggleButton.value, label = "قيد التنفيذ") {
+                                toggleButton.value = true
+                            }
+                            LoginButton(isLogin = !toggleButton.value, label = "مشاريع لم تبدأ") {
+                                toggleButton.value = false
+                            }
+                        }
+                        if (toggleButton.value) {
+                            if (offerData.value.isNotEmpty()) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize().padding(top = 20.dp),
+                                    verticalArrangement = if (acceptedCount.value == 0) Arrangement.Center else Arrangement.Top,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    if (acceptedCount.value > 0) {
+                                        items(offerData.value) {
+                                            UnderwayRow(item = it, navController = navController) {
+                                                navController.navigate(route = AllScreens.MyProjectProblemDetails.name)
+                                            }
+                                        }
+                                        item {
+                                            Spacer(modifier = Modifier.height(50.dp))
+                                        }
+                                    } else {
+                                        item {
+                                            Text(
+                                                text = "لا يوجد عروض قيد التنفيذ",
+                                                style = TextStyle(
+                                                    color = MainColor,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    fontSize = 20.sp
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                EmptyColumn(text = "لا يوجد عروض قيد التنفيذ")
+
+                            }
+                        } else {
+                            if (offerData.value.isNotEmpty()) {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize().padding(top = 20.dp),
+                                    verticalArrangement = if (pendingCount.value == 0) Arrangement.Center else Arrangement.Top,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    if (pendingCount.value > 0) {
+                                        items(offerData.value) {
+                                            OffersDidNotStartYet(item = it) {
+                                                navController.navigate(route = AllScreens.MyProjectProblemDetails.name)
+                                            }
+                                        }
+                                        item {
+                                            Spacer(modifier = Modifier.height(50.dp))
+                                        }
+                                    } else {
+                                        item {
+                                            Text(
+                                                text = "لا يوجد عروض قيد الانتظار",
+                                                style = TextStyle(
+                                                    color = MainColor,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    fontSize = 20.sp
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                EmptyColumn(text = "لا يوجد عروض قيد الانتظار")
+                            }
+                        }
+                    } else if (loading && !exception) {
+                        CircleProgress()
+                    } else if (exception) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = {
+                                exception = false
+                                loading = true
+                                scope.launch {
+                                    val response: WrapperClass<GetMyOffer, Boolean, Exception> =
+                                        myOffersViewModel.getMyOffers(
+                                            authorization = "Bearer ${Constant.token}",
+                                        )
+                                    if (response.data?.status == "success") {
+                                        if (response.data != null) {
+                                            scope.launch {
+                                                if (!response.data!!.data.isNullOrEmpty()) {
+                                                    offerData.emit(response.data!!.data!!)
+                                                    offerData.value.forEach {
+                                                        length.value = length.value + 1
+                                                        if (it.status == "pending") {
+                                                            pendingCount.value =
+                                                                pendingCount.value + 1
+                                                            if (length.value == offerData.value.size) {
+                                                                loading = false
+                                                                exception = false
+                                                            }
+                                                        } else if (it.status == "accepted") {
+                                                            acceptedCount.value =
+                                                                acceptedCount.value + 1
+                                                            if (length.value == offerData.value.size) {
+                                                                loading = false
+                                                                exception = false
+                                                            }
+                                                        } else {
+                                                            if (length.value == offerData.value.size) {
+                                                                loading = false
+                                                                exception = false
+                                                            }
+                                                        }
+                                                    }
+                                                } else {
+                                                    loading = false
+                                                    exception = false
+                                                }
+                                            }
+                                        }
+                                    } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+                                        exception = true
+                                        Toast.makeText(
+                                            context,
+                                            "خطأ في الانترنت",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh, contentDescription = null,
+                                    modifier = Modifier.size(60.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -89,168 +353,124 @@ fun MyProjects(navController: NavController) {
 
 @Composable
 fun UnderwayRow(
-    item: MyCraftOrderData, navController: NavController, onAction: (MyCraftOrderData) -> Unit
+    item: Data,
+    navController: NavController,
+    onAction: (Data) -> Unit
 
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                onAction.invoke(item)
-            }, elevation = 5.dp
-    ) {
-        Row(
+    if (item.status == "accepted") {
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 10.dp, end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .height(120.dp)
+                .clickable {
+                    onAction.invoke(item)
+                }, elevation = 5.dp
         ) {
-            SmallPhoto()
-            Column {
-                Text(
-                    text = item.clientName.toString(), style = TextStyle(
-                        fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = MainColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = item.problemTitle + "- " + item.problemType, style = TextStyle(
-                        fontSize = 14.sp, color = MainColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = item.address.toString(), style = TextStyle(
-                        fontSize = 12.sp, color = GrayColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-            }
-            //Action of Chat Button When Chat is Done
-            Surface(
+            Row(
                 modifier = Modifier
-                    .size(60.dp)
-                    .clickable {
-                        navController.navigate(route = AllScreens.WorkerHomeScreen.name + "/chat") {
-                            navController.popBackStack()
-                        }
-                    }, color = Color.Transparent
+                    .fillMaxSize()
+                    .padding(start = 10.dp, end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.chat),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MainColor
+                SmallPhoto()
+                Column {
+                    Text(
+                        text = item.order.user.name, style = TextStyle(
+                            fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = MainColor
+                        )
                     )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = item.order.title + "- " + item.order.orderDifficulty,
+                        style = TextStyle(
+                            fontSize = 14.sp, color = MainColor
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = item.order.user.address, style = TextStyle(
+                            fontSize = 12.sp, color = GrayColor
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
                 }
+                //Action of Chat Button When Chat is Done
+                Surface(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clickable {
+                            navController.navigate(route = AllScreens.WorkerHomeScreen.name + "/chat") {
+                                navController.popBackStack()
+                            }
+                        }, color = Color.Transparent
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
 
+                        Icon(
+                            painter = painterResource(id = R.drawable.chat),
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp),
+                            tint = MainColor
+                        )
+                    }
+
+                }
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
 @Composable
-fun ProjectsDidNotStartYet(
-    item: MyCraftOrderData,
-    navController: NavController,
-    onAcceptAction: (MyCraftOrderData) -> Unit,
-    onRejectAction: (MyCraftOrderData) -> Unit,
-    onAction: (MyCraftOrderData) -> Unit,
+fun OffersDidNotStartYet(
+    item: Data,
+    onAction: (Data) -> Unit,
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp)
-            .clickable {
-                onAction.invoke(item)
-            }, elevation = 5.dp
-    ) {
-        Row(
+    if (item.status == "pending") {
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 10.dp, end = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .height(100.dp)
+                .clickable {
+                    onAction.invoke(item)
+                }, elevation = 5.dp
         ) {
-            SmallPhoto()
-            Column {
-                Text(
-                    text = item.clientName.toString(), style = TextStyle(
-                        fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = MainColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = item.problemTitle + "- " + item.problemType, style = TextStyle(
-                        fontSize = 14.sp, color = MainColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    text = item.address.toString(), style = TextStyle(
-                        fontSize = 12.sp, color = GrayColor
-                    )
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    //Accept Button
-                    LoginButton(isLogin = true, label = "قبول", modifier = Modifier.width(65.dp)) {
-                        onAcceptAction.invoke(item)
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                    //Reject Button
-                    LoginButton(isLogin = false, label = "رفض", modifier = Modifier.width(65.dp)) {
-                        onRejectAction.invoke(item)
-                    }
-                }
-            }
-            //Action of Chat Button When Chat is Done
-            Surface(
+            Row(
                 modifier = Modifier
-                    .size(60.dp)
-                    .clickable {
-                        navController.navigate(route = AllScreens.WorkerHomeScreen.name + "/chat") {
-                            navController.popBackStack()
-                        }
-                    }, color = Color.Transparent
+                    .fillMaxSize()
+                    .padding(start = 10.dp, end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.chat),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MainColor
+                GetSmallPhoto(uri = if (item.order.user.avatar != null) item.order.user.avatar else null)
+                Spacer(modifier = Modifier.width(20.dp))
+                Column {
+                    Text(
+                        text = item.order.user.name, style = TextStyle(
+                            fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = MainColor
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = item.order.title + "- " + item.order.orderDifficulty,
+                        style = TextStyle(
+                            fontSize = 14.sp, color = MainColor
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = item.order.user.address, style = TextStyle(
+                            fontSize = 12.sp, color = GrayColor
+                        )
                     )
                 }
-
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
-
-val underwayList = listOf(
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-    MyCraftOrderData("أحمد محمد", "تصليح كرسي", "صيانة بسيطة", "", "مركز الفيوم"),
-)

@@ -4,13 +4,18 @@ import androidx.lifecycle.ViewModel
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.shared.profile.GetProfile
 import com.example.graduationproject.model.shared.updateProflePhoto.UpdateProfilePhoto
+import com.example.graduationproject.model.worker.getMyOffer.GetMyOffer
 import com.example.graduationproject.repository.SharedRepository
+import com.example.graduationproject.repository.WorkerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
 @HiltViewModel
-class WorkerProfileViewModel @Inject constructor(private val sharedRepository: SharedRepository) :
+class WorkerProfileViewModel @Inject constructor(
+    private val sharedRepository: SharedRepository,
+    private val workerRepository: WorkerRepository
+) :
     ViewModel() {
 
     suspend fun getProfile(
@@ -30,5 +35,9 @@ class WorkerProfileViewModel @Inject constructor(private val sharedRepository: S
             authorization = authorization,
             image = image
         )
+    }
+
+    suspend fun getMyCompletedOffer(authorization: String): WrapperClass<GetMyOffer, Boolean, Exception> {
+        return workerRepository.getMyOffer(authorization = authorization)
     }
 }
