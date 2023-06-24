@@ -90,7 +90,6 @@ fun ClientOrderScreen(navController: NavController, orderViewModel: OrderViewMod
             }
         }
     } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
-        Log.d("TAG", "Faild")
         exception = true
         Toast.makeText(
             context,

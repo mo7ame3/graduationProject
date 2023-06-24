@@ -163,11 +163,18 @@ fun ClientMyProfileScreen(
                             )
                         when (response.data?.status) {
                             "success" -> {
-                                uri = null
-                                loading = false
-                                changeProfilePhoto = false
+                                val newResponse: WrapperClass<GetProfile, Boolean, Exception> =
+                                    clientProfileViewModel.getProfile(
+                                        userId = userId.value.toString(),
+                                        authorization = "Bearer " + token.value.toString()
+                                    )
+                                if (newResponse.data?.status == null) {
+                                    getProfileUser.emit(newResponse.data!!.data?.user!!)
+                                    uri = null
+                                    loading = false
+                                    changeProfilePhoto = false
+                                }
                             }
-
                             "error" -> {
                                 uri = null
                                 changeProfilePhoto = false
@@ -200,8 +207,7 @@ fun ClientMyProfileScreen(
                         )
                     )
                 }
-            }
-            else {
+            } else {
                 Row {
 
                 }
@@ -292,11 +298,9 @@ fun ClientMyProfileScreen(
                     }
                 }
             }
-        }
-        else if (loading && !exception) {
+        } else if (loading && !exception) {
             CircleProgress()
-        }
-        else if (exception) {
+        } else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,

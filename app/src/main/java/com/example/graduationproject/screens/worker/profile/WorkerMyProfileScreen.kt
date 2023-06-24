@@ -212,11 +212,18 @@ fun WorkerMyProfileScreen(
                                 )
                             when (response.data?.status) {
                                 "success" -> {
-                                    uri = null
-                                    loading = false
-                                    changeProfilePhoto = false
+                                    val newResponse: WrapperClass<GetProfile, Boolean, Exception> =
+                                        workerProfileViewModel.getProfile(
+                                            userId = userId.value.toString(),
+                                            authorization = "Bearer " + token.value.toString()
+                                        )
+                                    if (newResponse.data?.status == null) {
+                                        getProfileUser.emit(newResponse.data!!.data?.user!!)
+                                        uri = null
+                                        loading = false
+                                        changeProfilePhoto = false
+                                    }
                                 }
-
                                 "error" -> {
                                     uri = null
                                     changeProfilePhoto = false
