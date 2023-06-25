@@ -266,8 +266,9 @@ fun ClientOrderOfferScreen(
                                 orderId = orderId
                             )
                         if (refreshData.data?.status == "success") {
-                            if (refreshData.data != null) {
+                            if (refreshData.data!!.length > 0) {
                                 offersList.emit(refreshData.data!!.data!!)
+                                haveOffer = refreshData.data!!.length > 0
                                 swipeLoading = false
                             }
                         } else {

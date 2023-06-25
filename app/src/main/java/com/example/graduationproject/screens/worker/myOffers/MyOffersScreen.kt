@@ -46,7 +46,6 @@ import com.example.graduationproject.components.CircleProgress
 import com.example.graduationproject.components.EmptyColumn
 import com.example.graduationproject.components.GetSmallPhoto
 import com.example.graduationproject.components.LoginButton
-import com.example.graduationproject.components.SmallPhoto
 import com.example.graduationproject.constant.Constant
 import com.example.graduationproject.data.WrapperClass
 import com.example.graduationproject.model.worker.getMyOffer.Data
@@ -176,12 +175,14 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                         pendingCountRefresh.value = pendingCountRefresh.value + 1
                                         if (lengthRefresh.value == offerData.value.size) {
                                             pendingCount.value = pendingCountRefresh.value
+                                            acceptedCount.value = acceptedCountRefresh.value
                                             swipeLoading = false
                                         }
                                     } else if (it.status == "accepted") {
                                         acceptedCountRefresh.value = acceptedCountRefresh.value + 1
                                         if (lengthRefresh.value == offerData.value.size) {
                                             acceptedCount.value = acceptedCountRefresh.value
+                                            pendingCount.value = pendingCountRefresh.value
                                             swipeLoading = false
                                         }
                                     } else {
@@ -236,7 +237,8 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                         item {
                                             Spacer(modifier = Modifier.height(50.dp))
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         item {
                                             Text(
                                                 text = "لا يوجد عروض قيد التنفيذ",

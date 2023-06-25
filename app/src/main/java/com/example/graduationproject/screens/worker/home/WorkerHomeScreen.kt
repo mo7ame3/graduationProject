@@ -121,6 +121,13 @@ fun WorkerHomeScreen(
         mutableStateOf(0)
     }
 
+    val pendingOrderRefresh = remember {
+        mutableStateOf(0)
+    }
+    val lengthRefresh = remember {
+        mutableStateOf(0)
+    }
+
     //state flow list
     val homeList = MutableStateFlow<List<Order>>(emptyList())
 
@@ -190,9 +197,30 @@ fun WorkerHomeScreen(
                         craftId = craftId.value.toString()
                     )
                 if (homeData.data?.status == "success") {
-                    if (homeData.data != null) {
+                    if (homeData.data!!.result > 0) {
                         homeList.emit(homeData.data!!.data!!.orders)
+                        lengthRefresh.value = 0
+                        pendingOrderRefresh.value = 0
+                        homeList.value.forEach {
+                            lengthRefresh.value = lengthRefresh.value + 1
+                            if (it.status == "pending") {
+                                pendingOrderRefresh.value = pendingOrderRefresh.value + 1
+                                if (lengthRefresh.value == homeList.value.size) {
+                                    pendingOrder.value = pendingOrderRefresh.value
+                                    //  pendingOrderRefresh.value = 0
+                                    swipeLoading = false
+                                }
+                            } else {
+                                if (lengthRefresh.value == homeList.value.size) {
+                                    pendingOrder.value = pendingOrderRefresh.value
+                                    //pendingOrderRefresh.value = 0
+                                    swipeLoading = false
+                                }
+                            }
+                        }
+                    } else {
                         swipeLoading = false
+                        pendingOrder.value = 0
                     }
                 } else {
                     swipeLoading = false
@@ -286,11 +314,9 @@ fun WorkerHomeScreen(
                 if (homeNavBar.value == "order") {
                     MyOffersScreen(navController, myOffersViewModel)
                 }
-            }
-            else if (loading && !exception) {
+            } else if (loading && !exception) {
                 CircleProgress()
-            }
-            else if (exception) {
+            } else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,

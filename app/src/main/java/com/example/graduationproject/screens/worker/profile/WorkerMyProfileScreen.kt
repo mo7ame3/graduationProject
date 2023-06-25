@@ -164,6 +164,7 @@ fun WorkerMyProfileScreen(
                             userId = userId.value.toString()
                         )
                     if (response.data?.status == "success") {
+                        if(!response.data!!.data.isNullOrEmpty()){
                         response.data!!.data?.forEach {
                             length.value = length.value + 1
                             if (it.status == "completed") {
@@ -171,11 +172,16 @@ fun WorkerMyProfileScreen(
                                 if (length.value == response.data!!.data?.size) {
                                     loading2 = false
                                 }
-                            } else {
+                            }
+                            else {
                                 if (length.value == response.data!!.data?.size) {
                                     loading2 = false
                                 }
                             }
+                        }
+                        }
+                        else{
+                            loading2 = false
                         }
                     }
                 }
@@ -370,7 +376,8 @@ fun WorkerMyProfileScreen(
                         } else {
                             EmptyColumn(text = "لا يوجد مشاريع مكتملة")
                         }
-                    } else {
+                    }
+                    else {
                         CircleProgress()
                     }
                 } else {
