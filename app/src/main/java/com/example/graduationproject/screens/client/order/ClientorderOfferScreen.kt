@@ -155,7 +155,8 @@ fun ClientOrderOfferScreen(
             } else {
                 loading = false
             }
-        } else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
+        }
+        else if (offerData.data?.status == "fail" || offerData.data?.status == "error" || offerData.e != null) {
             Toast.makeText(
                 context,
                 "خطأ في الانترنت",

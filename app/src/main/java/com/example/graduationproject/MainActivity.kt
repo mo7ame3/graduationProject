@@ -18,7 +18,7 @@ import com.example.graduationproject.navigation.NavGraph
 import com.example.graduationproject.ui.theme.GraduationProjectTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-
+@Suppress("DEPRECATION")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun attachBaseContext(newBase: Context) {
@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun MyApp() {
