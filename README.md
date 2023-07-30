@@ -2,4 +2,3 @@ Our service provider application is a platform designed to connect users with sk
 
 # Authentication 
     Login Screen
-    https://user-images.githubusercontent.com/108547900/256215520-8e4282c6-d0f8-458f-bf21-e837b55065fe.png
