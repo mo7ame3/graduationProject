@@ -61,3 +61,29 @@ Our service provider application is a platform designed to connect users with sk
 
 
 ![19](https://github.com/mo7ame3/graduationProject/assets/108547900/80d39d67-9598-49f1-90ab-9185fb3f1940)
+
+
+#Worker Ui
+
+![5](https://github.com/mo7ame3/graduationProject/assets/108547900/61820499-c790-4e6d-b42c-471e4ab5d7f7)
+
+
+![6](https://github.com/mo7ame3/graduationProject/assets/108547900/ddcdb2b0-a7cc-4ceb-b888-a888b2c5accf)
+
+
+![7](https://github.com/mo7ame3/graduationProject/assets/108547900/e5ca43cb-242c-4144-a147-705fe5796450)
+
+
+![8](https://github.com/mo7ame3/graduationProject/assets/108547900/e6b481db-8b38-49c6-9e1d-4305fd653506)
+
+
+![9](https://github.com/mo7ame3/graduationProject/assets/108547900/e9503507-326e-491a-937e-7308aa6d8976)
+
+
+![10](https://github.com/mo7ame3/graduationProject/assets/108547900/f01ebf35-3153-48c2-bcb5-7692e690c07e)
+
+
+![11](https://github.com/mo7ame3/graduationProject/assets/108547900/c340be59-48c9-49a6-a5ab-3a75dac80b9e)
+
+
+![asset-1](https://github.com/mo7ame3/graduationProject/assets/108547900/7efbcf8d-7f01-4245-b281-d4bb0adfa65b)
