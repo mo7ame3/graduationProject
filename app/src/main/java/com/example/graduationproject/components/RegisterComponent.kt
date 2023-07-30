@@ -38,7 +38,7 @@ fun Register(
         false
     }
     TextInput(text = name,
-        IsNotError = nameError,
+        isNotError = nameError,
         onAction = KeyboardActions { keyboardControllerRegister?.hide() })
 
     EmailInput(email = phoneNumber, isNotError = phoneError, onAction = KeyboardActions {
@@ -94,13 +94,15 @@ fun RegisterNext(
         } else {
             false
         }
-    } else if (workerOrClintBack.value == workerOrClientList[1]) {
+    }
+    else if (workerOrClintBack.value == workerOrClientList[1]) {
         if (workerOrClintBack.value.isNotEmpty() && craftIdBack.value.isNotEmpty()) {
             passwordIsNOtError.value && passwordIsNOtErrorConfirm.value
         } else {
             false
         }
-    } else {
+    }
+    else {
         false
     }
     val keyboardControllerRegister = LocalSoftwareKeyboardController.current

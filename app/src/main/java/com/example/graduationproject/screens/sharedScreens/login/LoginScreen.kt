@@ -92,6 +92,7 @@ fun LoginScreen(
     }
     val addressListBack = rememberSaveable {
         mutableStateOf("")
+        mutableStateOf("")
     }
 
     //RegisterNext values
@@ -148,7 +149,8 @@ fun LoginScreen(
                                 toggledTopButton = false
                             }
                         }
-                    } else {
+                    }
+                    else {
                         Row(modifier = Modifier.padding(end = 15.dp)) {
                             IconButton(onClick = {
                                 showBackArrow.value = false
@@ -260,7 +262,8 @@ fun LoginScreen(
                                     }
                                 }
                             }
-                        } else {
+                        }
+                        else {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -358,7 +361,8 @@ fun LoginScreen(
                     }
 
                 }
-            } else {
+            }
+            else {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,

@@ -291,14 +291,14 @@ fun ClientOrderOfferScreen(
                                 //Not Accept and Not Reject
                                 OfferRow(
                                     item = item,
-                                    onAcceptAction = { AcceptedWorker ->
+                                    onAcceptAction = { acceptedWorker ->
                                         scope.launch {
                                             loading = true
                                             haveOffer = false
                                             val acceptWorker: WrapperClass<UpdateOffer, Boolean, Exception> =
                                                 orderViewModel.updateOffer(
                                                     authorization = "Bearer ${token.value.toString()}",
-                                                    offerId = AcceptedWorker._id,
+                                                    offerId = acceptedWorker._id,
                                                     text = "",
                                                     status = "accepted"
                                                 )
@@ -312,9 +312,9 @@ fun ClientOrderOfferScreen(
                                                     )
                                                 if (updateOrder.data?.status == "success") {
                                                     offersList.value.forEach { t ->
-                                                        if (t.id == AcceptedWorker.id) {
+                                                        if (t.id == acceptedWorker.id) {
                                                             acceptOffer.value = true
-                                                            acceptedId.value = AcceptedWorker.id
+                                                            acceptedId.value = acceptedWorker.id
                                                             loading = false
                                                             haveOffer = true
                                                         } else {
@@ -335,14 +335,14 @@ fun ClientOrderOfferScreen(
                                             }
                                         }
                                     },
-                                    onRejectAction = { RejectedWorker ->
+                                    onRejectAction = { rejectedWorker ->
                                         scope.launch {
                                             loading = true
                                             haveOffer = false
                                             val rejectWorker: WrapperClass<UpdateOffer, Boolean, Exception> =
                                                 orderViewModel.updateOffer(
                                                     authorization = "Bearer ${token.value.toString()}",
-                                                    offerId = RejectedWorker._id,
+                                                    offerId = rejectedWorker._id,
                                                     text = "",
                                                     status = "canceled"
                                                 )
@@ -407,14 +407,14 @@ fun ClientOrderOfferScreen(
                                             }
                                         }
                                     },
-                                    onRejectCompleteAction = { RejectCompleteAction ->
+                                    onRejectCompleteAction = { rejectCompleteAction ->
                                         scope.launch {
                                             loading = true
                                             haveOffer = false
                                             val rejectWorker: WrapperClass<UpdateOffer, Boolean, Exception> =
                                                 orderViewModel.updateOffer(
                                                     authorization = "Bearer ${token.value.toString()}",
-                                                    offerId = RejectCompleteAction.id,
+                                                    offerId = rejectCompleteAction.id,
                                                     text = "",
                                                     status = "pending"
                                                 )

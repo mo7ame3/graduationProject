@@ -1,6 +1,9 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.example.graduationproject.components
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,8 +20,8 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -115,7 +118,8 @@ fun PasswordInput(
                     password.value = it
                     isNotError.value = false
                 }
-            } else {
+            }
+            else {
                 password.value = ""
                 isNotError.value = false
             }
@@ -188,7 +192,7 @@ fun TextInput(
     keyboardType: KeyboardType = KeyboardType.Text,
 //  imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default,
-    IsNotError: MutableState<Boolean>? = null,
+    isNotError: MutableState<Boolean>? = null,
     expanded: MutableState<Boolean>? = null,
     readOnly: Boolean = false,
     label: String = "الاسم",
@@ -207,10 +211,10 @@ fun TextInput(
             if (!readOnly) {
                 if (it.trim().isNotBlank()) {
                     text.value = it
-                    IsNotError?.value = true
+                    isNotError?.value = true
                 } else {
                     text.value = ""
-                    IsNotError?.value = false
+                    isNotError?.value = false
                 }
             }
         },
@@ -251,68 +255,141 @@ fun TextInput(
     )
 }
 
+@Composable
+fun DropInput(
+    modifier: Modifier,
+    text: MutableState<String>,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    expanded: MutableState<Boolean>,
+    readOnly: Boolean = false,
+    label: String,
+    isNotBackground: Boolean = false,
+    isBorder: Boolean = true,
+    isSingleLine: Boolean = true,
+    leadingImageVector: ImageVector? = null,
+) {
+    OutlinedTextField(
+        readOnly = readOnly,
+        modifier = modifier,
+        shape = RoundedCornerShape(25.dp),
+        label = { Text(text = label, style = TextStyle(color = MainColor)) },
+        value = text.value,
+        onValueChange = {},
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardActions = KeyboardActions {
+//            expanded.value = !expanded.value
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            backgroundColor = if (!isNotBackground) {
+                SecondaryColor.copy(
+                    alpha = 0.2f
+                )
+            } else Color.White,
+            disabledBorderColor = Color.Transparent,
+            focusedBorderColor = if (isBorder) {
+                if (isNotBackground) Color.Transparent else MainColor
+            } else Color.White,
+            unfocusedBorderColor = if (isBorder) {
+                if (isNotBackground) Color.Transparent else MainColor
+            } else
+                Color.White
+        ),
+        trailingIcon = {
+            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value)
+        },
+        singleLine = isSingleLine,
+        leadingIcon = {
+            if(leadingImageVector != null){
+                Icon(imageVector = leadingImageVector, contentDescription = null)
+            }
+        }
+
+        )
+}
+
 @OptIn(ExperimentalMaterialApi::class)
+@SuppressLint("RememberReturnType")
 @Composable
 fun DropList(
-    modifier: Modifier = Modifier.height(250.dp),
+    modifier: Modifier = Modifier,
     expanded: MutableState<Boolean>,
     value: MutableState<String>,
+    leadingImageVector: ImageVector? = null,
     craftId: MutableState<String>? = null,
     label: String = "العنوان",
     list: List<String>? = null,
     craftList: List<Craft>? = null,
-    isNotBackground: Boolean = false,
-    leadingImageVector: ImageVector? = null
+    isNotBackground: Boolean = false
 ) {
 
-    ExposedDropdownMenuBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            //.padding(start = 50.dp, end = 50.dp)
-            .clip(shape = RoundedCornerShape(25.dp)),
-        expanded = expanded.value,
-        onExpandedChange = { expanded.value = !expanded.value }) {
-        TextInput(
-            text = value,
-            readOnly = true,
-            label = label,
-            expanded = expanded,
-            isNotBackground = isNotBackground,
-            leadingImageVector = leadingImageVector
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 65.dp, start = 50.dp, end = 50.dp)
-        ) {
-            ExposedDropdownMenu(
-                expanded = expanded.value,
-                modifier = modifier,
-                onDismissRequest = { expanded.value = false }) {
-                if (list != null && craftList == null) {
-                    list.forEach { t ->
-                        DropdownMenuItem(
-                            onClick = {
-                                value.value = t
-                                expanded.value = false
-                            },
-                        ) {
-                            Text(text = t)
+    Box(contentAlignment = Alignment.Center) {
+        ExposedDropdownMenuBox(
+            expanded = expanded.value,
+            onExpandedChange = { expanded.value = !expanded.value }) {
+            if(leadingImageVector != null) {
+                DropInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 25.dp, end = 25.dp),
+                    text = value,
+                    expanded = expanded,
+                    leadingImageVector = leadingImageVector,
+                    readOnly = true,
+                    label = label,
+                    isNotBackground = isNotBackground
+                )
+            }else{
+                DropInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 25.dp, end = 25.dp),
+                    text = value,
+                    expanded = expanded,
+                    readOnly = true,
+                    label = label,
+                    isNotBackground = isNotBackground
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 80.dp, start = 25.dp, end = 50.dp)
+            ) {
+                ExposedDropdownMenu(
+                    expanded = expanded.value,
+                    modifier = modifier,
+                    onDismissRequest = {
+                        expanded.value = false
+                    },
+                ) {
+                    if (list != null && craftList == null) {
+                        list.forEach { item ->
+                            DropdownMenuItem(
+
+                                onClick = {
+                                    value.value = item
+                                    expanded.value = false
+                                },
+                            ){
+                                Text(text = item)
+                            }
+                            Divider(modifier = Modifier.fillMaxWidth())
                         }
-                        Divider(modifier = Modifier.fillMaxWidth())
-                    }
-                } else if (craftList != null && list == null) {
-                    craftList.forEach { t ->
-                        DropdownMenuItem(
-                            onClick = {
-                                value.value = t.name
-                                craftId?.value = t.id
-                                expanded.value = false
-                            },
-                        ) {
-                            Text(text = t.name)
+                    } else if (craftList != null && list == null) {
+                        craftList.forEach { item ->
+                            DropdownMenuItem(
+
+                                onClick = {
+                                    value.value = item.name
+                                    craftId?.value = item.id
+                                    expanded.value = false
+                                },
+                            ){
+                                Text(text = item.name)
+
+                            }
+                            Divider(modifier = Modifier.fillMaxWidth())
                         }
-                        Divider(modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
