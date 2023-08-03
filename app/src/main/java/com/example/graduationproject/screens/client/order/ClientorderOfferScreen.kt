@@ -218,7 +218,8 @@ fun ClientOrderOfferScreen(
             }
         }
 
-    }, bottomBar = {
+    },
+        bottomBar = {
         BottomBar(selected = home, home = {
             navController.navigate(route = AllScreens.ClientHomeScreen.name + "/${home.value}") {
                 navController.popBackStack()
@@ -231,7 +232,8 @@ fun ClientOrderOfferScreen(
                 navController.popBackStack()
                 navController.popBackStack()
             }
-        }, order = {
+        },
+            order = {
             navController.navigate(route = AllScreens.ClientHomeScreen.name + "/${home.value}") {
                 navController.popBackStack()
                 navController.popBackStack()

@@ -245,7 +245,8 @@ fun ClientPostScreen(
                     }
                 }
             }
-        } else {
+        }
+        else {
             CircleProgress()
         }
     }

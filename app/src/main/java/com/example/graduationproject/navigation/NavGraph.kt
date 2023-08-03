@@ -116,7 +116,8 @@ fun NavGraph() {
             route = AllScreens.ClientHomeScreen.name + "/{route}",
             arguments = listOf(navArgument(name = "route") {
                 type = NavType.StringType
-            })
+            }
+            )
         ) { data ->
             val viewModel = hiltViewModel<ClientHomeViewModel>()
             val orderViewModel = hiltViewModel<OrderViewModel>()
