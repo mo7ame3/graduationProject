@@ -117,7 +117,8 @@ fun WorkerProblemDetails(
         TopAppBar(title = "تفاصيل الطلب") {
             navController.popBackStack()
         }
-    }) {
+    })
+    {
         if (!loading && !exception) {
             LazyColumn(
                 modifier = Modifier
@@ -244,9 +245,11 @@ fun WorkerProblemDetails(
                     }
                 }
             }
-        } else if (loading && !exception) {
+        }
+        else if (loading && !exception) {
             CircleProgress()
-        } else if (exception) {
+        }
+        else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,

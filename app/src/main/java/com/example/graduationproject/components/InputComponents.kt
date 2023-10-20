@@ -338,7 +338,8 @@ fun DropList(
                     label = label,
                     isNotBackground = isNotBackground
                 )
-            }else{
+            }
+            else{
                 DropInput(
                     modifier = Modifier
                         .fillMaxWidth()

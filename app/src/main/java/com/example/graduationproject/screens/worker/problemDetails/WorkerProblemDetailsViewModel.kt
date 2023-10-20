@@ -12,7 +12,8 @@ import javax.inject.Inject
 class WorkerProblemDetailsViewModel @Inject constructor(private val workerRepository: WorkerRepository) :
     ViewModel() {
     suspend fun getOrderDetails(
-        craftId: String, authorization: String,
+        craftId: String,
+        authorization: String,
         orderId: String
     ): WrapperClass<GetOrderDetails, Boolean, Exception> {
         return workerRepository.getOrderDetails(

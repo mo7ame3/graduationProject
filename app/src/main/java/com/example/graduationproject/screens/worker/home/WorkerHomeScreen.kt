@@ -170,7 +170,8 @@ fun WorkerHomeScreen(
                 exception = false
             }
 
-        } else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
+        }
+        else if (homeData.data?.status == "fail" || homeData.data?.status == "error" || homeData.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -314,9 +315,11 @@ fun WorkerHomeScreen(
                 if (homeNavBar.value == "order") {
                     MyOffersScreen(navController, myOffersViewModel)
                 }
-            } else if (loading && !exception) {
+            }
+            else if (loading && !exception) {
                 CircleProgress()
-            } else if (exception) {
+            }
+            else if (exception) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,

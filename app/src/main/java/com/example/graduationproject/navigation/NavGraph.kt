@@ -362,6 +362,7 @@ fun NavGraph() {
         composable(route = AllScreens.AdminHomeScreen.name) {
             AdminHomeScreen(navController = navController)
         }
+
         composable(route = AllScreens.AdminJobsScreen.name) {
             val viewModel = hiltViewModel<CraftsViewModel>()
             AdminCraftsScreen(navController = navController, viewModel)

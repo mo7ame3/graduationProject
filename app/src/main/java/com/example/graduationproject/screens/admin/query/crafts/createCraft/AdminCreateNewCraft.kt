@@ -152,7 +152,8 @@ fun AdminCreateNewCraft(
                                 navController.popBackStack()
                                 navController.popBackStack()
                             }
-                        } else {
+                        }
+                        else {
                             loading = false
                             Toast.makeText(
                                 context, addCraft.data?.message, Toast.LENGTH_SHORT
@@ -161,7 +162,8 @@ fun AdminCreateNewCraft(
                     }
                 }
             }
-        } else {
+        }
+        else {
             CircleProgress()
         }
     }

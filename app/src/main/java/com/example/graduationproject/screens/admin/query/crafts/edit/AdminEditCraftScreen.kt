@@ -347,7 +347,8 @@ fun JobRow(
                 }
             }
         }
-    } else {
+    }
+    else {
         CircleProgress()
     }
 

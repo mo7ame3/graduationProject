@@ -132,7 +132,8 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                     }
                 }
             }
-        } else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
+        }
+        else if (response.data?.status == "fail" || response.data?.status == "error" || response.e != null) {
             exception = true
             Toast.makeText(
                 context,
@@ -288,9 +289,11 @@ fun MyOffersScreen(navController: NavController, myOffersViewModel: MyOffersView
                                 EmptyColumn(text = "لا يوجد عروض قيد الانتظار")
                             }
                         }
-                    } else if (loading && !exception) {
+                    }
+                    else if (loading && !exception) {
                         CircleProgress()
-                    } else if (exception) {
+                    }
+                    else if (exception) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
@@ -377,7 +380,8 @@ fun UnderwayRow(
                 .height(120.dp)
                 .clickable {
                     onAction.invoke(item)
-                }, elevation = 5.dp
+                },
+            elevation = 5.dp
         ) {
             Row(
                 modifier = Modifier

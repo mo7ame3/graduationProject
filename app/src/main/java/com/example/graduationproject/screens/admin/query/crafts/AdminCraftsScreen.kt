@@ -92,7 +92,8 @@ fun AdminCraftsScreen(
                     exception = false
                 }
             }
-        } else if (craftData.data?.status == "fail" || craftData.e != null) {
+        }
+        else if (craftData.data?.status == "fail" || craftData.e != null) {
             exception = true
             Toast.makeText(
                 context,

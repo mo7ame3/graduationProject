@@ -266,7 +266,8 @@ fun WorkerMyProfileScreen(
                             )
                         )
                     }
-                } else {
+                }
+                else {
                     Row {
 
                     }
@@ -300,7 +301,8 @@ fun WorkerMyProfileScreen(
                             isProfile = true,
                             uri = if (getProfileUser.value[0].avatar != null) getProfileUser.value[0].avatar.toString() else null
                         )
-                    } else {
+                    }
+                    else {
                         ProfilePhoto(uri = uri)
                         changeProfilePhoto = true
                     }
@@ -380,7 +382,8 @@ fun WorkerMyProfileScreen(
                     else {
                         CircleProgress()
                     }
-                } else {
+                }
+                else {
                     //pictures
                     LazyColumn(
                         modifier = Modifier
@@ -405,9 +408,11 @@ fun WorkerMyProfileScreen(
                     }
                 }
             }
-        } else if (loading && !exception) {
+        }
+        else if (loading && !exception) {
             CircleProgress()
-        } else if (exception) {
+        }
+        else if (exception) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,

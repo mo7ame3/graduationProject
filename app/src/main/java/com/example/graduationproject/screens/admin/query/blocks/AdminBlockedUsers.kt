@@ -43,10 +43,6 @@ fun AdminBlockedUsers(navController: NavController) {
                     )
                 )
             }
-
-
-
-
             Spacer(modifier = Modifier.height(50.dp))
             LazyColumn {
                 items(Constant.adminBlockList) {
